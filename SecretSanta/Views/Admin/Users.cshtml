@@ -1,0 +1,50 @@
+﻿@model SecretSanta.Models.EditUsersModel
+@{
+    ViewBag.Title = "Manage Users";
+}
+
+<h3>@ViewBag.Title</h3>
+
+<div class="text-right">
+    <button class="btn btn-primary" data-toggle="modal" data-target="#AddUser">Add User</button>
+</div>
+
+<div id="AddUser" class="modal fade">
+    @Html.Partial("EditorTemplates/AddUser", Model.NewUser)
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>E-Mail</th>
+            <th>Has Picked</th>
+            <th>Has Been Picked</th>
+            <th>&nbsp;</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (int i = 0; i < Model.Users.Count; i++)
+        {
+            <tr>
+                <td>@Html.DisplayFor(m => m.Users[i].Account.DisplayName)</td>
+                <td>@Html.DisplayFor(m => m.Users[i].Account.Email)</td>
+                <td>@Html.CheckBox("Users[" + i + "].HasPicked", Model.Users[i].Account.HasPicked(), new {disabled = "disabled"})</td>
+                <td>@Html.CheckBox("Users[" + i + "].HasBeenPicked", Model.Users[i].Account.HasBeenPicked(), new {disabled = "disabled"})</td>
+                <td>
+                    <div class="pull-right">
+                        <button class="btn btn-primary" data-toggle="modal" data-target="#EditUser@(i)">Edit</button>
+                        <button class="btn btn-inverse" data-toggle="modal" data-target="#DeleteUser@(i)">Delete</button>
+                    </div>
+
+                    <div id="EditUser@(i)" class="modal fade">
+                        @Html.Partial("EditorTemplates/EditUser", Model.Users[i])
+                    </div>
+                    <div id="DeleteUser@(i)" class="modal fade">
+                        @Html.Partial("DisplayTemplates/DeleteUser", Model.Users[i])
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

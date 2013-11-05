@@ -1,0 +1,37 @@
+﻿@model SecretSanta.Models.AddUserModel
+@{
+    Layout = "";
+}
+
+<div class="modal-dialog">
+    <div class="modal-content">
+        @using (Html.BeginForm("AddUser", "Admin", FormMethod.Post, new {role = "form", @class = "form-horizontal"}))
+        {
+            @Html.AntiForgeryToken()
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Add User</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Email, new {@class = "control-label col-sm-4"})
+                    <div class="col-sm-8">
+                        @Html.TextBoxFor(m => m.Email, new {@class = "form-control"})
+                        @Html.ValidationMessageFor(m => m.Email)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.DisplayName, new {@class = "control-label col-sm-4"})
+                    <div class="col-sm-8">
+                        @Html.TextBoxFor(m => m.DisplayName, new {@class = "form-control"})
+                        @Html.ValidationMessageFor(m => m.DisplayName)
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        }
+    </div>
+</div>

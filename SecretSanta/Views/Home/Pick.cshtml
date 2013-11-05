@@ -1,0 +1,12 @@
+﻿@using SecretSanta.Models
+@model SecretSanta.Models.Account
+@{
+    ViewBag.Title = "Home Page";
+    Account person = Model.GetPicked();
+}
+
+<div class="jumbotron">
+    <h1>You picked @person.DisplayName!</h1>
+    <p>Ho ho ho!</p>
+    <p><a href="@Url.Action("Details", "Wishlist", new {id = person.Id})" class="btn btn-primary">View @person.DisplayName's Wish List &raquo;</a></p>
+</div>

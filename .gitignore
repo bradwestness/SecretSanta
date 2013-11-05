@@ -1,3 +1,7 @@
+# Data and Config Settings Folders
+[Aa]pp_[Dd]ata/
+[Aa]pp_[Cc]onfig/
+
 # Build Folders (you can keep bin if you'd like, to store dlls and pdbs)
 [Bb]in/
 [Oo]bj/

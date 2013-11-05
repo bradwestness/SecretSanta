@@ -1,0 +1,42 @@
+﻿@using SecretSanta.Models
+@model SecretSanta.Models.WishlistEditModel
+@{
+    ViewBag.Title = Model.Account.DisplayName + "'s Wish List";
+}
+
+<div class="jumbotron">
+    <h1>@ViewBag.Title</h1>
+    @if (Model.Account.Wishlist != null && Model.Account.Wishlist.Any())
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Description</th>
+                    <th>&nbsp;</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (WishlistItem item in Model.Account.Wishlist)
+                {
+                    <tr>
+                        <td>@item.Name</td>
+                        <td>@item.Description</td>
+                        <td>
+                            <div class="pull-right">
+                                <a href="@item.Url" target="_blank" class="btn btn-primary">More Information &raquo;</a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>Looks like @Model.Account.DisplayName has not added any items yet.</p>
+        <p>
+            <a href="@Url.Action("Remind", "Wishlist", new {id = Model.Account.Id})" class="btn btn-primary">Send a Reminder &raquo;</a>
+        </p>
+    }
+</div>

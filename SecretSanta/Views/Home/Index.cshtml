@@ -1,0 +1,26 @@
+﻿@using SecretSanta.Models
+@model SecretSanta.Models.Account
+@{
+    ViewBag.Title = "Home Page";
+    Account person = Model.GetPicked();
+}
+
+<div class="jumbotron">
+    <h1>Welcome to Secret Santa!</h1>
+    @if (!Model.HasPicked() || person == null)
+    {
+        <p>Looks like you haven't picked yet.</p>
+        <p>
+            <a class="btn btn-primary" href="@Url.Action("Pick", "Home")">Pick Your Giftee &raquo;</a>
+            <a class="btn btn-default" href="@Url.Action("Index", "Wishlist")">Manage Your Wish List &raquo;</a>
+        </p>
+    }
+    else
+    {
+        <p>You picked @person.DisplayName!</p>
+        <p>
+            <a class="btn btn-primary" href="@Url.Action("Details", "Wishlist", new {id = person.Id})">View @person.DisplayName's Wish List &raquo;</a>
+            <a class="btn btn-default" href="@Url.Action("Index", "Wishlist")">Manage Your Wish List &raquo;</a>
+        </p>
+    }
+</div>

@@ -1,0 +1,44 @@
+﻿@model SecretSanta.Models.WishlistItem
+@{
+    Layout = "";
+}
+
+<div class="modal-dialog">
+    <div class="modal-content">
+        @using (Html.BeginForm("AddItem", "Wishlist", FormMethod.Post, new {role = "form", @class = "form-horizontal"}))
+        {
+            @Html.AntiForgeryToken()
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Add Item</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Name, new {@class = "control-label col-sm-4"})
+                    <div class="col-sm-8">
+                        @Html.TextBoxFor(m => m.Name, new {@class = "form-control"})
+                        @Html.ValidationMessageFor(m => m.Name)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Description, new {@class = "control-label col-sm-4"})
+                    <div class="col-sm-8">
+                        @Html.TextAreaFor(m => m.Description, new {@class = "form-control"})
+                        @Html.ValidationMessageFor(m => m.Description)
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Url, new {@class = "control-label col-sm-4"})
+                    <div class="col-sm-8">
+                        @Html.TextBoxFor(m => m.Url, new {@class = "form-control"})
+                        @Html.ValidationMessageFor(m => m.Url)
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        }
+    </div>
+</div>
