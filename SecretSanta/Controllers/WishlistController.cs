@@ -33,6 +33,7 @@ namespace SecretSanta.Controllers
             if (ModelState.IsValid)
             {
                 WishlistManager.AddItem(model);
+                this.SetResultMessage(string.Format("<strong>Successfully added</strong> {0}.", model.Name));
             }
 
             return RedirectToAction("Index");
@@ -45,7 +46,8 @@ namespace SecretSanta.Controllers
         {
             if (ModelState.IsValid)
             {
-                WishlistManager.EditItem(model);
+                WishlistManager.EditItem(model); 
+                this.SetResultMessage(string.Format("<strong>Successfully updated</strong> {0}.", model.Name));
             }
 
             return RedirectToAction("Index");
@@ -57,6 +59,7 @@ namespace SecretSanta.Controllers
         public ActionResult DeleteItem(WishlistItem model)
         {
             WishlistManager.DeleteItem(model);
+            this.SetResultMessage(string.Format("<strong>Successfully deleted</strong> {0}.", model.Name));
             return RedirectToAction("Index");
         }
 
@@ -66,6 +69,7 @@ namespace SecretSanta.Controllers
         {
             string url = Url.Action("Index", "Home", null, "http");
             WishlistManager.SendReminder(new Guid(id), url);
+            this.SetResultMessage("<strong>Reminder sent</strong> successfully.");
             return RedirectToAction("Details", new {id});
         }
     }

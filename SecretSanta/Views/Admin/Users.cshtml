@@ -3,9 +3,13 @@
     ViewBag.Title = "Manage Users";
 }
 
-<h3>@ViewBag.Title</h3>
+<h1>@ViewBag.Title</h1>
 
 <div class="text-right">
+    @if (Model.AllPicked)
+    {
+        @Html.ActionLink("Send All Picked Reminders", "AllPicked", null, new { @class = "btn btn-default" })
+    }
     <button class="btn btn-primary" data-toggle="modal" data-target="#AddUser">Add User</button>
 </div>
 
@@ -34,7 +38,7 @@
                 <td>
                     <div class="pull-right">
                         <button class="btn btn-primary" data-toggle="modal" data-target="#EditUser@(i)">Edit</button>
-                        <button class="btn btn-inverse" data-toggle="modal" data-target="#DeleteUser@(i)">Delete</button>
+                        <button class="btn btn-default" data-toggle="modal" data-target="#DeleteUser@(i)">Delete</button>
                     </div>
 
                     <div id="EditUser@(i)" class="modal fade">

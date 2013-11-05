@@ -47,6 +47,7 @@
             </div>
         </div>
         <div class="container body-content">
+            @Html.ResultMessage()
             @RenderBody()
             @if (User.Identity.IsAuthenticated)
             {
@@ -69,6 +70,23 @@
 
         @Scripts.Render("~/bundles/jquery")
         @Scripts.Render("~/bundles/bootstrap")
+        <script async defer>
+            (function ($) {
+                
+                //
+                // Add bootstrap styling to fancy HTML5 inputs
+                $("input[type='url'], input[type='email']").addClass("form-control");
+
+                //
+                // Hide dismissable alerts after 10 seconds
+                setTimeout(function () {
+                    $(".alert-dismissable").slideUp("normal", function() {
+                        $(this).remove();
+                    });
+                }, 10000);
+
+            })(window.jQuery);
+        </script>
         @RenderSection("scripts", false)
     </body>
 </html>

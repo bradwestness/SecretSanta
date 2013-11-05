@@ -5,11 +5,16 @@ namespace SecretSanta.Utilities
 {
     public static class EmailMessage
     {
-        public static void Send(MailAddress from, MailAddress to, string subject, string body)
+        public static void Send(MailAddress from, MailAddressCollection to, string subject, string body)
         {
             using (var smtp = new SmtpClient(AppSettings.SmtpHost, AppSettings.SmtpPort))
             {
-                var message = new MailMessage(from, to);
+                var message = new MailMessage();
+                message.From = from;
+                foreach (var recipient in to)
+                {
+                    message.To.Add(recipient); 
+                }
                 message.Subject = subject;
                 message.Body = body;
                 message.From = from;

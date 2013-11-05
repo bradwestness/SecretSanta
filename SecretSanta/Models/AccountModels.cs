@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Net.Mail;
+using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
@@ -136,6 +138,17 @@ namespace SecretSanta.Models
 
         public IList<EditUserModel> Users { get; set; }
 
+        public bool AllPicked
+        {
+            get
+            {
+                if (Users == null)
+                    return false;
+
+                return Users.All(u => u.Account.HasPicked() && u.Account.HasBeenPicked());
+            }
+        }
+
         #endregion
 
         #region Public Methods
@@ -157,6 +170,49 @@ namespace SecretSanta.Models
             };
 
             return model;
+        }
+
+        public static void SendAllPickedMessages(string url)
+        {
+            var accounts = DataRepository.GetAll<Account>();
+
+            foreach (var account in accounts)
+            {
+                var giftee = account.GetPicked();
+
+                StringBuilder body = new StringBuilder()
+                    .AppendFormat("Hey {0}! ", account.DisplayName).AppendLine()
+                    .AppendLine()
+                    .AppendFormat("Santa here. Just wanted to let you know that everyone ")
+                    .AppendFormat("has now picked a person using the Secret Santa website. ").AppendLine()
+                    .AppendLine()
+                    .AppendFormat("Thought I'd send a frindly reminder that you picked {0}! ", giftee.DisplayName).AppendLine()
+                    .AppendLine()
+                    .AppendFormat("Here's their wish list as it stands right now: ").AppendLine()
+                    .AppendLine();
+
+                foreach (var item in giftee.Wishlist)
+                {
+                    body.AppendFormat("Item: {0}", item.Name).AppendLine()
+                        .AppendFormat("Description: {0}", item.Description).AppendLine()
+                        .AppendFormat("Link: {0}", item.Url).AppendLine()
+                        .AppendLine();
+                }
+
+                body.AppendFormat("Remember that you can always visit the address below to update your wish list and view ")
+                    .AppendFormat("any changes made by {0} too! ", giftee.DisplayName).AppendLine()
+                    .AppendLine()
+                    .AppendFormat("{0} ", url).AppendLine()
+                    .AppendLine()
+                    .AppendFormat("Ho ho ho, ").AppendLine()
+                    .AppendLine()
+                    .AppendFormat("Santa ").AppendLine();
+
+                var from = new MailAddress("santa@thenorthpole.com", "Santa Claus");
+                var to = new MailAddressCollection { new MailAddress(account.Email, account.DisplayName) };
+
+                EmailMessage.Send(from, to, "Secret Santa Reminder", body.ToString());
+            }
         }
 
         #endregion
@@ -245,7 +301,7 @@ namespace SecretSanta.Models
         public IEnumerable<SelectListItem> GetDoNotPickOptions()
         {
             return DataRepository.GetAll<Account>()
-                .Where(a => !a.Email.Equals(Account.Email, StringComparison.CurrentCultureIgnoreCase))
+                .Where(a => a.Id.HasValue && !a.Email.Equals(Account.Email, StringComparison.CurrentCultureIgnoreCase))
                 .OrderBy(a => a.DisplayName)
                 .Select(a => new SelectListItem
                 {

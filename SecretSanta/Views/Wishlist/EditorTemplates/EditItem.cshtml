@@ -31,7 +31,7 @@
                 <div class="form-group">
                     @Html.LabelFor(m => m.Url, new {@class = "control-label col-sm-4"})
                     <div class="col-sm-8">
-                        @Html.TextBoxFor(m => m.Url, new {@class = "form-control"})
+                        @Html.EditorFor(m => m.Url)
                         @Html.ValidationMessageFor(m => m.Url)
                     </div>
                 </div>

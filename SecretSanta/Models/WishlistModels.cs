@@ -21,7 +21,7 @@ namespace SecretSanta.Models
 
         public string Description { get; set; }
 
-        [DisplayName("Link")]
+        [DisplayName("Link"), DataType(DataType.Url)]
         public string Url { get; set; }
 
         #endregion
@@ -106,7 +106,7 @@ namespace SecretSanta.Models
                 .ToString();
 
             var from = new MailAddress("santa@thenorthpole.com", "Santa Claus");
-            var to = new MailAddress(account.Email, account.DisplayName);
+            var to = new MailAddressCollection { new MailAddress(account.Email, account.DisplayName) };
 
             EmailMessage.Send(from, to, "Secret Santa Reminder", body);
         }

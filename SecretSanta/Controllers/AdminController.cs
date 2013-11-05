@@ -1,5 +1,6 @@
 ﻿using System.Web.Mvc;
 using SecretSanta.Models;
+using SecretSanta.Utilities;
 
 namespace SecretSanta.Controllers
 {
@@ -15,6 +16,16 @@ namespace SecretSanta.Controllers
         }
 
         //
+        // GET: /AllPicked
+        public ActionResult AllPicked()
+        {
+            var url = Url.Action("Index", "Home", null, "http");
+            EditUsersModel.SendAllPickedMessages(url);
+            this.SetResultMessage("Reminders successfully sent to all users.");
+            return RedirectToAction("Users");
+        }
+
+        //
         // POST: /Admin/AddUser
         [HttpPost]
         public ActionResult AddUser(AddUserModel model)
@@ -27,6 +38,7 @@ namespace SecretSanta.Controllers
             if (ModelState.IsValid)
             {
                 model.CreateAccount();
+                this.SetResultMessage(string.Format("<strong>Successfully added</strong> {0}.", model.DisplayName));
             }
 
             return RedirectToAction("Users");
@@ -40,6 +52,7 @@ namespace SecretSanta.Controllers
             if (ModelState.IsValid)
             {
                 model.Save();
+                this.SetResultMessage(string.Format("<strong>Successfully updated</strong> {0}.", model.Account.DisplayName));
             }
 
             return RedirectToAction("Users");
@@ -51,6 +64,7 @@ namespace SecretSanta.Controllers
         public ActionResult DeleteUser(EditUserModel model)
         {
             model.Delete();
+            this.SetResultMessage(string.Format("<strong>Successfully deleted</strong> {0}.", model.Account.DisplayName));
 
             return RedirectToAction("Users");
         }
