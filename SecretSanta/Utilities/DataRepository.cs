@@ -20,31 +20,12 @@ namespace SecretSanta.Utilities
 
         #region Public Methods
 
-        public static void Save<T>(T theObject) where T : class
-        {
-            var account = theObject as Account;
-            if (account != null)
-            {
-                if (!account.Id.HasValue)
-                {
-                    account.Id = Guid.NewGuid();
-                }
-
-                string output = JsonConvert.SerializeObject(theObject);
-                string fileName = AppSettings.AccountFilePattern.Replace("*", SanitizeFileName(account.Id.ToString()));
-                string directory = GetDataDirectory();
-                string path = Path.Combine(directory, fileName);
-                File.WriteAllText(path, output, Encoding.UTF8);
-                _accounts = null;
-            }
-        }
-
         public static T Get<T>(Guid? id) where T : class
         {
             T theObject = null;
             string fileName = string.Empty;
 
-            if (typeof (T) == typeof (Account))
+            if (typeof(T) == typeof(Account))
             {
                 if (_accounts != null)
                 {
@@ -69,34 +50,12 @@ namespace SecretSanta.Utilities
             return theObject;
         }
 
-        public static void Delete<T>(Guid? id) where T : class
-        {
-            string fileName = string.Empty;
-
-            if (typeof (T) == typeof (Account))
-            {
-                fileName = AppSettings.AccountFilePattern.Replace("*", SanitizeFileName(id.ToString()));
-            }
-
-            if (!string.IsNullOrWhiteSpace(fileName))
-            {
-                string directory = GetDataDirectory();
-                string path = Path.Combine(directory, fileName);
-
-                if (File.Exists(path))
-                {
-                    File.Delete(path);
-                    _accounts = null;
-                }
-            }
-        }
-
         public static IList<T> GetAll<T>()
         {
             var list = new List<T>();
             string pattern = string.Empty;
 
-            if (typeof (T) == typeof (Account))
+            if (typeof(T) == typeof(Account))
             {
                 if (_accounts != null)
                 {
@@ -117,14 +76,61 @@ namespace SecretSanta.Utilities
                 var item = JsonConvert.DeserializeObject<T>(input);
                 list.Add(item);
             }
-
-
-            if (typeof (T) == typeof (Account))
+            
+            if (typeof(T) == typeof(Account))
             {
                 _accounts = list as IList<Account>;
             }
 
             return list;
+        }
+
+        public static void Save<T>(T theObject) where T : class
+        {
+            string fileName = string.Empty;
+            string output = string.Empty;
+
+            if (typeof(T) == typeof(Account))
+            {
+                var account = theObject as Account;
+                if (account != null)
+                {
+                    if (!account.Id.HasValue)
+                    {
+                        account.Id = Guid.NewGuid();
+                    }
+                }
+
+                output = JsonConvert.SerializeObject(account);
+                fileName = AppSettings.AccountFilePattern.Replace("*", SanitizeFileName(account.Id.ToString()));
+                _accounts = null;
+            }
+
+            string directory = GetDataDirectory();
+            string path = Path.Combine(directory, fileName);
+            File.WriteAllText(path, output, Encoding.UTF8);
+        }
+
+        public static void Delete<T>(Guid? id) where T : class
+        {
+            string fileName = string.Empty;
+
+            if (typeof(T) == typeof(Account))
+            {
+                fileName = AppSettings.AccountFilePattern.Replace("*", SanitizeFileName(id.ToString()));
+                _accounts = null;
+            }
+
+            if (!string.IsNullOrWhiteSpace(fileName))
+            {
+                string directory = GetDataDirectory();
+                string path = Path.Combine(directory, fileName);
+
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                }
+            }
         }
 
         #endregion
