@@ -66,6 +66,7 @@ namespace SecretSanta.Models
             {
                 account.Wishlist = new List<WishlistItem>();
             }
+            item.Id = Guid.NewGuid();
             account.Wishlist.Add(item);
             DataRepository.Save(account);
         }

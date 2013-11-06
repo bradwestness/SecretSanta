@@ -42,3 +42,8 @@ input[type="checkbox"].input-validation-error {
 }
 
 /* secret santa mods */
+
+.preview img {
+    width: 250px;
+    height: auto;
+}

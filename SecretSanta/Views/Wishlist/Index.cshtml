@@ -17,8 +17,8 @@
     <table class="table table-striped">
         <thead>
             <tr>
-                <th>Name</th>
-                <th>Description</th>
+                <th>Item</th>
+                <th>Preview</th>
                 <th>Link</th>
                 <th>&nbsp;</th>
             </tr>
@@ -27,19 +27,32 @@
             @for (int i = 0; i < Model.Account.Wishlist.Count; i++)
             {
                 <tr>
-                    <td>@Html.DisplayFor(m => m.Account.Wishlist[i].Name)</td>
-                    <td>@Html.DisplayFor(m => m.Account.Wishlist[i].Description)</td>
                     <td>
-                        <p>
-                            <a target="_blank" href="@Model.Account.Wishlist[i].Url">More Information &raquo;</a>
-                        </p>
+                        <h3>@Html.DisplayFor(m => m.Account.Wishlist[i].Name)</h3>
+                        <p><small>@Html.DisplayFor(m => m.Account.Wishlist[i].Description)</small></p>
+                    </td>
+                    <td>
+                        @if (!string.IsNullOrWhiteSpace(Model.Account.Wishlist[i].Url))
+                        {
+                            <a class="preview" target="_blank" href="@Model.Account.Wishlist[i].Url"><img class="img-thumbnail img-responsive" src="@Url.Action("FeaturedImage", "Preview", new { url = HttpUtility.UrlEncode(Model.Account.Wishlist[i].Url) })" /></a>
+                        }
+                        <p>&nbsp;</p>
+                    </td>
+                    <td>
+                        @if (!string.IsNullOrWhiteSpace(Model.Account.Wishlist[i].Url))
+                        {
+                            <a target="_blank" class="btn btn-default" href="@Model.Account.Wishlist[i].Url">More Information &raquo;</a>
+                        }
+                        else
+                        {
+                            <a class="btn btn-link" href="#">No Link Provided</a>
+                        }
                     </td>
                     <td>
                         <div class="pull-right">
                             <button class="btn btn-primary" data-toggle="modal" data-target="#EditItem@(i)">Edit</button>
                             <button class="btn btn-default" data-toggle="modal" data-target="#DeleteItem@(i)">Delete</button>
                         </div>
-
                         <div id="EditItem@(i)" class="modal fade">
                             @Html.Partial("EditorTemplates/EditItem", Model.Account.Wishlist[i])
                         </div>

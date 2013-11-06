@@ -12,7 +12,7 @@
             <thead>
                 <tr>
                     <th>Item</th>
-                    <th>Description</th>
+                    <th>Preview</th>
                     <th>&nbsp;</th>
                 </tr>
             </thead>
@@ -20,11 +20,27 @@
                 @foreach (WishlistItem item in Model.Account.Wishlist)
                 {
                     <tr>
-                        <td>@item.Name</td>
-                        <td>@item.Description</td>
+                        <td>
+                            <h3>@Html.DisplayFor(m => item.Name)</h3>
+                            <p><small>@Html.DisplayFor(m => item.Description)</small></p>
+                        </td>
+                        <td>
+                            @if (!string.IsNullOrWhiteSpace(item.Url))
+                            {
+                                <a class="preview" target="_blank" href="@item.Url"><img class="img-thumbnail img-responsive" src="@Url.Action("FeaturedImage", "Preview", new { url = HttpUtility.UrlEncode(item.Url) })" /></a>
+                            }
+                            <p>&nbsp;</p>
+                        </td>
                         <td>
                             <div class="pull-right">
-                                <a href="@item.Url" target="_blank" class="btn btn-primary">More Information &raquo;</a>
+                                @if (!string.IsNullOrWhiteSpace(item.Url))
+                                {
+                                    <a target="_blank" class="btn btn-default" href="@item.Url">More Information &raquo;</a>
+                                }
+                                else
+                                {
+                                    <a class="btn btn-link" href="#">No Link Provided</a>
+                                }
                             </div>
                         </td>
                     </tr>

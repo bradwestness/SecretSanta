@@ -5,88 +5,89 @@
 }
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>@ViewBag.Title - Secret Santa</title>
-        @Styles.Render("~/Content/css")
-        @Scripts.Render("~/bundles/modernizr")
-    </head>
-    <body>
-        <div class="navbar navbar-inverse navbar-fixed-top">
-            <div class="container">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    @Html.ActionLink("Secret Santa", "Index", "Home", null, new {@class = "navbar-brand"})
-                </div>
-                <div class="navbar-collapse collapse">
-                    <ul class="nav navbar-nav">
-                        @if (User.Identity.IsAuthenticated)
-                        {
-                            <li>@Html.ActionLink("Wish List", "Index", "Wishlist")</li>
-                        }
-                        @if (ViewBag.IsAdmin)
-                        {
-                            <li class="dropdown">
-                                <a class="dropdown-toggle" data-toggle="dropdown" href="#">Administration <b class="caret"></b></a>
-                                <ul class="dropdown-menu">
-                                    <li>@Html.ActionLink("Manage Users", "Users", "Admin")</li>
-                                </ul>
-                            </li>
-                        }
-                        @if (User.Identity.IsAuthenticated)
-                        {
-                            <li>@Html.ActionLink("Log Out", "LogOut", "Account")</li>
-                        }
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Secret Santa</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @Html.ActionLink("Secret Santa", "Index", "Home", null, new { @class = "navbar-brand" })
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <li>@Html.ActionLink("Wish List", "Index", "Wishlist")</li>
+                    }
+                    @if (ViewBag.IsAdmin)
+                    {
+                        <li class="dropdown">
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">Administration <b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li>@Html.ActionLink("Manage Users", "Users", "Admin")</li>
+                            </ul>
+                        </li>
+                    }
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <li>@Html.ActionLink("Log Out", "LogOut", "Account")</li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="container body-content">
+        @Html.ResultMessage()
+        @RenderBody()
+        @if (User.Identity.IsAuthenticated)
+        {
+            <div class="row">
+                <div class="col-md-6">
+                    <h2>Notes</h2>
+                    <ul>
+                        <li>Once you pick, you will get an e-mail with a reminder, plus the person's wish list.</li>
+                        <li>The dollar limit per person is @AppSettings.GiftDollarLimit.ToString("$0.00")@(".")</li>
+                        <li>Log back into this website with your e-mail address at any time to manage your wish list and view your giftee's wish list.</li>
+                        <li>Preview images are pulled automagically from the given link address and may not be the correct picture, it's recommended that you click through to the actual linked page.</li>
                     </ul>
                 </div>
             </div>
-        </div>
-        <div class="container body-content">
-            @Html.ResultMessage()
-            @RenderBody()
-            @if (User.Identity.IsAuthenticated)
-            {
-                <div class="row">
-                    <div class="col-md-6">
-                        <h2>Notes</h2>
-                        <ul>
-                            <li>Once you pick, you will get an e-mail with a reminder, plus the person's wish list.</li>
-                            <li>The dollar limit per person is @AppSettings.GiftDollarLimit.ToString("$0.00")@(".")</li>
-                            <li>Log back into this website with your e-mail address at any time to manage your wish list and view your giftee's wish list.</li>
-                        </ul>
-                    </div>
-                </div>
-            }
-            <hr />
-            <footer>
-                <p>&copy; @DateTime.Now.Year - <a href="http://github.com/bradwestness/SecretSanta">Secret Santa</a></p>
-            </footer>
-        </div>
+        }
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - <a href="http://github.com/bradwestness/SecretSanta">Secret Santa</a></p>
+        </footer>
+    </div>
 
-        @Scripts.Render("~/bundles/jquery")
-        @Scripts.Render("~/bundles/bootstrap")
-        <script async defer>
-            (function ($) {
-                
-                //
-                // Add bootstrap styling to fancy HTML5 inputs
-                $("input[type='url'], input[type='email']").addClass("form-control");
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    <script async defer>
+        (function ($) {
 
-                //
-                // Hide dismissable alerts after 10 seconds
-                setTimeout(function () {
-                    $(".alert-dismissable").slideUp("normal", function() {
-                        $(this).remove();
-                    });
-                }, 10000);
+            //
+            // Add bootstrap styling to fancy HTML5 inputs
+            $("input[type='url'], input[type='email']").addClass("form-control");
 
-            })(window.jQuery);
-        </script>
-        @RenderSection("scripts", false)
-    </body>
+            //
+            // Hide dismissable alerts after 10 seconds
+            setTimeout(function () {
+                $(".alert-dismissable").slideUp("normal", function () {
+                    $(this).remove();
+                });
+            }, 10000);
+
+        })(window.jQuery);
+    </script>
+    @RenderSection("scripts", false)
+</body>
 </html>
