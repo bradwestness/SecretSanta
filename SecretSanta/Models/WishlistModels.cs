@@ -46,10 +46,12 @@ namespace SecretSanta.Models
 
         public static WishlistEditModel Load(string id)
         {
-            return new WishlistEditModel
+            var model = new WishlistEditModel
             {
                 Account = DataRepository.Load<Account>(new Guid(id))
             };
+            model.Account.Wishlist = model.Account.Wishlist.OrderBy(x => x.Name).ToList();
+            return model;
         }
 
         #endregion
