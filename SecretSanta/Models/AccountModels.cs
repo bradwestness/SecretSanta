@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SecretSanta.Utilities;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -8,7 +9,6 @@ using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
-using SecretSanta.Utilities;
 
 namespace SecretSanta.Models
 {
@@ -93,7 +93,7 @@ namespace SecretSanta.Models
 
         #region Public Methods
 
-        public bool Authenticate()
+        public bool IsValid()
         {
             if (string.IsNullOrWhiteSpace(Email))
                 return false;
@@ -111,6 +111,13 @@ namespace SecretSanta.Models
             return string.IsNullOrWhiteSpace(returnUrl)
                 ? FormsAuthentication.GetRedirectUrl(Email, true)
                 : returnUrl;
+        }
+
+        public static string GuidSignIn(Guid guid, string returnUrl)
+        {
+            var account = DataRepository.Load<Account>(guid);
+            var model = new LogInModel { Email = account.Email };
+            return model.SignIn(returnUrl);
         }
 
         #endregion
@@ -166,18 +173,50 @@ namespace SecretSanta.Models
                 NewUser = new AddUserModel(),
                 Users = DataRepository.GetAll<Account>()
                     .OrderBy(a => a.DisplayName)
-                    .Select(a => new EditUserModel {Account = a}).ToList()
+                    .Select(a => new EditUserModel { Account = a }).ToList()
             };
 
             return model;
         }
 
-        public static void SendAllPickedMessages(string url)
+        public static void SendInvitationMessages(UrlHelper urlHelper)
         {
             var accounts = DataRepository.GetAll<Account>();
 
             foreach (var account in accounts)
             {
+                var url = urlHelper.Action("LogIn", "Account", new { id = account.Id }, "http");
+
+                StringBuilder body = new StringBuilder()
+                    .AppendFormat("Hey {0}! ", account.DisplayName).AppendLine()
+                    .AppendLine()
+                    .AppendFormat("Santa here. Just wanted to let you know that the ")
+                    .AppendFormat("Secret Santa website is ready! ").AppendLine()
+                    .AppendLine()
+                    .AppendFormat("Please visit the address below to pick your \"giftee\" and ")
+                    .AppendFormat("create your wish list. ").AppendLine()
+                    .AppendLine()
+                    .AppendFormat("<a href=\"{0}\">Secret Santa Website</a> ", url).AppendLine()
+                    .AppendLine()
+                    .AppendFormat("Ho ho ho, ").AppendLine()
+                    .AppendLine()
+                    .AppendFormat("Santa ").AppendLine();
+
+                var from = new MailAddress("santa@thenorthpole.com", "Santa Claus");
+                var to = new MailAddressCollection { new MailAddress(account.Email, account.DisplayName) };
+
+                EmailMessage.Send(from, to, "Secret Santa Reminder", body.ToString());
+            }
+
+        }
+
+        public static void SendAllPickedMessages(UrlHelper urlHelper)
+        {
+            var accounts = DataRepository.GetAll<Account>();
+
+            foreach (var account in accounts)
+            {
+                var url = urlHelper.Action("LogIn", "Account", new { id = account.Id }, "http");
                 var giftee = account.GetPicked();
 
                 StringBuilder body = new StringBuilder()
@@ -202,7 +241,7 @@ namespace SecretSanta.Models
                 body.AppendFormat("Remember that you can always visit the address below to update your wish list and view ")
                     .AppendFormat("any changes made by {0} too! ", giftee.DisplayName).AppendLine()
                     .AppendLine()
-                    .AppendFormat("{0} ", url).AppendLine()
+                    .AppendFormat("<a href=\"{0}\">Secret Santa Website</a> ", url).AppendLine()
                     .AppendLine()
                     .AppendFormat("Ho ho ho, ").AppendLine()
                     .AppendLine()

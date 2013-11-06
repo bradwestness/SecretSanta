@@ -1,7 +1,11 @@
-﻿@using SecretSanta.Utilities
+﻿@using SecretSanta.Models
+@using SecretSanta.Utilities
 @{
     ViewBag.IsAdmin = User.Identity.IsAuthenticated &&
                       User.Identity.Name.Equals(AppSettings.AdminEmail, StringComparison.CurrentCultureIgnoreCase);
+    ViewBag.CurrentUserAccount = User.Identity.IsAuthenticated
+        ? User.GetAccount()
+        : null;
 }
 <!DOCTYPE html>
 <html>
@@ -28,7 +32,12 @@
                 <ul class="nav navbar-nav">
                     @if (User.Identity.IsAuthenticated)
                     {
-                        <li>@Html.ActionLink("Wish List", "Index", "Wishlist")</li>
+                        <li>@Html.ActionLink("My Wish List", "Index", "Wishlist")</li>
+                        if (ViewBag.CurrentUserAccount.HasPicked())
+                        {
+                            Account picked = ViewBag.CurrentUserAccount.GetPicked();
+                            <li>@Html.ActionLink(picked.DisplayName + "'s Wish List", "Details", "Wishlist", new { id = picked.Id }, null)</li>
+                        }
                     }
                     @if (ViewBag.IsAdmin)
                     {
@@ -41,7 +50,12 @@
                     }
                     @if (User.Identity.IsAuthenticated)
                     {
-                        <li>@Html.ActionLink("Log Out", "LogOut", "Account")</li>
+                        <li class="dropdown">
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">Logged in as @ViewBag.CurrentUserAccount.DisplayName <b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li>@Html.ActionLink("Log Out", "LogOut", "Account")</li>
+                            </ul>
+                        </li>
                     }
                 </ul>
             </div>

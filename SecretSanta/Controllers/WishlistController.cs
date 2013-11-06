@@ -67,8 +67,8 @@ namespace SecretSanta.Controllers
         // GET: /Wishlist/Remind
         public ActionResult Remind(string id)
         {
-            string url = Url.Action("Index", "Home", null, "http");
-            WishlistManager.SendReminder(new Guid(id), url);
+            var urlHelper = new UrlHelper(ControllerContext.RequestContext);
+            WishlistManager.SendReminder(new Guid(id), urlHelper);
             this.SetResultMessage("<strong>Reminder sent</strong> successfully.");
             return RedirectToAction("Details", new { id });
         }

@@ -1,67 +1,74 @@
 ﻿@model SecretSanta.Models.WishlistEditModel
 @{
-    ViewBag.Title = "Manage Wish List";
+    ViewBag.Title = Model.Account.DisplayName + "'s Wish List";
 }
 
 <div class="jumbotron">
     <h1>@ViewBag.Title</h1>
 
     <div class="text-right">
-        <button class="btn btn-primary" data-toggle="modal" data-target="#AddItem">Add Item</button>
+        <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#AddItem">Add Item</button>
     </div>
 
     <div id="AddItem" class="modal fade">
         @Html.Partial("EditorTemplates/AddItem", Model.NewItem)
     </div>
 
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Item</th>
-                <th>Preview</th>
-                <th>Link</th>
-                <th>&nbsp;</th>
-            </tr>
-        </thead>
-        <tbody>
-            @for (int i = 0; i < Model.Account.Wishlist.Count; i++)
-            {
+    @if (Model.Account.Wishlist != null && Model.Account.Wishlist.Any())
+    {
+        <table class="table table-striped">
+            <thead>
                 <tr>
-                    <td>
-                        <h3>@Html.DisplayFor(m => m.Account.Wishlist[i].Name)</h3>
-                        <p><small>@Html.DisplayFor(m => m.Account.Wishlist[i].Description)</small></p>
-                    </td>
-                    <td>
-                        @if (!string.IsNullOrWhiteSpace(Model.Account.Wishlist[i].Url))
-                        {
-                            <a class="preview" target="_blank" href="@Model.Account.Wishlist[i].Url"><img class="img-thumbnail img-responsive" src="@Url.Action("FeaturedImage", "Preview", new { url = HttpUtility.UrlEncode(Model.Account.Wishlist[i].Url) })" /></a>
-                        }
-                        <p>&nbsp;</p>
-                    </td>
-                    <td>
-                        @if (!string.IsNullOrWhiteSpace(Model.Account.Wishlist[i].Url))
-                        {
-                            <a target="_blank" class="btn btn-default" href="@Model.Account.Wishlist[i].Url">More Information &raquo;</a>
-                        }
-                        else
-                        {
-                            <a class="btn btn-link" href="#">No Link Provided</a>
-                        }
-                    </td>
-                    <td>
-                        <div class="pull-right">
-                            <button class="btn btn-primary" data-toggle="modal" data-target="#EditItem@(i)">Edit</button>
-                            <button class="btn btn-default" data-toggle="modal" data-target="#DeleteItem@(i)">Delete</button>
-                        </div>
-                        <div id="EditItem@(i)" class="modal fade">
-                            @Html.Partial("EditorTemplates/EditItem", Model.Account.Wishlist[i])
-                        </div>
-                        <div id="DeleteItem@(i)" class="modal fade">
-                            @Html.Partial("DisplayTemplates/DeleteItem", Model.Account.Wishlist[i])
-                        </div>
-                    </td>
+                    <th>Item</th>
+                    <th>Preview</th>
+                    <th>Link</th>
+                    <th>&nbsp;</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.Account.Wishlist.Count; i++)
+                {
+                    <tr>
+                        <td>
+                            <h3>@Html.DisplayFor(m => m.Account.Wishlist[i].Name)</h3>
+                            <p><small>@Html.DisplayFor(m => m.Account.Wishlist[i].Description)</small></p>
+                        </td>
+                        <td>
+                            @if (!string.IsNullOrWhiteSpace(Model.Account.Wishlist[i].Url))
+                            {
+                                <a class="preview" target="_blank" href="@Model.Account.Wishlist[i].Url"><img class="img-thumbnail img-responsive" src="@Url.Action("FeaturedImage", "Preview", new { url = HttpUtility.UrlEncode(Model.Account.Wishlist[i].Url) })" /></a>
+                            }
+                            <p>&nbsp;</p>
+                        </td>
+                        <td>
+                            @if (!string.IsNullOrWhiteSpace(Model.Account.Wishlist[i].Url))
+                            {
+                                <a target="_blank" class="btn btn-default" href="@Model.Account.Wishlist[i].Url">More Information &raquo;</a>
+                            }
+                            else
+                            {
+                                <a class="btn btn-link" href="#">No Link Provided</a>
+                            }
+                        </td>
+                        <td>
+                            <div class="pull-right">
+                                <button class="btn btn-primary" data-toggle="modal" data-target="#EditItem@(i)">Edit</button>
+                                <button class="btn btn-default" data-toggle="modal" data-target="#DeleteItem@(i)">Delete</button>
+                            </div>
+                            <div id="EditItem@(i)" class="modal fade">
+                                @Html.Partial("EditorTemplates/EditItem", Model.Account.Wishlist[i])
+                            </div>
+                            <div id="DeleteItem@(i)" class="modal fade">
+                                @Html.Partial("DisplayTemplates/DeleteItem", Model.Account.Wishlist[i])
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>Looks like you haven't added any items yet. Click the "Add Item" button to get started!</p>
+    }
 </div>

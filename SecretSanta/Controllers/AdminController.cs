@@ -16,11 +16,21 @@ namespace SecretSanta.Controllers
         }
 
         //
+        // GET: /Invite
+        public ActionResult Invite()
+        {
+            var urlHelper = new UrlHelper(ControllerContext.RequestContext);
+            EditUsersModel.SendInvitationMessages(urlHelper);
+            this.SetResultMessage("Invitations successfully sent to all users.");
+            return RedirectToAction("Users");
+        }
+
+        //
         // GET: /AllPicked
         public ActionResult AllPicked()
         {
-            var url = Url.Action("Index", "Home", null, "http");
-            EditUsersModel.SendAllPickedMessages(url);
+            var urlHelper = new UrlHelper(ControllerContext.RequestContext);
+            EditUsersModel.SendAllPickedMessages(urlHelper);
             this.SetResultMessage("Reminders successfully sent to all users.");
             return RedirectToAction("Users");
         }

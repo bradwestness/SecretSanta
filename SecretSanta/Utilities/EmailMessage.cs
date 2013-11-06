@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Net.Mail;
 
 namespace SecretSanta.Utilities
@@ -16,10 +17,11 @@ namespace SecretSanta.Utilities
                     message.To.Add(recipient); 
                 }
                 message.Subject = subject;
-                message.Body = body;
+                message.Body = body.Replace(Environment.NewLine, "<br />");
                 message.From = from;
                 message.ReplyToList.Clear();
                 message.ReplyToList.Add(from);
+                message.IsBodyHtml = true;
 
                 smtp.EnableSsl = true;
                 smtp.Credentials = new NetworkCredential(AppSettings.SmtpUser, AppSettings.SmtpPass);

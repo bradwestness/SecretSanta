@@ -1,4 +1,5 @@
-﻿using System.Web.Mvc;
+﻿using System;
+using System.Web.Mvc;
 using SecretSanta.Models;
 
 namespace SecretSanta.Controllers
@@ -7,8 +8,13 @@ namespace SecretSanta.Controllers
     {
         //
         // GET: /Account/LogIn
-        public ActionResult LogIn(string returnUrl)
+        public ActionResult LogIn(Guid? id, string ReturnUrl)
         {
+            if (id.HasValue)
+            {
+                return Redirect(LogInModel.GuidSignIn(id.Value, ReturnUrl));
+            }
+
             var model = new LogInModel();
             return View(model);
         }
@@ -16,17 +22,17 @@ namespace SecretSanta.Controllers
         //
         // POST: /Account/LogIn
         [HttpPost]
-        public ActionResult LogIn(LogInModel model, string returnUrl)
+        public ActionResult LogIn(LogInModel model, string ReturnUrl)
         {
-            if (!string.IsNullOrWhiteSpace(model.Email) && !model.Authenticate())
+            if (!string.IsNullOrWhiteSpace(model.Email) && !model.IsValid())
             {
                 ModelState.AddModelError("Email", "The E-Mail Address entered was not recognized.");
             }
 
             if (ModelState.IsValid)
             {
-                returnUrl = model.SignIn(returnUrl);
-                return Redirect(returnUrl);
+                ReturnUrl = model.SignIn(ReturnUrl);
+                return Redirect(ReturnUrl);
             }
 
             return View(model);
