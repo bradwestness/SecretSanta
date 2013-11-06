@@ -12,9 +12,9 @@ namespace SecretSanta.Utilities
             {
                 var message = new MailMessage();
                 message.From = from;
-                foreach (var recipient in to)
+                foreach (MailAddress recipient in to)
                 {
-                    message.To.Add(recipient); 
+                    message.To.Add(recipient);
                 }
                 message.Subject = subject;
                 message.Body = body.Replace(Environment.NewLine, "<br />");

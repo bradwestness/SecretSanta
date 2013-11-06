@@ -25,7 +25,7 @@ namespace SecretSanta.Utilities
             T theObject = null;
             string fileName = string.Empty;
 
-            if (typeof(T) == typeof(Account))
+            if (typeof (T) == typeof (Account))
             {
                 if (_accounts != null)
                 {
@@ -55,7 +55,7 @@ namespace SecretSanta.Utilities
             var list = new List<T>();
             string pattern = string.Empty;
 
-            if (typeof(T) == typeof(Account))
+            if (typeof (T) == typeof (Account))
             {
                 if (_accounts != null)
                 {
@@ -76,8 +76,8 @@ namespace SecretSanta.Utilities
                 var item = JsonConvert.DeserializeObject<T>(input);
                 list.Add(item);
             }
-            
-            if (typeof(T) == typeof(Account))
+
+            if (typeof (T) == typeof (Account))
             {
                 _accounts = list as IList<Account>;
             }
@@ -90,7 +90,7 @@ namespace SecretSanta.Utilities
             string fileName = string.Empty;
             string output = string.Empty;
 
-            if (typeof(T) == typeof(Account))
+            if (typeof (T) == typeof (Account))
             {
                 var account = theObject as Account;
                 if (account != null)
@@ -115,7 +115,7 @@ namespace SecretSanta.Utilities
         {
             string fileName = string.Empty;
 
-            if (typeof(T) == typeof(Account))
+            if (typeof (T) == typeof (Account))
             {
                 fileName = AppSettings.AccountFilePattern.Replace("*", SanitizeFileName(id.ToString()));
                 _accounts = null;

@@ -1,5 +1,4 @@
-﻿@using SecretSanta.Models
-@model SecretSanta.Models.WishlistEditModel
+﻿@model WishlistEditModel
 @{
     ViewBag.Title = Model.Account.DisplayName + "'s Wish List";
 }
@@ -27,7 +26,7 @@
                         <td>
                             @if (!string.IsNullOrWhiteSpace(item.Url))
                             {
-                                <a class="preview" target="_blank" href="@item.Url"><img class="img-thumbnail img-responsive" src="@Url.Action("FeaturedImage", "Preview", new { url = HttpUtility.UrlEncode(item.Url) })" /></a>
+                                <a class="preview" target="_blank" href="@item.Url"><img class="img-thumbnail img-responsive" src="@Url.Action("FeaturedImage", "Preview", new {url = HttpUtility.UrlEncode(item.Url)})" /></a>
                             }
                             <p>&nbsp;</p>
                         </td>

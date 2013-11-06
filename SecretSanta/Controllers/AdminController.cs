@@ -62,7 +62,8 @@ namespace SecretSanta.Controllers
             if (ModelState.IsValid)
             {
                 model.Save();
-                this.SetResultMessage(string.Format("<strong>Successfully updated</strong> {0}.", model.Account.DisplayName));
+                this.SetResultMessage(string.Format("<strong>Successfully updated</strong> {0}.",
+                    model.Account.DisplayName));
             }
 
             return RedirectToAction("Users");

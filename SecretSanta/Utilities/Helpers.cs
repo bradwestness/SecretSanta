@@ -3,7 +3,6 @@ using System.Linq;
 using System.Security.Principal;
 using System.Text;
 using System.Web;
-using System.Web.ModelBinding;
 using System.Web.Mvc;
 using SecretSanta.Models;
 
@@ -16,7 +15,7 @@ namespace SecretSanta.Utilities
             if (!user.Identity.IsAuthenticated || string.IsNullOrWhiteSpace(user.Identity.Name))
                 return null;
 
-            var account = DataRepository.GetAll<Account>()
+            Account account = DataRepository.GetAll<Account>()
                 .SingleOrDefault(a => a.Email.Equals(user.Identity.Name, StringComparison.CurrentCultureIgnoreCase));
 
             if (account == null)
@@ -43,7 +42,8 @@ namespace SecretSanta.Utilities
             {
                 output = new StringBuilder()
                     .Append("<div class='alert alert-info alert-dismissable'>")
-                    .Append("<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button>")
+                    .Append(
+                        "<button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button>")
                     .Append(message)
                     .Append("</div>")
                     .ToString();

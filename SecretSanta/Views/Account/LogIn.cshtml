@@ -1,4 +1,4 @@
-﻿@model SecretSanta.Models.LogInModel
+﻿@model LogInModel
 @{
     ViewBag.Title = "Log In";
 }
@@ -8,13 +8,13 @@
         <div class="col-lg-6">
             <h1>Welcome to Secret Santa!</h1>
 
-            @using (Html.BeginForm("LogIn", "Account", FormMethod.Post, new { role = "form", @class = "form-horizontal" }))
+            @using (Html.BeginForm("LogIn", "Account", FormMethod.Post, new {role = "form", @class = "form-horizontal"}))
             {
                 <fieldset>
                     <legend>@ViewBag.Title</legend>
 
                     <div class="form-group">
-                        <small>@Html.LabelFor(m => m.Email, new { @class = "control-label col-sm-4" })</small>
+                        <small>@Html.LabelFor(m => m.Email, new {@class = "control-label col-sm-4"})</small>
                         <div class="col-sm-6">
                             @Html.EditorFor(m => m.Email)
                             <small>@Html.ValidationMessageFor(m => m.Email)</small>

@@ -1,7 +1,6 @@
 ﻿using System.Web;
-using System.Web.Caching;
-using SecretSanta.Utilities;
 using System.Web.Mvc;
+using SecretSanta.Utilities;
 
 namespace SecretSanta.Controllers
 {

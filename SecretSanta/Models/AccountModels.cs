@@ -1,5 +1,4 @@
-﻿using SecretSanta.Utilities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -9,6 +8,7 @@ using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
+using SecretSanta.Utilities;
 
 namespace SecretSanta.Models
 {
@@ -116,7 +116,7 @@ namespace SecretSanta.Models
         public static string GuidSignIn(Guid guid, string returnUrl)
         {
             var account = DataRepository.Get<Account>(guid);
-            var model = new LogInModel { Email = account.Email };
+            var model = new LogInModel {Email = account.Email};
             return model.SignIn(returnUrl);
         }
 
@@ -173,7 +173,7 @@ namespace SecretSanta.Models
                 NewUser = new AddUserModel(),
                 Users = DataRepository.GetAll<Account>()
                     .OrderBy(a => a.DisplayName)
-                    .Select(a => new EditUserModel { Account = a }).ToList()
+                    .Select(a => new EditUserModel {Account = a}).ToList()
             };
 
             return model;
@@ -181,11 +181,11 @@ namespace SecretSanta.Models
 
         public static void SendInvitationMessages(UrlHelper urlHelper)
         {
-            var accounts = DataRepository.GetAll<Account>();
+            IList<Account> accounts = DataRepository.GetAll<Account>();
 
-            foreach (var account in accounts)
+            foreach (Account account in accounts)
             {
-                var url = urlHelper.Action("LogIn", "Account", new { id = account.Id }, "http");
+                string url = urlHelper.Action("LogIn", "Account", new {id = account.Id}, "http");
 
                 StringBuilder body = new StringBuilder()
                     .AppendFormat("Hey {0}! ", account.DisplayName).AppendLine()
@@ -193,7 +193,7 @@ namespace SecretSanta.Models
                     .AppendFormat("Santa here. Just wanted to let you know that the ")
                     .AppendFormat("Secret Santa website is ready! ").AppendLine()
                     .AppendLine()
-                    .AppendFormat("Please visit the address below to pick your \"giftee\" and ")
+                    .AppendFormat("Please visit the address below to pick your recipient and ")
                     .AppendFormat("create your wish list. ").AppendLine()
                     .AppendLine()
                     .AppendFormat("<a href=\"{0}\">Secret Santa Website</a> ", url).AppendLine()
@@ -203,21 +203,20 @@ namespace SecretSanta.Models
                     .AppendFormat("Santa ").AppendLine();
 
                 var from = new MailAddress("santa@thenorthpole.com", "Santa Claus");
-                var to = new MailAddressCollection { new MailAddress(account.Email, account.DisplayName) };
+                var to = new MailAddressCollection {new MailAddress(account.Email, account.DisplayName)};
 
                 EmailMessage.Send(from, to, "Secret Santa Reminder", body.ToString());
             }
-
         }
 
         public static void SendAllPickedMessages(UrlHelper urlHelper)
         {
-            var accounts = DataRepository.GetAll<Account>();
+            IList<Account> accounts = DataRepository.GetAll<Account>();
 
-            foreach (var account in accounts)
+            foreach (Account account in accounts)
             {
-                var url = urlHelper.Action("LogIn", "Account", new { id = account.Id }, "http");
-                var giftee = account.GetPicked();
+                string url = urlHelper.Action("LogIn", "Account", new {id = account.Id}, "http");
+                Account recipient = account.GetPicked();
 
                 StringBuilder body = new StringBuilder()
                     .AppendFormat("Hey {0}! ", account.DisplayName).AppendLine()
@@ -225,12 +224,13 @@ namespace SecretSanta.Models
                     .AppendFormat("Santa here. Just wanted to let you know that everyone ")
                     .AppendFormat("has now picked a person using the Secret Santa website. ").AppendLine()
                     .AppendLine()
-                    .AppendFormat("Thought I'd send a frindly reminder that you picked {0}! ", giftee.DisplayName).AppendLine()
+                    .AppendFormat("Thought I'd send a frindly reminder that you picked {0}! ", recipient.DisplayName)
+                    .AppendLine()
                     .AppendLine()
                     .AppendFormat("Here's their wish list as it stands right now: ").AppendLine()
                     .AppendLine();
 
-                foreach (var item in giftee.Wishlist)
+                foreach (WishlistItem item in recipient.Wishlist)
                 {
                     body.AppendFormat("Item: {0}", item.Name).AppendLine()
                         .AppendFormat("Description: {0}", item.Description).AppendLine()
@@ -238,8 +238,9 @@ namespace SecretSanta.Models
                         .AppendLine();
                 }
 
-                body.AppendFormat("Remember that you can always visit the address below to update your wish list and view ")
-                    .AppendFormat("any changes made by {0} too! ", giftee.DisplayName).AppendLine()
+                body.AppendFormat(
+                    "Remember that you can always visit the address below to update your wish list and view ")
+                    .AppendFormat("any changes made by {0} too! ", recipient.DisplayName).AppendLine()
                     .AppendLine()
                     .AppendFormat("<a href=\"{0}\">Secret Santa Website</a> ", url).AppendLine()
                     .AppendLine()
@@ -248,7 +249,7 @@ namespace SecretSanta.Models
                     .AppendFormat("Santa ").AppendLine();
 
                 var from = new MailAddress("santa@thenorthpole.com", "Santa Claus");
-                var to = new MailAddressCollection { new MailAddress(account.Email, account.DisplayName) };
+                var to = new MailAddressCollection {new MailAddress(account.Email, account.DisplayName)};
 
                 EmailMessage.Send(from, to, "Secret Santa Reminder", body.ToString());
             }

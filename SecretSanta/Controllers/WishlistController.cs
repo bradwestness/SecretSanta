@@ -58,7 +58,7 @@ namespace SecretSanta.Controllers
         [HttpPost]
         public ActionResult DeleteItem(WishlistItem model)
         {
-            WishlistManager.DeleteItem(model); 
+            WishlistManager.DeleteItem(model);
             this.SetResultMessage(string.Format("<strong>Successfully deleted</strong> {0}.", model.Name));
             return RedirectToAction("Index");
         }
@@ -70,7 +70,7 @@ namespace SecretSanta.Controllers
             var urlHelper = new UrlHelper(ControllerContext.RequestContext);
             WishlistManager.SendReminder(new Guid(id), urlHelper);
             this.SetResultMessage("<strong>Reminder sent</strong> successfully.");
-            return RedirectToAction("Details", new { id });
+            return RedirectToAction("Details", new {id});
         }
     }
 }

@@ -94,7 +94,7 @@ namespace SecretSanta.Models
         public static void SendReminder(Guid id, UrlHelper urlHelper)
         {
             var account = DataRepository.Get<Account>(id);
-            var url = urlHelper.Action("LogIn", "Account", new {id = account.Id}, "http");
+            string url = urlHelper.Action("LogIn", "Account", new {id = account.Id}, "http");
             string body = new StringBuilder()
                 .AppendFormat("Hey {0}, ", account.DisplayName).AppendLine()
                 .AppendLine()
@@ -111,7 +111,7 @@ namespace SecretSanta.Models
                 .ToString();
 
             var from = new MailAddress("santa@thenorthpole.com", "Santa Claus");
-            var to = new MailAddressCollection { new MailAddress(account.Email, account.DisplayName) };
+            var to = new MailAddressCollection {new MailAddress(account.Email, account.DisplayName)};
 
             EmailMessage.Send(from, to, "Secret Santa Reminder", body);
         }

@@ -8,7 +8,6 @@ using System.Text.RegularExpressions;
 
 namespace SecretSanta.Utilities
 {
-
     public static class PreviewGenerator
     {
         public static byte[] GetFeaturedImage(string url)
@@ -23,14 +22,14 @@ namespace SecretSanta.Utilities
 
                 // build a list of all img tags
                 IList<ImageTag> imageTags = new List<ImageTag>();
-                for (var i = 0; i < matches.Count; i++)
+                for (int i = 0; i < matches.Count; i++)
                 {
                     imageTags.Add(new ImageTag(matches[i].Value, url));
                 }
 
                 // download the image data from the largest image
-                int maxSize = imageTags.Max(t => t.Width * t.Height);
-                var imageTag = imageTags.FirstOrDefault(t => t.Width * t.Height == maxSize);
+                int maxSize = imageTags.Max(t => t.Width*t.Height);
+                ImageTag imageTag = imageTags.FirstOrDefault(t => t.Width*t.Height == maxSize);
                 byte[] data = client.DownloadData(imageTag.Source);
 
                 // convert the data to an image
@@ -78,14 +77,14 @@ namespace SecretSanta.Utilities
 
             private string ExtractSource(string tag, string url)
             {
-                var match = Regex.Match(tag, "src=\"([^\"]+)");
+                Match match = Regex.Match(tag, "src=\"([^\"]+)");
                 string source = string.Empty;
                 if (match.Groups.Count > 0)
                 {
                     source = match.Groups[1].Value;
                     if (!source.StartsWith("http"))
                     {
-                        var tokens = url.Split('/').ToList();
+                        List<string> tokens = url.Split('/').ToList();
                         tokens.RemoveAt(tokens.Count - 1);
                         tokens.Add(source.TrimStart('/'));
                         source = string.Join("/", tokens);
@@ -96,11 +95,11 @@ namespace SecretSanta.Utilities
 
             private int ExtractHeight(string tag)
             {
-                var match = Regex.Match(tag, "height=\"([^\"]+)");
+                Match match = Regex.Match(tag, "height=\"([^\"]+)");
                 int height = 0;
                 if (match.Groups.Count > 0)
                 {
-                    var value = Regex.Replace(match.Groups[1].Value, "\\D", "");
+                    string value = Regex.Replace(match.Groups[1].Value, "\\D", "");
                     int.TryParse(value, out height);
                 }
                 return height;
@@ -108,11 +107,11 @@ namespace SecretSanta.Utilities
 
             private int ExtractWidth(string tag)
             {
-                var match = Regex.Match(tag, "width=\"([^\"]+)");
+                Match match = Regex.Match(tag, "width=\"([^\"]+)");
                 int width = 0;
                 if (match.Groups.Count > 0)
                 {
-                    var value = Regex.Replace(match.Groups[1].Value, "\\D", "");
+                    string value = Regex.Replace(match.Groups[1].Value, "\\D", "");
                     int.TryParse(value, out width);
                 }
                 return width;
