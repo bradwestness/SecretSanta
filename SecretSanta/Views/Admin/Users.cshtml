@@ -37,6 +37,7 @@
                 <td>@Html.CheckBox("Users[" + i + "].HasBeenPicked", Model.Users[i].Account.HasBeenPicked(), new {disabled = "disabled"})</td>
                 <td>
                     <div class="pull-right">
+                        <a class="btn btn-link" href="@Url.Action("Details", "Wishlist", new{ id = Model.Users[i].Account.Id })">View Wishlist &raquo;</a>
                         <button class="btn btn-primary" data-toggle="modal" data-target="#EditUser@(i)">Edit</button>
                         <button class="btn btn-default" data-toggle="modal" data-target="#DeleteUser@(i)">Delete</button>
                     </div>
