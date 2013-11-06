@@ -49,7 +49,7 @@ namespace SecretSanta.Models
         {
             var model = new WishlistEditModel
             {
-                Account = DataRepository.Load<Account>(new Guid(id))
+                Account = DataRepository.Get<Account>(new Guid(id))
             };
             model.Account.Wishlist = model.Account.Wishlist.OrderBy(x => x.Name).ToList();
             return model;
@@ -93,7 +93,7 @@ namespace SecretSanta.Models
 
         public static void SendReminder(Guid id, UrlHelper urlHelper)
         {
-            var account = DataRepository.Load<Account>(id);
+            var account = DataRepository.Get<Account>(id);
             var url = urlHelper.Action("LogIn", "Account", new {id = account.Id}, "http");
             string body = new StringBuilder()
                 .AppendFormat("Hey {0}, ", account.DisplayName).AppendLine()

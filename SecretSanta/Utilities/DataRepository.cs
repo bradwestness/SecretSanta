@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
@@ -11,6 +12,12 @@ namespace SecretSanta.Utilities
 {
     public static class DataRepository
     {
+        #region Variables
+
+        private static IList<Account> _accounts;
+
+        #endregion
+
         #region Public Methods
 
         public static void Save<T>(T theObject) where T : class
@@ -28,16 +35,22 @@ namespace SecretSanta.Utilities
                 string directory = GetDataDirectory();
                 string path = Path.Combine(directory, fileName);
                 File.WriteAllText(path, output, Encoding.UTF8);
+                _accounts = null;
             }
         }
 
-        public static T Load<T>(Guid? id) where T : class
+        public static T Get<T>(Guid? id) where T : class
         {
             T theObject = null;
             string fileName = string.Empty;
 
             if (typeof (T) == typeof (Account))
             {
+                if (_accounts != null)
+                {
+                    return _accounts.SingleOrDefault(a => a.Id == id) as T;
+                }
+
                 fileName = AppSettings.AccountFilePattern.Replace("*", SanitizeFileName(id.ToString()));
             }
 
@@ -73,6 +86,7 @@ namespace SecretSanta.Utilities
                 if (File.Exists(path))
                 {
                     File.Delete(path);
+                    _accounts = null;
                 }
             }
         }
@@ -84,6 +98,11 @@ namespace SecretSanta.Utilities
 
             if (typeof (T) == typeof (Account))
             {
+                if (_accounts != null)
+                {
+                    return _accounts as IList<T>;
+                }
+
                 pattern = AppSettings.AccountFilePattern;
             }
 
@@ -97,6 +116,12 @@ namespace SecretSanta.Utilities
                 string input = File.ReadAllText(file);
                 var item = JsonConvert.DeserializeObject<T>(input);
                 list.Add(item);
+            }
+
+
+            if (typeof (T) == typeof (Account))
+            {
+                _accounts = list as IList<Account>;
             }
 
             return list;

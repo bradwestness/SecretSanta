@@ -54,7 +54,7 @@ namespace SecretSanta.Models
 
         public Account GetPicked()
         {
-            return DataRepository.Load<Account>(Picked);
+            return DataRepository.Get<Account>(Picked);
         }
 
         public Account GetPickedBy()
@@ -115,7 +115,7 @@ namespace SecretSanta.Models
 
         public static string GuidSignIn(Guid guid, string returnUrl)
         {
-            var account = DataRepository.Load<Account>(guid);
+            var account = DataRepository.Get<Account>(guid);
             var model = new LogInModel { Email = account.Email };
             return model.SignIn(returnUrl);
         }
@@ -312,7 +312,7 @@ namespace SecretSanta.Models
         {
             return new EditUserModel
             {
-                Account = DataRepository.Load<Account>(new Guid(id))
+                Account = DataRepository.Get<Account>(new Guid(id))
             };
         }
 
