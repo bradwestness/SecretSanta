@@ -25,6 +25,8 @@ namespace SecretSanta.Models
         [DisplayName("Link"), DataType(DataType.Url)]
         public string Url { get; set; }
 
+        public byte[] PreviewImage { get; set; }
+
         #endregion
     }
 
@@ -70,6 +72,7 @@ namespace SecretSanta.Models
                 account.Wishlist = new List<WishlistItem>();
             }
             item.Id = Guid.NewGuid();
+            item.PreviewImage = PreviewGenerator.GetFeaturedImage(item.Url);
             account.Wishlist.Add(item);
             DataRepository.Save(account);
         }
@@ -79,6 +82,7 @@ namespace SecretSanta.Models
             Account account = HttpContext.Current.User.GetAccount();
             WishlistItem remove = account.Wishlist.SingleOrDefault(i => i.Id.Equals(item.Id));
             account.Wishlist.Remove(remove);
+            item.PreviewImage = PreviewGenerator.GetFeaturedImage(item.Url);
             account.Wishlist.Add(item);
             DataRepository.Save(account);
         }

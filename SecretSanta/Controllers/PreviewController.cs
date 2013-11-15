@@ -1,6 +1,8 @@
-﻿using System.Web;
-using System.Web.Mvc;
+﻿using SecretSanta.Models;
 using SecretSanta.Utilities;
+using System;
+using System.Linq;
+using System.Web.Mvc;
 
 namespace SecretSanta.Controllers
 {
@@ -8,18 +10,21 @@ namespace SecretSanta.Controllers
     {
         //
         // GET: /Preview/FeaturedImage
-        public ActionResult FeaturedImage(string url)
+        [Route("Preview/{accountId:Guid}/{itemId:Guid}")]
+        public ActionResult FeaturedImage(Guid accountId, Guid itemId)
         {
-            url = HttpUtility.UrlDecode(url);
-            byte[] fileContents = PreviewGenerator.GetFeaturedImage(url);
+            var account = DataRepository.Get<Account>(accountId);
+            var item = account.Wishlist.Single(x => x.Id == itemId);
 
-            Response.Cache.SetValidUntilExpires(true);
-            Response.Cache.SetCacheability(HttpCacheability.Public);
-            Response.Cache.VaryByHeaders["Cookie"] = true;
-            Response.Cache.VaryByHeaders["Accept-Encoding"] = true;
-            Response.Cache.VaryByParams["url"] = true;
-
-            return File(fileContents, "image/jpg");
+            if (item.PreviewImage == null || item.PreviewImage.Length == 0)
+            {
+                account.Wishlist.Remove(item);
+                item.PreviewImage = PreviewGenerator.GetFeaturedImage(item.Url);
+                account.Wishlist.Add(item);
+                DataRepository.Save(account);
+            }
+            
+            return File(item.PreviewImage, "image/jpg");
         }
     }
 }
