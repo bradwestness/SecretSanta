@@ -1,4 +1,5 @@
-﻿using SecretSanta.Models;
+﻿using System.Web;
+using SecretSanta.Models;
 using SecretSanta.Utilities;
 using System;
 using System.Linq;
@@ -23,7 +24,14 @@ namespace SecretSanta.Controllers
                 account.Wishlist.Add(item);
                 DataRepository.Save(account);
             }
-            
+
+            Response.Cache.SetValidUntilExpires(true);
+            Response.Cache.SetCacheability(HttpCacheability.Public);
+            Response.Cache.VaryByHeaders["Cookie"] = true;
+            Response.Cache.VaryByHeaders["Accept-Encoding"] = true;
+            Response.Cache.VaryByParams["accountId"] = true;
+            Response.Cache.VaryByParams["itemId"] = true;
+
             return File(item.PreviewImage, "image/jpg");
         }
     }
