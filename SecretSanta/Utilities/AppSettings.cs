@@ -14,6 +14,16 @@ namespace SecretSanta.Utilities
             get { return ConfigurationManager.AppSettings["SecretSanta:DataDirectory"]; }
         }
 
+        public static int MaxImagesToLoad
+        {
+            get { return int.Parse(ConfigurationManager.AppSettings["SecretSanta:MaxImagesToLoad"]); }
+        }
+
+        public static string DefaultPreviewImage
+        {
+            get { return ConfigurationManager.AppSettings["SecretSanta:DefaultPreviewImage"]; }
+        }
+
         public static string AccountFilePattern
         {
             get { return ConfigurationManager.AppSettings["SecretSanta:AccountFilePattern"]; }

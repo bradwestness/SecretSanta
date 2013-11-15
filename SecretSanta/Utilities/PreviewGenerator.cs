@@ -1,10 +1,14 @@
-﻿using System.Collections.Generic;
-using System.Drawing;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Runtime.Remoting.Channels;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using System.Web;
+using Image = System.Drawing.Image;
 
 namespace SecretSanta.Utilities
 {
@@ -14,36 +18,30 @@ namespace SecretSanta.Utilities
         {
             byte[] output;
 
-            // download the page contents as a string
-            using (var client = new WebClient())
+            try
             {
-                string pageContents = client.DownloadString(url);
-                MatchCollection matches = Regex.Matches(pageContents, @"<img ([^>]+)>");
-
-                // build a list of all img tags
-                IList<ImageTag> imageTags = new List<ImageTag>();
-                for (int i = 0; i < matches.Count; i++)
+                // download the page contents as a string
+                using (var client = new WebClient())
                 {
-                    imageTags.Add(new ImageTag(matches[i].Value, url));
-                }
+                    string pageContents = client.DownloadString(url);
+                    MatchCollection matches = Regex.Matches(pageContents, @"<img ([^>]+)>");
 
-                // download the image data from the largest image
-                int maxSize = imageTags.Max(t => t.Width*t.Height);
-                ImageTag imageTag = imageTags.FirstOrDefault(t => t.Width*t.Height == maxSize);
-                byte[] data = client.DownloadData(imageTag.Source);
-
-                // convert the data to an image
-                using (var inStream = new MemoryStream(data))
-                {
-                    Image image = Image.FromStream(inStream);
-
-                    // convert the data to a compressed jpeg
-                    using (var outStream = new MemoryStream())
+                    // build a list of all img tags
+                    IList<ImageTag> imageTags = new List<ImageTag>();
+                    for (int i = 0; i < matches.Count && i < AppSettings.MaxImagesToLoad; i++)
                     {
-                        image.Save(outStream, ImageFormat.Jpeg);
-                        output = outStream.ToArray();
+                        imageTags.Add(new ImageTag(matches[i].Value, url));
                     }
+
+                    int maxSize = imageTags.Max(t => t.Width * t.Height);
+                    var featured = imageTags.First((t => t.Width * t.Height == maxSize));
+                    output = featured.ImageBytes;
                 }
+            }
+            catch (Exception e)
+            {
+                string fileName = HttpContext.Current.Server.MapPath(AppSettings.DefaultPreviewImage);
+                output = File.ReadAllBytes(fileName);
             }
 
             return output;
@@ -53,11 +51,11 @@ namespace SecretSanta.Utilities
         {
             #region Variables
 
-            public string Source { get; set; }
+            public byte[] ImageBytes { get; private set; }
 
-            public int Width { get; set; }
+            public int Height { get; private set; }
 
-            public int Height { get; set; }
+            public int Width { get; private set; }
 
             #endregion
 
@@ -66,9 +64,12 @@ namespace SecretSanta.Utilities
             public ImageTag(string tag, string url)
             {
                 tag = tag.Replace('\'', '"');
-                Source = ExtractSource(tag, url);
-                Width = ExtractWidth(tag);
-                Height = ExtractHeight(tag);
+                int height;
+                int width;
+                var source = ExtractSource(tag, url);
+                ImageBytes = DownloadImage(source, out height, out width);
+                Height = height;
+                Width = width;
             }
 
             #endregion
@@ -93,28 +94,37 @@ namespace SecretSanta.Utilities
                 return source;
             }
 
-            private int ExtractHeight(string tag)
+            private byte[] DownloadImage(string source, out int height, out int width)
             {
-                Match match = Regex.Match(tag, "height=\"([^\"]+)");
-                int height = 0;
-                if (match.Groups.Count > 0)
-                {
-                    string value = Regex.Replace(match.Groups[1].Value, "\\D", "");
-                    int.TryParse(value, out height);
-                }
-                return height;
-            }
+                byte[] output;
 
-            private int ExtractWidth(string tag)
-            {
-                Match match = Regex.Match(tag, "width=\"([^\"]+)");
-                int width = 0;
-                if (match.Groups.Count > 0)
+                try
                 {
-                    string value = Regex.Replace(match.Groups[1].Value, "\\D", "");
-                    int.TryParse(value, out width);
+                    using (var client = new WebClient())
+                    {
+                        var data = client.DownloadData(source);
+                        using (var inStream = new MemoryStream(data))
+                        {
+                            var tempImage = Image.FromStream(inStream);
+
+                            using (var outStream = new MemoryStream())
+                            {
+                                tempImage.Save(outStream, ImageFormat.Jpeg);
+                                height = tempImage.Height;
+                                width = tempImage.Width;
+                                output = outStream.ToArray();
+                            }
+                        }
+                    }
                 }
-                return width;
+                catch (Exception e)
+                {
+                    height = -1;
+                    width = -1;
+                    output = new byte[] { };
+                }
+
+                return output;
             }
 
             #endregion
