@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Runtime.Remoting.Channels;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Web;
-using Image = System.Drawing.Image;
 
 namespace SecretSanta.Utilities
 {
@@ -33,8 +31,8 @@ namespace SecretSanta.Utilities
                         imageTags.Add(new ImageTag(matches[i].Value, url));
                     }
 
-                    int maxSize = imageTags.Max(t => t.Width * t.Height);
-                    var featured = imageTags.First((t => t.Width * t.Height == maxSize));
+                    int maxSize = imageTags.Max(t => t.Width*t.Height);
+                    ImageTag featured = imageTags.First((t => t.Width*t.Height == maxSize));
                     output = featured.ImageBytes;
                 }
             }
@@ -66,7 +64,7 @@ namespace SecretSanta.Utilities
                 tag = tag.Replace('\'', '"');
                 int height;
                 int width;
-                var source = ExtractSource(tag, url);
+                string source = ExtractSource(tag, url);
                 ImageBytes = DownloadImage(source, out height, out width);
                 Height = height;
                 Width = width;
@@ -102,10 +100,10 @@ namespace SecretSanta.Utilities
                 {
                     using (var client = new WebClient())
                     {
-                        var data = client.DownloadData(source);
+                        byte[] data = client.DownloadData(source);
                         using (var inStream = new MemoryStream(data))
                         {
-                            var tempImage = Image.FromStream(inStream);
+                            Image tempImage = Image.FromStream(inStream);
 
                             using (var outStream = new MemoryStream())
                             {
@@ -121,7 +119,7 @@ namespace SecretSanta.Utilities
                 {
                     height = -1;
                     width = -1;
-                    output = new byte[] { };
+                    output = new byte[] {};
                 }
 
                 return output;

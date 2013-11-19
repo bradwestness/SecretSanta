@@ -1,9 +1,9 @@
-﻿using System.Web;
+﻿using System;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
 using SecretSanta.Models;
 using SecretSanta.Utilities;
-using System;
-using System.Linq;
-using System.Web.Mvc;
 
 namespace SecretSanta.Controllers
 {
@@ -15,7 +15,7 @@ namespace SecretSanta.Controllers
         public ActionResult FeaturedImage(Guid accountId, Guid itemId)
         {
             var account = DataRepository.Get<Account>(accountId);
-            var item = account.Wishlist.Single(x => x.Id == itemId);
+            WishlistItem item = account.Wishlist.Single(x => x.Id == itemId);
 
             if (item.PreviewImage == null || item.PreviewImage.Length == 0)
             {

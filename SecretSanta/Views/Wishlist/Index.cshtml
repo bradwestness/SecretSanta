@@ -36,7 +36,7 @@
                         <td>
                             @if (!string.IsNullOrWhiteSpace(Model.Account.Wishlist[i].Url))
                             {
-                                <a class="preview" target="_blank" href="@Model.Account.Wishlist[i].Url"><img class="img-thumbnail img-responsive" src="@Url.Action("FeaturedImage", "Preview", new {accountId = Model.Account.Id, itemId = Model.Account.Wishlist[i].Id })" /></a>
+                                <a class="preview" target="_blank" href="@Model.Account.Wishlist[i].Url"><img class="img-thumbnail img-responsive" src="@Url.Action("FeaturedImage", "Preview", new {accountId = Model.Account.Id, itemId = Model.Account.Wishlist[i].Id})" /></a>
                             }
                             <p>&nbsp;</p>
                         </td>
