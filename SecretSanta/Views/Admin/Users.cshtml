@@ -6,10 +6,11 @@
 <h1>@ViewBag.Title</h1>
 
 <div class="text-right">
-    @Html.ActionLink("Send Invitations", "Invite", null, new {@class = "btn btn-default"})
+    @Html.ActionLink("Send Invitations", "Invite", null, new { @class = "btn btn-default" })
+    @Html.ActionLink("Send Received Gift Reminders", "ReceivedGift", null, new { @class = "btn btn-default" })
     @if (Model.AllPicked)
     {
-        @Html.ActionLink("Send All Picked Reminders", "AllPicked", null, new {@class = "btn btn-default"})
+        @Html.ActionLink("Send All Picked Reminders", "AllPicked", null, new { @class = "btn btn-default" })
     }
     <button class="btn btn-primary" data-toggle="modal" data-target="#AddUser">Add User</button>
 </div>
@@ -34,8 +35,8 @@
             <tr>
                 <td>@Html.DisplayFor(m => m.Users[i].Account.DisplayName)</td>
                 <td>@Html.DisplayFor(m => m.Users[i].Account.Email)</td>
-                <td>@Html.CheckBox("Users[" + i + "].HasPicked", Model.Users[i].Account.HasPicked(), new {disabled = "disabled"})</td>
-                <td>@Html.CheckBox("Users[" + i + "].HasBeenPicked", Model.Users[i].Account.HasBeenPicked(), new {disabled = "disabled"})</td>
+                <td>@Html.CheckBox("Users[" + i + "].HasPicked", Model.Users[i].Account.HasPicked(), new { disabled = "disabled" })</td>
+                <td>@Html.CheckBox("Users[" + i + "].HasBeenPicked", Model.Users[i].Account.HasBeenPicked(), new { disabled = "disabled" })</td>
                 <td>
                     <div class="pull-right">
                         <a class="btn btn-link" href="@Url.Action("Details", "Wishlist", new {id = Model.Users[i].Account.Id})">View Wishlist &raquo;</a>

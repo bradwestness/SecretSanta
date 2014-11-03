@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.IO;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.Net.Mail;
 using System.Text;
 using System.Web;
@@ -98,7 +101,7 @@ namespace SecretSanta.Models
         public static void SendReminder(Guid id, UrlHelper urlHelper)
         {
             var account = DataRepository.Get<Account>(id);
-            string url = urlHelper.Action("LogIn", "Account", new {id = account.Id}, "http");
+            string url = urlHelper.Action("LogIn", "Account", new { id = account.Id }, "http");
             string body = new StringBuilder()
                 .AppendFormat("Hey {0}, ", account.DisplayName).AppendLine()
                 .AppendLine()
@@ -115,7 +118,7 @@ namespace SecretSanta.Models
                 .ToString();
 
             var from = new MailAddress("santa@thenorthpole.com", "Santa Claus");
-            var to = new MailAddressCollection {new MailAddress(account.Email, account.DisplayName)};
+            var to = new MailAddressCollection { new MailAddress(account.Email, account.DisplayName) };
 
             EmailMessage.Send(from, to, "Secret Santa Reminder", body);
         }

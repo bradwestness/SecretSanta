@@ -16,7 +16,7 @@ namespace SecretSanta.Controllers
         }
 
         //
-        // GET: /Invite
+        // GET: /Admin/Invite
         public ActionResult Invite()
         {
             var urlHelper = new UrlHelper(ControllerContext.RequestContext);
@@ -26,12 +26,22 @@ namespace SecretSanta.Controllers
         }
 
         //
-        // GET: /AllPicked
+        // GET: /Admin/AllPicked
         public ActionResult AllPicked()
         {
             var urlHelper = new UrlHelper(ControllerContext.RequestContext);
             EditUsersModel.SendAllPickedMessages(urlHelper);
             this.SetResultMessage("Reminders successfully sent to all users.");
+            return RedirectToAction("Users");
+        }
+
+        //
+        // GET: /Admin/ReceivedGift
+        public ActionResult ReceivedGift()
+        {
+            var urlHelper = new UrlHelper(ControllerContext.RequestContext);
+            ReceivedGiftEditModel.SendReminders(urlHelper);
+            this.SetResultMessage("Reminders successfully sent to all users who have not entered their received gift info.");
             return RedirectToAction("Users");
         }
 

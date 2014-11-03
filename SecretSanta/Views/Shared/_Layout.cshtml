@@ -36,6 +36,7 @@
                                 Account picked = ViewBag.CurrentUserAccount.GetPicked();
                                 <li>@Html.ActionLink(picked.DisplayName + "'s Wish List", "Details", "Wishlist", new {id = picked.Id}, null)</li>
                             }
+                            <li>@Html.ActionLink("Received Gifts", "Index", "Received")</li>
                         }
                         @if (ViewBag.IsAdmin)
                         {
@@ -72,6 +73,7 @@
                             <li>The dollar limit per person is @AppSettings.GiftDollarLimit.ToString("$0.00")@(".")</li>
                             <li>Log back into this website with your e-mail address at any time to manage your wish list and view your recipient's wish list.</li>
                             <li>Preview images are pulled automagically from the given link address and may not be the correct picture, it's recommended that you click through to the actual linked page.</li>
+                            <li><strong>New!</strong> Click "Received Gifts" at the top to view the gifts everyone got and add your own!</li>
                         </ul>
                     </div>
                 </div>

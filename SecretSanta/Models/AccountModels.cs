@@ -32,6 +32,9 @@ namespace SecretSanta.Models
         [DisplayName("Wish List")]
         public IList<WishlistItem> Wishlist { get; set; }
 
+        [DisplayName("Gift Received")]
+        public ReceivedGift ReceivedGift { get; set; }
+
         #endregion
 
         #region Public Methods
@@ -40,6 +43,7 @@ namespace SecretSanta.Models
         {
             DoNotPick = new List<Guid>();
             Wishlist = new List<WishlistItem>();
+            ReceivedGift = new ReceivedGift { Id = Id };
         }
 
         public bool HasPicked()
