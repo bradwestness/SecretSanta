@@ -259,6 +259,20 @@ namespace SecretSanta.Models
             }
         }
 
+        public static void Reset()
+        {
+            var users = DataRepository.GetAll<Account>();
+
+            foreach(var user in users)
+            {
+                user.Picked = null;
+                user.ReceivedGift = new ReceivedGift();
+                user.Wishlist = new List<WishlistItem>();
+
+                DataRepository.Save(user);
+            }
+        }
+
         #endregion
     }
 

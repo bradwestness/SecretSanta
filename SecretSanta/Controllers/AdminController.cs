@@ -16,6 +16,15 @@ namespace SecretSanta.Controllers
         }
 
         //
+        // GET: /Admin/Reset
+        public ActionResult Reset()
+        {
+            EditUsersModel.Reset();
+            this.SetResultMessage("All user wishlists and picks have been reset.");
+            return RedirectToAction("Users");
+        }
+
+        //
         // GET: /Admin/Invite
         public ActionResult Invite()
         {
