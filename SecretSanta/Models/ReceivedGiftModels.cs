@@ -1,16 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Drawing.Imaging;
-using System.IO;
-using System.Net.Mail;
-using System.Web.Mvc;
-using System.Text;
+﻿using Newtonsoft.Json;
 using SecretSanta.Utilities;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using Newtonsoft.Json;
+using System.Drawing.Imaging;
+using System.IO;
+using System.Linq;
+using System.Net.Mail;
+using System.Text;
+using System.Web;
+using System.Web.Mvc;
 
 namespace SecretSanta.Models
 {

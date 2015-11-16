@@ -1,16 +1,13 @@
-﻿using System;
+﻿using SecretSanta.Utilities;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.IO;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.Net.Mail;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
-using SecretSanta.Utilities;
 
 namespace SecretSanta.Models
 {

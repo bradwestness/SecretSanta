@@ -1,10 +1,10 @@
-﻿using System;
+﻿using SecretSanta.Models;
+using System;
 using System.Linq;
 using System.Security.Principal;
 using System.Text;
 using System.Web;
 using System.Web.Mvc;
-using SecretSanta.Models;
 
 namespace SecretSanta.Utilities
 {

@@ -1,7 +1,7 @@
-﻿using System;
-using System.Web.Mvc;
-using SecretSanta.Models;
+﻿using SecretSanta.Models;
 using SecretSanta.Utilities;
+using System;
+using System.Web.Mvc;
 
 namespace SecretSanta.Controllers
 {
