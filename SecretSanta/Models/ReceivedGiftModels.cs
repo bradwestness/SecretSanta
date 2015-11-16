@@ -54,7 +54,7 @@ namespace SecretSanta.Models
 
             Account account = HttpContext.Current.User.GetAccount();
             Id = account.Id;
-            account.ReceivedGift = this;
+            account.ReceivedGift[DateTime.Now.Year] = this;
             DataRepository.Save(account);
         }
 
@@ -76,14 +76,19 @@ namespace SecretSanta.Models
         public ReceivedGiftEditModel()
         {
             Gifts = DataRepository.GetAll<Account>().Where(x =>
-                    x.ReceivedGift != null &&
-                    !string.IsNullOrWhiteSpace(x.ReceivedGift.Description)
-                ).Select(x => x.ReceivedGift).ToList();
+                        x.ReceivedGift.ContainsKey(DateTime.Now.Year) &&
+                        x.ReceivedGift[DateTime.Now.Year] != null &&
+                        !string.IsNullOrWhiteSpace(x.ReceivedGift[DateTime.Now.Year].Description)
+                    )
+                    .Select(x => x.ReceivedGift[DateTime.Now.Year])
+                    .ToList();
         }
 
         public ReceivedGiftEditModel(Account account) : this()
         {
-            Item = account.ReceivedGift;
+            Item = account.ReceivedGift.ContainsKey(DateTime.Now.Year)
+                ? account.ReceivedGift[DateTime.Now.Year]
+                : new ReceivedGift();
             Item.Id = account.Id;
 
             if (string.IsNullOrWhiteSpace(Item.From))
@@ -99,7 +104,11 @@ namespace SecretSanta.Models
 
         public static void SendReminders(UrlHelper urlHelper)
         {
-            var accounts = DataRepository.GetAll<Account>().Where(x => x.ReceivedGift == null || string.IsNullOrWhiteSpace(x.ReceivedGift.Description));
+            var accounts = DataRepository.GetAll<Account>().Where(x => 
+                x.ReceivedGift == null || 
+                !x.ReceivedGift.ContainsKey(DateTime.Now.Year) ||
+                string.IsNullOrWhiteSpace(x.ReceivedGift[DateTime.Now.Year].Description)
+            );
 
             foreach (var account in accounts)
             {

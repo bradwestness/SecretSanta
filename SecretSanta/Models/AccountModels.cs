@@ -24,16 +24,16 @@ namespace SecretSanta.Models
         [DisplayName("Display Name"), Required]
         public string DisplayName { get; set; }
 
-        public Guid? Picked { get; set; }
-
         [DisplayName("Do Not Pick")]
         public IList<Guid> DoNotPick { get; set; }
 
+        public IDictionary<int, Guid?> Picked { get; set; }
+
         [DisplayName("Wish List")]
-        public IList<WishlistItem> Wishlist { get; set; }
+        public IDictionary<int, IList<WishlistItem>> Wishlist { get; set; }
 
         [DisplayName("Gift Received")]
-        public ReceivedGift ReceivedGift { get; set; }
+        public IDictionary<int, ReceivedGift> ReceivedGift { get; set; }
 
         #endregion
 
@@ -42,13 +42,14 @@ namespace SecretSanta.Models
         public Account()
         {
             DoNotPick = new List<Guid>();
-            Wishlist = new List<WishlistItem>();
-            ReceivedGift = new ReceivedGift { Id = Id };
+            Picked = new Dictionary<int, Guid?>();
+            Wishlist = new Dictionary<int, IList<WishlistItem>>();
+            ReceivedGift = new Dictionary<int, ReceivedGift>();
         }
 
         public bool HasPicked()
         {
-            return Picked.HasValue && Picked.Value != new Guid();
+            return GetPicked() != null;
         }
 
         public bool HasBeenPicked()
@@ -58,28 +59,44 @@ namespace SecretSanta.Models
 
         public Account GetPicked()
         {
-            return DataRepository.Get<Account>(Picked);
+            if (Picked != null && Picked.ContainsKey(DateTime.Now.Year))
+            {
+                return DataRepository.Get<Account>(Picked[DateTime.Now.Year]);
+            }
+
+            return null;
         }
 
         public Account GetPickedBy()
         {
-            return DataRepository.GetAll<Account>().SingleOrDefault(a => a.Picked == Id);
+            var pickedBy = DataRepository.GetAll<Account>()
+                .FirstOrDefault(x => 
+                    x.Picked != null && x.Picked.Any(y => 
+                        y.Key == DateTime.Now.Year && 
+                        y.Value == Id
+                    )
+                );
+            return pickedBy;
         }
 
         public void Pick()
         {
             if (!Id.HasValue || HasPicked())
+            {
                 return;
+            }
 
             Account[] candidates = DataRepository.GetAll<Account>()
                 .Where(a =>
-                    a.HasBeenPicked() == false
+                    a.Id != Id 
+                    && a.HasBeenPicked() == false
                     && !DoNotPick.Contains(a.Id.Value)
                     && !a.DoNotPick.Contains(Id.Value)
+                    && !Picked.Any(y => y.Key == (DateTime.Now.Year - 1) && y.Value == a.Id)
                 ).ToArray();
 
             int rand = new Random().Next(0, candidates.Length);
-            Picked = candidates[rand].Id;
+            Picked.Add(DateTime.Now.Year, candidates[rand].Id);
             DataRepository.Save(this);
         }
 
@@ -234,12 +251,15 @@ namespace SecretSanta.Models
                     .AppendFormat("Here's their wish list as it stands right now: ").AppendLine()
                     .AppendLine();
 
-                foreach (WishlistItem item in recipient.Wishlist)
+                if (recipient.Wishlist.ContainsKey(DateTime.Now.Year))
                 {
-                    body.AppendFormat("Item: {0}", item.Name).AppendLine()
-                        .AppendFormat("Description: {0}", item.Description).AppendLine()
-                        .AppendFormat("Link: {0}", item.Url).AppendLine()
-                        .AppendLine();
+                    foreach (WishlistItem item in recipient.Wishlist[DateTime.Now.Year])
+                    {
+                        body.AppendFormat("Item: {0}", item.Name).AppendLine()
+                            .AppendFormat("Description: {0}", item.Description).AppendLine()
+                            .AppendFormat("Link: {0}", item.Url).AppendLine()
+                            .AppendLine();
+                    }
                 }
 
                 body.AppendFormat(
@@ -265,9 +285,9 @@ namespace SecretSanta.Models
 
             foreach(var user in users)
             {
-                user.Picked = null;
-                user.ReceivedGift = new ReceivedGift();
-                user.Wishlist = new List<WishlistItem>();
+                user.Picked.Remove(DateTime.Now.Year);
+                user.ReceivedGift.Remove(DateTime.Now.Year);
+                user.Wishlist.Remove(DateTime.Now.Year);
 
                 DataRepository.Save(user);
             }
@@ -323,6 +343,8 @@ namespace SecretSanta.Models
 
         public Account Account { get; set; }
 
+        public Guid? Picked { get; set; }
+
         #endregion
 
         #region Public Methods
@@ -337,6 +359,11 @@ namespace SecretSanta.Models
 
         public void Save()
         {
+            if (Picked.HasValue)
+            {
+                Account.Picked[DateTime.Now.Year] = Picked.Value;
+            }
+
             DataRepository.Save(Account);
         }
 

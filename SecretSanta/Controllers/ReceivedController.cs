@@ -37,7 +37,7 @@ namespace SecretSanta.Controllers
         public ActionResult Image(Guid accountId)
         {
             var account = DataRepository.Get<Account>(accountId);
-            ReceivedGift gift = account.ReceivedGift;
+            ReceivedGift gift = account.ReceivedGift[DateTime.Now.Year];
 
             if (gift.Image == null || gift.Image.Length == 0)
             {

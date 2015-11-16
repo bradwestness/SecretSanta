@@ -5,7 +5,7 @@
 
 <div class="jumbotron">
     <h1>@ViewBag.Title</h1>
-    @if (Model.Account.Wishlist != null && Model.Account.Wishlist.Any())
+    @if (Model.Account.Wishlist != null && Model.Account.Wishlist.Any(x => x.Key == DateTime.Now.Year))
     {
         <table class="table table-striped">
             <thead>
@@ -16,7 +16,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (WishlistItem item in Model.Account.Wishlist)
+                @foreach (WishlistItem item in Model.Account.Wishlist[DateTime.Now.Year])
                 {
                     <tr>
                         <td>

@@ -14,7 +14,7 @@
         @Html.Partial("EditorTemplates/AddItem", Model.NewItem)
     </div>
 
-    @if (Model.Account.Wishlist != null && Model.Account.Wishlist.Any())
+    @if (Model.Account.Wishlist != null && Model.Account.Wishlist.Any(x => x.Key == DateTime.Now.Year))
     {
         <table class="table table-striped">
             <thead>
@@ -26,24 +26,24 @@
                 </tr>
             </thead>
             <tbody>
-                @for (int i = 0; i < Model.Account.Wishlist.Count; i++)
+                @for (int i = 0; i < Model.Account.Wishlist[DateTime.Now.Year].Count; i++)
                 {
                     <tr>
                         <td>
-                            <h3>@Html.DisplayFor(m => m.Account.Wishlist[i].Name)</h3>
-                            <p><small>@Html.DisplayFor(m => m.Account.Wishlist[i].Description)</small></p>
+                            <h3>@Html.DisplayFor(m => m.Account.Wishlist[DateTime.Now.Year][i].Name)</h3>
+                            <p><small>@Html.DisplayFor(m => m.Account.Wishlist[DateTime.Now.Year][i].Description)</small></p>
                         </td>
                         <td>
-                            @if (!string.IsNullOrWhiteSpace(Model.Account.Wishlist[i].Url))
+                            @if (!string.IsNullOrWhiteSpace(Model.Account.Wishlist[DateTime.Now.Year][i].Url))
                             {
-                                <a class="preview" target="_blank" href="@Model.Account.Wishlist[i].Url"><img class="img-thumbnail img-responsive" src="@Url.Action("FeaturedImage", "Preview", new {accountId = Model.Account.Id, itemId = Model.Account.Wishlist[i].Id})" /></a>
+                                <a class="preview" target="_blank" href="@Model.Account.Wishlist[DateTime.Now.Year][i].Url"><img class="img-thumbnail img-responsive" src="@Url.Action("FeaturedImage", "Preview", new {accountId = Model.Account.Id, itemId = Model.Account.Wishlist[DateTime.Now.Year][i].Id})" /></a>
                             }
                             <p>&nbsp;</p>
                         </td>
                         <td>
-                            @if (!string.IsNullOrWhiteSpace(Model.Account.Wishlist[i].Url))
+                            @if (!string.IsNullOrWhiteSpace(Model.Account.Wishlist[DateTime.Now.Year][i].Url))
                             {
-                                <a target="_blank" class="btn btn-default" href="@Model.Account.Wishlist[i].Url">More Information &raquo;</a>
+                                <a target="_blank" class="btn btn-default" href="@Model.Account.Wishlist[DateTime.Now.Year][i].Url">More Information &raquo;</a>
                             }
                             else
                             {
@@ -56,10 +56,10 @@
                                 <button class="btn btn-default" data-toggle="modal" data-target="#DeleteItem@(i)">Delete</button>
                             </div>
                             <div id="EditItem@(i)" class="modal fade">
-                                @Html.Partial("EditorTemplates/EditItem", Model.Account.Wishlist[i])
+                                @Html.Partial("EditorTemplates/EditItem", Model.Account.Wishlist[DateTime.Now.Year][i])
                             </div>
                             <div id="DeleteItem@(i)" class="modal fade">
-                                @Html.Partial("DisplayTemplates/DeleteItem", Model.Account.Wishlist[i])
+                                @Html.Partial("DisplayTemplates/DeleteItem", Model.Account.Wishlist[DateTime.Now.Year][i])
                             </div>
                         </td>
                     </tr>

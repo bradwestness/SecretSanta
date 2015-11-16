@@ -56,7 +56,6 @@ namespace SecretSanta.Models
             {
                 Account = DataRepository.Get<Account>(new Guid(id))
             };
-            model.Account.Wishlist = model.Account.Wishlist.OrderBy(x => x.Name).ToList();
             return model;
         }
 
@@ -72,29 +71,31 @@ namespace SecretSanta.Models
             Account account = HttpContext.Current.User.GetAccount();
             if (account.Wishlist == null)
             {
-                account.Wishlist = new List<WishlistItem>();
+                account.Wishlist = new Dictionary<int, IList<WishlistItem>> {
+                    { DateTime.Now.Year, new List<WishlistItem>() }
+                };
             }
             item.Id = Guid.NewGuid();
             item.PreviewImage = PreviewGenerator.GetFeaturedImage(item.Url);
-            account.Wishlist.Add(item);
+            account.Wishlist[DateTime.Now.Year].Add(item);
             DataRepository.Save(account);
         }
 
         public static void EditItem(WishlistItem item)
         {
             Account account = HttpContext.Current.User.GetAccount();
-            WishlistItem remove = account.Wishlist.SingleOrDefault(i => i.Id.Equals(item.Id));
-            account.Wishlist.Remove(remove);
+            WishlistItem remove = account.Wishlist[DateTime.Now.Year].SingleOrDefault(i => i.Id.Equals(item.Id));
+            account.Wishlist[DateTime.Now.Year].Remove(remove);
             item.PreviewImage = PreviewGenerator.GetFeaturedImage(item.Url);
-            account.Wishlist.Add(item);
+            account.Wishlist[DateTime.Now.Year].Add(item);
             DataRepository.Save(account);
         }
 
         public static void DeleteItem(WishlistItem item)
         {
             Account account = HttpContext.Current.User.GetAccount();
-            WishlistItem remove = account.Wishlist.SingleOrDefault(i => i.Id.Equals(item.Id));
-            account.Wishlist.Remove(remove);
+            WishlistItem remove = account.Wishlist[DateTime.Now.Year].SingleOrDefault(i => i.Id.Equals(item.Id));
+            account.Wishlist[DateTime.Now.Year].Remove(remove);
             DataRepository.Save(account);
         }
 

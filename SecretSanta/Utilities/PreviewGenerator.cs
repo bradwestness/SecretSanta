@@ -36,7 +36,7 @@ namespace SecretSanta.Utilities
                     output = featured.ImageBytes;
                 }
             }
-            catch (Exception e)
+            catch
             {
                 string fileName = HttpContext.Current.Server.MapPath(AppSettings.DefaultPreviewImage);
                 output = File.ReadAllBytes(fileName);
@@ -115,7 +115,7 @@ namespace SecretSanta.Utilities
                         }
                     }
                 }
-                catch (Exception e)
+                catch
                 {
                     height = -1;
                     width = -1;

@@ -4,6 +4,7 @@ using System.Web;
 using System.Web.Mvc;
 using SecretSanta.Models;
 using SecretSanta.Utilities;
+using System.Collections.Generic;
 
 namespace SecretSanta.Controllers
 {
@@ -15,13 +16,22 @@ namespace SecretSanta.Controllers
         public ActionResult FeaturedImage(Guid accountId, Guid itemId)
         {
             var account = DataRepository.Get<Account>(accountId);
-            WishlistItem item = account.Wishlist.Single(x => x.Id == itemId);
-
-            if (item.PreviewImage == null || item.PreviewImage.Length == 0)
+            var item = new KeyValuePair<int, WishlistItem>();
+            foreach(var year in account.Wishlist.Keys)
             {
-                account.Wishlist.Remove(item);
-                item.PreviewImage = PreviewGenerator.GetFeaturedImage(item.Url);
-                account.Wishlist.Add(item);
+                var match = account.Wishlist[year].FirstOrDefault(x => x.Id == itemId);
+                if (match != null)
+                {
+                    item = new KeyValuePair<int, WishlistItem>(year, match);
+                    break;
+                }
+            }
+
+            if (item.Value.PreviewImage == null || item.Value.PreviewImage.Length == 0)
+            {
+                account.Wishlist[item.Key].Remove(item.Value);
+                item.Value.PreviewImage = PreviewGenerator.GetFeaturedImage(item.Value.Url);
+                account.Wishlist[item.Key].Add(item.Value);
                 DataRepository.Save(account);
             }
 
@@ -32,7 +42,7 @@ namespace SecretSanta.Controllers
             Response.Cache.VaryByParams["accountId"] = true;
             Response.Cache.VaryByParams["itemId"] = true;
 
-            return File(item.PreviewImage, "image/jpg");
+            return File(item.Value.PreviewImage, "image/jpg");
         }
     }
 }
