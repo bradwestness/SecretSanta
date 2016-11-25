@@ -72,6 +72,10 @@ namespace SecretSanta.Models
                     { DateTime.Now.Year, new List<WishlistItem>() }
                 };
             }
+            if(!account.Wishlist.ContainsKey(DateTime.Now.Year))
+            {
+                account.Wishlist[DateTime.Now.Year] = new List<WishlistItem>();
+            }
             item.Id = Guid.NewGuid();
             item.PreviewImage = PreviewGenerator.GetFeaturedImage(item.Url);
             account.Wishlist[DateTime.Now.Year].Add(item);
