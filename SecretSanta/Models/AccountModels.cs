@@ -86,17 +86,25 @@ namespace SecretSanta.Models
                 return;
             }
 
-            Account[] candidates = DataRepository.GetAll<Account>()
+            var candidates = DataRepository.GetAll<Account>()
                 .Where(a =>
-                    a.Id != Id 
+                    a.Id != Id
                     && a.HasBeenPicked() == false
                     && !DoNotPick.Contains(a.Id.Value)
                     && !a.DoNotPick.Contains(Id.Value)
-                    && !Picked.Any(y => y.Key == (DateTime.Now.Year - 1) && y.Value == a.Id)
-                ).ToArray();
+                );
 
-            int rand = new Random().Next(0, candidates.Length);
-            Picked.Add(DateTime.Now.Year, candidates[rand].Id);
+            if (candidates.Count() > 1)
+            {
+                // if there's more than one potential candidate,
+                // make sure not to pick the same person as the previous year
+                candidates = candidates.Where(a =>
+                    !Picked.Any(y => y.Key == (DateTime.Now.Year - 1) && y.Value == a.Id)
+                );
+            }
+
+            int rand = new Random().Next(0, candidates.Count());
+            Picked.Add(DateTime.Now.Year, candidates.ElementAt(rand).Id);
             DataRepository.Save(this);
         }
 
