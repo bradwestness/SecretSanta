@@ -66,15 +66,9 @@ namespace SecretSanta.Models
         public static void AddItem(WishlistItem item)
         {
             Account account = HttpContext.Current.User.GetAccount();
-            if (account.Wishlist == null)
+            if (!account.Wishlist.ContainsKey(DateTime.Now.Year))
             {
-                account.Wishlist = new Dictionary<int, IList<WishlistItem>> {
-                    { DateTime.Now.Year, new List<WishlistItem>() }
-                };
-            }
-            if(!account.Wishlist.ContainsKey(DateTime.Now.Year))
-            {
-                account.Wishlist[DateTime.Now.Year] = new List<WishlistItem>();
+                account.Wishlist.Add(DateTime.Now.Year, new List<WishlistItem>());
             }
             item.Id = Guid.NewGuid();
             item.PreviewImage = PreviewGenerator.GetFeaturedImage(item.Url);
