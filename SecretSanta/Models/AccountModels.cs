@@ -339,7 +339,7 @@ namespace SecretSanta.Models
     {
         #region Variables
 
-        public Guid Id { get; set; }
+        public Guid AccountId { get; set; }
 
         [Required, EmailAddress, DisplayName("E-Mail Address")]
         public string Email { get; set; }
@@ -373,7 +373,7 @@ namespace SecretSanta.Models
                 x.Picked[DateTime.Now.Year].Equals(id)
             );
 
-            Id = account.Id.Value;
+            AccountId = account.Id.Value;
             Email = account.Email;
             DisplayName = account.DisplayName;
             Picked = account.Picked?[DateTime.Now.Year];
@@ -383,7 +383,7 @@ namespace SecretSanta.Models
         
         public void Save()
         {
-            var account = DataRepository.Get<Account>(Id);
+            var account = DataRepository.Get<Account>(AccountId);
 
             account.Email = Email;
             account.DisplayName = DisplayName;
@@ -395,13 +395,13 @@ namespace SecretSanta.Models
 
         public void Delete()
         {
-            DataRepository.Delete<Account>(Id);
+            DataRepository.Delete<Account>(AccountId);
         }
 
         public IEnumerable<SelectListItem> GetPickOptions()
         {
             return DataRepository.GetAll<Account>()
-                .Where(a => !a.Id.Equals(Id) && !DoNotPick.Contains(a.Id.Value))
+                .Where(a => !a.Id.Equals(AccountId) && !DoNotPick.Contains(a.Id.Value))
                 .Select(a => new SelectListItem
                 {
                     Text = a.DisplayName,
