@@ -69,13 +69,13 @@ namespace SecretSanta.Models
 
         public Account GetPickedBy()
         {
-            var pickedBy = DataRepository.GetAll<Account>()
-                .FirstOrDefault(x => 
-                    x.Picked != null && x.Picked.Any(y => 
-                        y.Key == DateTime.Now.Year && 
-                        y.Value == Id
-                    )
-                );
+            var pickedBy = DataRepository.GetAll<Account>().FirstOrDefault(x => 
+                x.Picked != null && x.Picked.Any(y => 
+                    y.Key == DateTime.Now.Year && 
+                    y.Value == Id
+                )
+            );
+
             return pickedBy;
         }
 
@@ -125,10 +125,14 @@ namespace SecretSanta.Models
         public bool IsValid()
         {
             if (string.IsNullOrWhiteSpace(Email))
+            {
                 return false;
+            }
 
             if (Email.Equals(AppSettings.AdminEmail, StringComparison.CurrentCultureIgnoreCase))
+            {
                 return true;
+            }
 
             IList<Account> accounts = DataRepository.GetAll<Account>();
             return accounts.Any(a => a.Email.Equals(Email, StringComparison.CurrentCultureIgnoreCase));
@@ -179,7 +183,9 @@ namespace SecretSanta.Models
             get
             {
                 if (Users == null)
+                {
                     return false;
+                }
 
                 return Users.All(u => u.Account.HasPicked() && u.Account.HasBeenPicked());
             }
@@ -202,7 +208,8 @@ namespace SecretSanta.Models
                 NewUser = new AddUserModel(),
                 Users = DataRepository.GetAll<Account>()
                     .OrderBy(a => a.DisplayName)
-                    .Select(a => new EditUserModel {Account = a}).ToList()
+                    .Select(a => new EditUserModel {Account = a})
+                    .ToList()
             };
 
             return model;

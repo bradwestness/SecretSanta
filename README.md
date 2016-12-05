@@ -23,8 +23,7 @@ SecretSanta is an easy to use gift exchange organizer that you can deploy to you
 
 ## Set Up
 
-1. Create a settings file in App_Config/AppSettings.Config under the project directory
-2. Set values for the following items:
+1. Add the following appSettings to web.config:
     <add key="SecretSanta:AdminEmail" value="my_email@outlook.com" />
     <add key="SecretSanta:MaxImagesToLoad" value="25"/>
     <add key="SecretSanta:DefaultPreviewImage" value="~/Content/Images/photo_not_available.png"/>

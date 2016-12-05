@@ -140,7 +140,9 @@ namespace SecretSanta.Utilities
         private static string SanitizeFileName(string fileName)
         {
             if (string.IsNullOrWhiteSpace(fileName))
+            {
                 return string.Empty;
+            }
 
             return Regex.Replace(fileName.ToLower(), @"[^a-z0-9-]", "");
         }
@@ -148,10 +150,12 @@ namespace SecretSanta.Utilities
         private static string GetDataDirectory()
         {
             string directory = HttpContext.Current.Server.MapPath(AppSettings.DataDirectory);
+
             if (!Directory.Exists(directory))
             {
                 Directory.CreateDirectory(directory);
             }
+
             return directory;
         }
 

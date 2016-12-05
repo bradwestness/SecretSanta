@@ -13,10 +13,13 @@ namespace SecretSanta.Utilities
         public static Account GetAccount(this IPrincipal user)
         {
             if (!user.Identity.IsAuthenticated || string.IsNullOrWhiteSpace(user.Identity.Name))
+            {
                 return null;
+            }
 
-            Account account = DataRepository.GetAll<Account>()
-                .SingleOrDefault(a => a.Email.Equals(user.Identity.Name, StringComparison.CurrentCultureIgnoreCase));
+            Account account = DataRepository.GetAll<Account>().SingleOrDefault(a => 
+                a.Email.Equals(user.Identity.Name, StringComparison.CurrentCultureIgnoreCase)
+            );
 
             if (account == null)
             {
