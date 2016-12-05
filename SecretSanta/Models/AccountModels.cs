@@ -366,9 +366,14 @@ namespace SecretSanta.Models
 
         public static EditUserModel Load(string id)
         {
+            var account = DataRepository.Get<Account>(new Guid(id));
+
             return new EditUserModel
             {
-                Account = DataRepository.Get<Account>(new Guid(id))
+                Account = account,
+                Picked = account.Picked.ContainsKey(DateTime.Now.Year)
+                    ? account.Picked[DateTime.Now.Year]
+                    : null
             };
         }
 
