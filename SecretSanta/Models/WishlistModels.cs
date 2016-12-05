@@ -34,9 +34,13 @@ namespace SecretSanta.Models
     {
         #region Variables
 
-        public Account Account { get; set; }
+        public Guid AccountId { get; set; }
+
+        public string DisplayName { get; set; }
 
         public WishlistItem NewItem { get; set; }
+
+        public IList<WishlistItem> Items { get; set; }
 
         #endregion
 
@@ -45,17 +49,17 @@ namespace SecretSanta.Models
         public WishlistEditModel()
         {
             NewItem = new WishlistItem();
+            Items = new List<WishlistItem>();
         }
 
-        public static WishlistEditModel Load(string id)
+        public WishlistEditModel(Guid id)
         {
-            var model = new WishlistEditModel
-            {
-                Account = DataRepository.Get<Account>(new Guid(id))
-            };
-            return model;
+            var account = DataRepository.Get<Account>(id);
+            AccountId = account.Id.Value;
+            DisplayName = account.DisplayName;
+            Items = account?.Wishlist?[DateTime.Now.Year] ?? new List<WishlistItem>();
         }
-
+        
         #endregion
     }
 

@@ -1,11 +1,11 @@
 ﻿@model WishlistEditModel
 @{
-    ViewBag.Title = Model.Account.DisplayName + "'s Wish List";
+    ViewBag.Title = Model.DisplayName + "'s Wish List";
 }
 
 <div class="jumbotron">
     <h1>@ViewBag.Title</h1>
-    @if (Model.Account.Wishlist != null && Model.Account.Wishlist.Any(x => x.Key == DateTime.Now.Year))
+    @if (Model.Items.Any())
     {
         <table class="table table-striped">
             <thead>
@@ -16,7 +16,7 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach (WishlistItem item in Model.Account.Wishlist[DateTime.Now.Year])
+                @foreach (WishlistItem item in Model.Items)
                 {
                     <tr>
                         <td>
@@ -26,7 +26,7 @@
                         <td>
                             @if (!string.IsNullOrWhiteSpace(item.Url))
                             {
-                                <a class="preview" target="_blank" href="@item.Url"><img class="img-thumbnail img-responsive" src="@Url.Action("FeaturedImage", "Preview", new {accountId = Model.Account.Id, itemId = item.Id})" /></a>
+                                <a class="preview" target="_blank" href="@item.Url"><img class="img-thumbnail img-responsive" src="@Url.Action("FeaturedImage", "Preview", new {accountId = Model.AccountId, itemId = item.Id})" /></a>
                             }
                             <p>&nbsp;</p>
                         </td>
@@ -49,9 +49,9 @@
     }
     else
     {
-        <p>Looks like @Model.Account.DisplayName has not added any items yet.</p>
+        <p>Looks like @Model.DisplayName has not added any items yet.</p>
         <p>
-            <a href="@Url.Action("Remind", "Wishlist", new {id = Model.Account.Id})" class="btn btn-primary btn-lg">Send a Reminder &raquo;</a>
+            <a href="@Url.Action("Remind", "Wishlist", new {id = Model.AccountId})" class="btn btn-primary btn-lg">Send a Reminder &raquo;</a>
         </p>
     }
 </div>

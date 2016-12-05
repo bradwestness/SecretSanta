@@ -12,16 +12,15 @@ namespace SecretSanta.Controllers
         // GET: /Wishlist/
         public ActionResult Index()
         {
-            string id = User.GetAccount().Id.ToString();
-            WishlistEditModel model = WishlistEditModel.Load(id);
+            var model = new WishlistEditModel(User.GetAccount().Id.Value);
             return View(model);
         }
 
         //
         // GET: /Wishlist/Details
-        public ActionResult Details(string id)
+        public ActionResult Details(Guid id)
         {
-            WishlistEditModel model = WishlistEditModel.Load(id);
+            var model = new WishlistEditModel(id);
             return View(model);
         }
 
@@ -33,7 +32,7 @@ namespace SecretSanta.Controllers
             if (ModelState.IsValid)
             {
                 WishlistManager.AddItem(model);
-                this.SetResultMessage(string.Format("<strong>Successfully added</strong> {0}.", model.Name));
+                this.SetResultMessage($"<strong>Successfully added</strong> {model.Name}.");
             }
 
             return RedirectToAction("Index");
@@ -47,7 +46,7 @@ namespace SecretSanta.Controllers
             if (ModelState.IsValid)
             {
                 WishlistManager.EditItem(model);
-                this.SetResultMessage(string.Format("<strong>Successfully updated</strong> {0}.", model.Name));
+                this.SetResultMessage($"<strong>Successfully updated</strong> {model.Name}.");
             }
 
             return RedirectToAction("Index");
@@ -59,16 +58,16 @@ namespace SecretSanta.Controllers
         public ActionResult DeleteItem(WishlistItem model)
         {
             WishlistManager.DeleteItem(model);
-            this.SetResultMessage(string.Format("<strong>Successfully deleted</strong> {0}.", model.Name));
+            this.SetResultMessage($"<strong>Successfully deleted</strong> {model.Name}.");
             return RedirectToAction("Index");
         }
 
         //
         // GET: /Wishlist/Remind
-        public ActionResult Remind(string id)
+        public ActionResult Remind(Guid id)
         {
             var urlHelper = new UrlHelper(ControllerContext.RequestContext);
-            WishlistManager.SendReminder(new Guid(id), urlHelper);
+            WishlistManager.SendReminder(id, urlHelper);
             this.SetResultMessage("<strong>Reminder sent</strong> successfully.");
             return RedirectToAction("Details", new {id});
         }
