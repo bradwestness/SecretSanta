@@ -11,7 +11,7 @@ namespace SecretSanta.Controllers
         // GET: /Admin/Users
         public ActionResult Users()
         {
-            EditUsersModel model = EditUsersModel.Load();
+            var model = new EditUsersModel();
             return View(model);
         }
 
@@ -67,7 +67,7 @@ namespace SecretSanta.Controllers
             if (ModelState.IsValid)
             {
                 model.CreateAccount();
-                this.SetResultMessage(string.Format("<strong>Successfully added</strong> {0}.", model.DisplayName));
+                this.SetResultMessage($"<strong>Successfully added</strong> {model.DisplayName}.");
             }
 
             return RedirectToAction("Users");
@@ -81,8 +81,7 @@ namespace SecretSanta.Controllers
             if (ModelState.IsValid)
             {
                 model.Save();
-                this.SetResultMessage(string.Format("<strong>Successfully updated</strong> {0}.",
-                    model.Account.DisplayName));
+                this.SetResultMessage($"<strong>Successfully updated</strong> {model.DisplayName}.");
             }
 
             return RedirectToAction("Users");
@@ -94,7 +93,7 @@ namespace SecretSanta.Controllers
         public ActionResult DeleteUser(EditUserModel model)
         {
             model.Delete();
-            this.SetResultMessage(string.Format("<strong>Successfully deleted</strong> {0}.", model.Account.DisplayName));
+            this.SetResultMessage($"<strong>Successfully deleted</strong> {model.DisplayName}.");
 
             return RedirectToAction("Users");
         }

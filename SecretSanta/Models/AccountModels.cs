@@ -178,43 +178,26 @@ namespace SecretSanta.Models
 
         public IList<EditUserModel> Users { get; set; }
 
-        public bool AllPicked
-        {
-            get
-            {
-                if (Users == null)
-                {
-                    return false;
-                }
-
-                return Users.All(u => u.Account.HasPicked() && u.Account.HasBeenPicked());
-            }
-        }
+        public bool AllPicked => Users.All(u => 
+            u.Picked.HasValue && 
+            !string.IsNullOrWhiteSpace(u.PickedBy)
+        );
 
         #endregion
 
         #region Public Methods
-
+        
         public EditUsersModel()
         {
             NewUser = new AddUserModel();
             Users = new List<EditUserModel>();
-        }
 
-        public static EditUsersModel Load()
-        {
-            var model = new EditUsersModel
+            foreach(var id in DataRepository.GetAll<Account>().Select(x => x.Id.Value))
             {
-                NewUser = new AddUserModel(),
-                Users = DataRepository.GetAll<Account>()
-                    .OrderBy(a => a.DisplayName)
-                    .Select(a => new EditUserModel {Account = a})
-                    .ToList()
-            };
-
-            return model;
+                Users.Add(new EditUserModel(id));
+            }
         }
-
+        
         public static void SendInvitationMessages(UrlHelper urlHelper)
         {
             IList<Account> accounts = DataRepository.GetAll<Account>();
@@ -356,46 +339,69 @@ namespace SecretSanta.Models
     {
         #region Variables
 
-        public Account Account { get; set; }
+        public Guid Id { get; set; }
 
+        [Required, EmailAddress, DisplayName("E-Mail Address")]
+        public string Email { get; set; }
+
+        [Required, DisplayName("Display Name")]
+        public string DisplayName { get; set; }
+                
         public Guid? Picked { get; set; }
+
+        [DisplayName("PickedBy")]
+        public string PickedBy { get; set; }
+
+        [DisplayName("Do Not Pick")]
+        public IList<Guid> DoNotPick { get; set; }
 
         #endregion
 
         #region Public Methods
 
-        public static EditUserModel Load(string id)
+        public EditUserModel()
         {
-            var account = DataRepository.Get<Account>(new Guid(id));
-
-            return new EditUserModel
-            {
-                Account = account,
-                Picked = account.Picked.ContainsKey(DateTime.Now.Year)
-                    ? account.Picked[DateTime.Now.Year]
-                    : null
-            };
+            DoNotPick = new List<Guid>();
         }
 
+        public EditUserModel(Guid id)
+        {
+            var accounts = DataRepository.GetAll<Account>();
+            var account = accounts.Single(x => x.Id.Equals(id));
+            var pickedBy = accounts.SingleOrDefault(x => 
+                x.Picked.ContainsKey(DateTime.Now.Year) && 
+                x.Picked[DateTime.Now.Year].Equals(id)
+            );
+
+            Id = account.Id.Value;
+            Email = account.Email;
+            DisplayName = account.DisplayName;
+            Picked = account.Picked?[DateTime.Now.Year];
+            PickedBy = pickedBy?.DisplayName;
+            DoNotPick = account.DoNotPick ?? new List<Guid>();
+        }
+        
         public void Save()
         {
-            if (Picked.HasValue)
-            {
-                Account.Picked[DateTime.Now.Year] = Picked.Value;
-            }
+            var account = DataRepository.Get<Account>(Id);
 
-            DataRepository.Save(Account);
+            account.Email = Email;
+            account.DisplayName = DisplayName;
+            account.Picked[DateTime.Now.Year] = Picked;
+            account.DoNotPick = DoNotPick;
+
+            DataRepository.Save(account);
         }
 
         public void Delete()
         {
-            DataRepository.Delete<Account>(Account.Id);
+            DataRepository.Delete<Account>(Id);
         }
 
         public IEnumerable<SelectListItem> GetPickOptions()
         {
             return DataRepository.GetAll<Account>()
-                .Where(a => a.Id != Account.Id && !Account.DoNotPick.Contains(a.Id.Value))
+                .Where(a => !a.Id.Equals(Id) && !DoNotPick.Contains(a.Id.Value))
                 .Select(a => new SelectListItem
                 {
                     Text = a.DisplayName,
@@ -407,13 +413,13 @@ namespace SecretSanta.Models
         public IEnumerable<SelectListItem> GetDoNotPickOptions()
         {
             return DataRepository.GetAll<Account>()
-                .Where(a => a.Id.HasValue && !a.Email.Equals(Account.Email, StringComparison.CurrentCultureIgnoreCase))
+                .Where(a => a.Id.HasValue && !a.Email.Equals(Email, StringComparison.CurrentCultureIgnoreCase))
                 .OrderBy(a => a.DisplayName)
                 .Select(a => new SelectListItem
                 {
                     Text = a.DisplayName,
                     Value = a.Id.ToString(),
-                    Selected = Account.DoNotPick?.Any(b => b.Equals(a.Id)) ?? false
+                    Selected = DoNotPick.Any(b => b.Equals(a.Id))
                 });
         }
 
