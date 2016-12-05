@@ -394,7 +394,8 @@ namespace SecretSanta.Models
                 .Select(a => new SelectListItem
                 {
                     Text = a.DisplayName,
-                    Value = a.Id.ToString()
+                    Value = a.Id.ToString(),
+                    Selected = Picked.Equals(a.Id)
                 });
         }
 
@@ -406,7 +407,8 @@ namespace SecretSanta.Models
                 .Select(a => new SelectListItem
                 {
                     Text = a.DisplayName,
-                    Value = a.Id.ToString()
+                    Value = a.Id.ToString(),
+                    Selected = Account.DoNotPick?.Any(b => b.Equals(a.Id)) ?? false
                 });
         }
 
