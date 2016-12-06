@@ -3,18 +3,24 @@
     ViewBag.Title = "Received Gifts";
 }
 
-<h1>@ViewBag.Title</h1>
-
-@if (Model.Item != null && !string.IsNullOrWhiteSpace(Model.Item.From))
-{
-    <div class="text-right">
-        <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#UpdateGift">Update My Received Gift</button>
+<div class="row">
+    <div class="col-lg-8">
+        <h1>@ViewBag.Title</h1>
     </div>
 
-        <div id="UpdateGift" class="modal fade">
-            @Html.Partial("EditorTemplates/UpdateGift", Model.Item)
-        </div>
-}
+    <div class="col-lg-6 text-right">
+        @if (Model.Item != null && !string.IsNullOrWhiteSpace(Model.Item.From))
+        {
+            <div class="text-right">
+                <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#UpdateGift">Update My Received Gift</button>
+            </div>
+
+            <div id="UpdateGift" class="modal fade">
+                @Html.Partial("EditorTemplates/UpdateGift", Model.Item)
+            </div>
+        }
+    </div>
+</div>
 
 @if (Model.Gifts != null && Model.Gifts.Any())
 {
@@ -27,7 +33,7 @@
         </thead>
         <tbody>
             @for (int i = 0; i < Model.Gifts.Count(); i++)
-                {
+            {
                     var gift = Model.Gifts.ElementAt(i);
                     var imageSrc = Url.Action("Image", "Received", new { accountId = gift.Id });
                 <tr>

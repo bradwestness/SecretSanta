@@ -4,6 +4,7 @@
 }
 
 <h1>@ViewBag.Title</h1>
+
 @if (Model.Items.Any())
 {
     <table class="table table-striped">
@@ -16,7 +17,7 @@
         </thead>
         <tbody>
             @foreach (WishlistItem item in Model.Items)
-                {
+            {
                 <tr>
                     <td>
                         <h3>@Html.DisplayFor(m => item.Name)</h3>
@@ -49,7 +50,7 @@
 else
 {
     <p>Looks like @Model.DisplayName has not added any items yet.</p>
-        <p>
-            <a href="@Url.Action("Remind", "Wishlist", new {id = Model.AccountId})" class="btn btn-primary btn-lg">Send a Reminder &raquo;</a>
-        </p>
+    <p>
+        <a href="@Url.Action("Remind", "Wishlist", new {id = Model.AccountId})" class="btn btn-primary btn-lg">Send a Reminder &raquo;</a>
+    </p>
 }
