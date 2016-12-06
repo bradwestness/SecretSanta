@@ -20,7 +20,7 @@ namespace SecretSanta.Utilities
             {
                 encoded = encoded.Replace("_", "/").Replace("-", "+");
 
-                var buffer = Convert.FromBase64String(encoded);
+                var buffer = Convert.FromBase64String($"{encoded}==");
                 guid = new Guid(buffer);
             }
 
