@@ -13,62 +13,62 @@
     <div id="AddItem" class="modal fade">
         @Html.EditorFor(m => m.NewItem, "AddItem")
     </div>
-
-    @if (Model.Items.Any())
-    {
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Item</th>
-                    <th>Preview</th>
-                    <th>Link</th>
-                    <th>&nbsp;</th>
-                </tr>
-            </thead>
-            <tbody>
-                @for (int i = 0; i < Model.Items.Count; i++)
-                {
-                    <tr>
-                        <td>
-                            <h3>@Html.DisplayFor(m => m.Items[i].Name)</h3>
-                            <p><small>@Html.DisplayFor(m => m.Items[i].Description)</small></p>
-                        </td>
-                        <td>
-                            @if (!string.IsNullOrWhiteSpace(Model.Items[i].Url))
-                            {
-                                <a class="preview" target="_blank" href="@Model.Items[i].Url"><img class="img-thumbnail img-responsive" src="@Url.Action("FeaturedImage", "Preview", new {accountId = Model.AccountId, itemId = Model.Items[i].Id})" /></a>
-                            }
-                            <p>&nbsp;</p>
-                        </td>
-                        <td>
-                            @if (!string.IsNullOrWhiteSpace(Model.Items[i].Url))
-                            {
-                                <a target="_blank" class="btn btn-default" href="@Model.Items[i].Url">More Information &raquo;</a>
-                            }
-                            else
-                            {
-                                <a class="btn btn-link" href="#">No Link Provided</a>
-                            }
-                        </td>
-                        <td>
-                            <div class="pull-right">
-                                <button class="btn btn-primary" data-toggle="modal" data-target="#EditItem@(i)">Edit</button>
-                                <button class="btn btn-default" data-toggle="modal" data-target="#DeleteItem@(i)">Delete</button>
-                            </div>
-                            <div id="EditItem@(i)" class="modal fade">
-                                @Html.EditorFor(m => m.Items[i], "EditItem")
-                            </div>
-                            <div id="DeleteItem@(i)" class="modal fade">
-                                @Html.EditorFor(m => m.Items[i], "DeleteItem")
-                            </div>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
-    else
-    {
-        <p>Looks like you haven't added any items yet. Click the "Add Item" button to get started!</p>
-    }
 </div>
+
+@if (Model.Items.Any())
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Preview</th>
+                <th>Link</th>
+                <th>&nbsp;</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Items.Count; i++)
+                {
+                <tr>
+                    <td>
+                        <h3>@Html.DisplayFor(m => m.Items[i].Name)</h3>
+                        <p><small>@Html.DisplayFor(m => m.Items[i].Description)</small></p>
+                    </td>
+                    <td>
+                        @if (!string.IsNullOrWhiteSpace(Model.Items[i].Url))
+                        {
+                            <a class="preview" target="_blank" href="@Model.Items[i].Url"><img class="img-thumbnail img-responsive" src="@Url.Action("FeaturedImage", "Preview", new {accountId = Model.AccountId, itemId = Model.Items[i].Id})" /></a>
+                        }
+                        <p>&nbsp;</p>
+                    </td>
+                    <td>
+                        @if (!string.IsNullOrWhiteSpace(Model.Items[i].Url))
+                        {
+                            <a target="_blank" class="btn btn-default" href="@Model.Items[i].Url">More Information &raquo;</a>
+                        }
+                        else
+                        {
+                            <a class="btn btn-link" href="#">No Link Provided</a>
+                        }
+                    </td>
+                    <td>
+                        <div class="pull-right">
+                            <button class="btn btn-primary" data-toggle="modal" data-target="#EditItem@(i)">Edit</button>
+                            <button class="btn btn-default" data-toggle="modal" data-target="#DeleteItem@(i)">Delete</button>
+                        </div>
+                        <div id="EditItem@(i)" class="modal fade">
+                            @Html.EditorFor(m => m.Items[i], "EditItem")
+                        </div>
+                        <div id="DeleteItem@(i)" class="modal fade">
+                            @Html.EditorFor(m => m.Items[i], "DeleteItem")
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Looks like you haven't added any items yet. Click the "Add Item" button to get started!</p>
+}

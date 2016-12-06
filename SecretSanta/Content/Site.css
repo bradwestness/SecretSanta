@@ -14,21 +14,35 @@
 
 input,
 select,
-textarea { max-width: 280px; }
+textarea {
+    max-width: 280px;
+}
 
 /* styles for validation helpers */
 
-.field-validation-error { color: #b94a48; }
+.field-validation-error {
+    color: #b94a48;
+}
 
-.field-validation-valid { display: none; }
+.field-validation-valid {
+    display: none;
+}
 
-input.input-validation-error { border: 1px solid #b94a48; }
+input.input-validation-error {
+    border: 1px solid #b94a48;
+}
 
-input[type="checkbox"].input-validation-error { border: 0 none; }
+input[type="checkbox"].input-validation-error {
+    border: 0 none;
+}
 
-.validation-summary-errors { color: #b94a48; }
+.validation-summary-errors {
+    color: #b94a48;
+}
 
-.validation-summary-valid { display: none; }
+.validation-summary-valid {
+    display: none;
+}
 
 /* secret santa mods */
 
@@ -40,13 +54,13 @@ input[type="checkbox"].input-validation-error { border: 0 none; }
     overflow: hidden;
 }
 
-.preview img {
-    width: auto;
-    height: auto;
-    max-width: 100%;
-    max-height: 100%;
-}
+    .preview img {
+        width: auto;
+        height: auto;
+        max-width: 100%;
+        max-height: 100%;
+    }
 
 p small {
-    white-space: pre-wrap; 
+    white-space: pre-wrap;
 }

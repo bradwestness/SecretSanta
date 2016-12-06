@@ -3,55 +3,53 @@
     ViewBag.Title = Model.DisplayName + "'s Wish List";
 }
 
-<div class="jumbotron">
-    <h1>@ViewBag.Title</h1>
-    @if (Model.Items.Any())
-    {
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Item</th>
-                    <th>Preview</th>
-                    <th>&nbsp;</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (WishlistItem item in Model.Items)
+<h1>@ViewBag.Title</h1>
+@if (Model.Items.Any())
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Preview</th>
+                <th>&nbsp;</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (WishlistItem item in Model.Items)
                 {
-                    <tr>
-                        <td>
-                            <h3>@Html.DisplayFor(m => item.Name)</h3>
-                            <p><small>@Html.DisplayFor(m => item.Description)</small></p>
-                        </td>
-                        <td>
+                <tr>
+                    <td>
+                        <h3>@Html.DisplayFor(m => item.Name)</h3>
+                        <p><small>@Html.DisplayFor(m => item.Description)</small></p>
+                    </td>
+                    <td>
+                        @if (!string.IsNullOrWhiteSpace(item.Url))
+                        {
+                            <a class="preview" target="_blank" href="@item.Url"><img class="img-thumbnail img-responsive" src="@Url.Action("FeaturedImage", "Preview", new {accountId = Model.AccountId, itemId = item.Id})" /></a>
+                        }
+                        <p>&nbsp;</p>
+                    </td>
+                    <td>
+                        <div class="pull-right">
                             @if (!string.IsNullOrWhiteSpace(item.Url))
                             {
-                                <a class="preview" target="_blank" href="@item.Url"><img class="img-thumbnail img-responsive" src="@Url.Action("FeaturedImage", "Preview", new {accountId = Model.AccountId, itemId = item.Id})" /></a>
+                                <a target="_blank" class="btn btn-default" href="@item.Url">More Information &raquo;</a>
                             }
-                            <p>&nbsp;</p>
-                        </td>
-                        <td>
-                            <div class="pull-right">
-                                @if (!string.IsNullOrWhiteSpace(item.Url))
-                                {
-                                    <a target="_blank" class="btn btn-default" href="@item.Url">More Information &raquo;</a>
-                                }
-                                else
-                                {
-                                    <a class="btn btn-link" href="#">No Link Provided</a>
-                                }
-                            </div>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    }
-    else
-    {
-        <p>Looks like @Model.DisplayName has not added any items yet.</p>
+                            else
+                            {
+                                <a class="btn btn-link" href="#">No Link Provided</a>
+                            }
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>Looks like @Model.DisplayName has not added any items yet.</p>
         <p>
             <a href="@Url.Action("Remind", "Wishlist", new {id = Model.AccountId})" class="btn btn-primary btn-lg">Send a Reminder &raquo;</a>
         </p>
-    }
-</div>
+}
