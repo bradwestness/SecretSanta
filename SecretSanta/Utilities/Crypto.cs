@@ -10,7 +10,7 @@ namespace SecretSanta.Utilities
         {
             var output = string.Empty;
 
-            using (var provider = new RSACryptoServiceProvider())
+            using (var provider = new  RSACryptoServiceProvider())
             {
                 var encryptedBytes = provider.Encrypt(Encoding.UTF8.GetBytes(input), true);
                 output = Encoding.UTF8.GetString(encryptedBytes);

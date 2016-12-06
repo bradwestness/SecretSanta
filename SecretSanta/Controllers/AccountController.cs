@@ -10,6 +10,10 @@ namespace SecretSanta.Controllers
         // GET: /Account/LogIn
         public ActionResult LogIn(string token, string returnUrl)
         {
+            Response.Write(token);
+            Response.Flush();
+            Response.End();
+
             var redirect = Url.Action("Index", "Home");
 
             if (!string.IsNullOrWhiteSpace(token))
@@ -35,9 +39,9 @@ namespace SecretSanta.Controllers
             if (ModelState.IsValid)
             {
                 model.Send(Url);
+                this.SetResultMessage($"A log in link will be sent to {model.Email}.");
             }
 
-            this.SetResultMessage("A log in link has been sent to the specified e-mail address.");
             return RedirectToAction("Index", "Home");
         }
     }
