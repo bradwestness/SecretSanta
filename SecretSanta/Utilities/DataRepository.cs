@@ -15,7 +15,7 @@ namespace SecretSanta.Utilities
         #region Variables
 
         private static IList<Account> _accounts_singleton;
-        private static object _lock;
+        private static object _lock = new object();
         private static IList<Account> _accounts
         {
             get
