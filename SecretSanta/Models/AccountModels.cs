@@ -94,6 +94,32 @@ namespace SecretSanta.Models
                     && !a.DoNotPick.Contains(Id.Value)
                 );
 
+            // Special-case it when only 2 options are left, and choosing
+            // one of these options means that there'd be dangling candidate
+            // that nobody chose.
+            //
+            // Example 1:
+            //   Item     Receive   Give
+            //      x          no     no
+            //      y          no    yes
+            // In this case, choosing 'y' will leave 'x' dangling.
+            //
+            // Example 2:
+            //   Item     Receive   Give
+            //      x          no    yes
+            //      y          no    yes
+            // In this case there's no possibility of a dangling candidate.
+            //
+            // Example 3:
+            //   Item     Receive   Give
+            //      x          no     no
+            //      y          no     no
+            // In this case there's no possibility of a dangling candidate.
+            if (candidates.Count() == 2 && !candidates.All(a => a.HasPicked()))
+            {
+                candidates = candidates.Where(a => !a.HasPicked());
+            }
+
             if (candidates.Count() > 1)
             {
                 // if there's more than one potential candidate,
@@ -347,7 +373,19 @@ namespace SecretSanta.Models
         [Required, DisplayName("Display Name")]
         public string DisplayName { get; set; }
                 
-        public Guid? Picked { get; set; }
+        private Guid? picked;
+        public Guid? Picked
+        {
+            get
+            {
+                Guid? val;
+                return picked ?? (Account.Picked.TryGetValue(DateTime.Now.Year, out val) ? val : null);
+            }
+            set
+            {
+                picked = value;
+            }
+        }
 
         [DisplayName("PickedBy")]
         public string PickedBy { get; set; }
