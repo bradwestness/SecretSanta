@@ -27,24 +27,19 @@
                 @Html.ActionLink("Secret Santa", "Index", "Home", null, new { @class = "navbar-brand" })
             </div>
             <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    @if (User.Identity.IsAuthenticated)
-                    {
-                        <li>@Html.ActionLink("My Wish List", "Index", "Wishlist")</li>
-                        if (ViewBag.CurrentUserAccount.HasPicked())
-                        {
-                            Account picked = ViewBag.CurrentUserAccount.GetPicked();
-                            <li>@Html.ActionLink(picked.DisplayName + "'s Wish List", "Details", "Wishlist", new { id = picked.Id }, null)</li>
-                        }
-                        <li>@Html.ActionLink("Received Gifts", "Index", "Received")</li>
-                    }
-                </ul>
                 @if (User.Identity.IsAuthenticated)
                 {
                     <ul class="nav navbar-nav navbar-right">
                         <li class="dropdown">
                             <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-lock"></span> @ViewBag.CurrentUserAccount.DisplayName <b class="caret"></b></a>
                             <ul class="dropdown-menu">
+                                <li>@Html.ActionLink("My Wish List", "Index", "Wishlist")</li>
+                                @if (ViewBag.CurrentUserAccount.HasPicked())
+                                {
+                                    Account picked = ViewBag.CurrentUserAccount.GetPicked();
+                                    <li>@Html.ActionLink(picked.DisplayName + "'s Wish List", "Details", "Wishlist", new { id = picked.Id }, null)</li>
+                                }
+                                <li>@Html.ActionLink("Received Gifts", "Index", "Received")</li>
                                 @if (ViewBag.IsAdmin)
                                 {
                                     <li>@Html.ActionLink("Manage Users", "Users", "Admin")</li>
