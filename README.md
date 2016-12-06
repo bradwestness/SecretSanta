@@ -9,8 +9,8 @@ SecretSanta is an easy to use gift exchange organizer that you can deploy to you
 
 ## Features
 
-* Add as many family members as you like!
-* No database needed, all data is stored in as JSON in text files
+* Add as many family members as you like
+* No database needed, all data is stored as JSON in text files
 * Users get to click a button to pick a recipient (more fun than just being told who you picked)
 * Specify which people each user should NOT pick (e.g. spouses)
 * Admin console for managing users
@@ -24,6 +24,7 @@ SecretSanta is an easy to use gift exchange organizer that you can deploy to you
 ## Set Up
 
 1. Add the following appSettings to web.config:
+```xml
     <add key="SecretSanta:AdminEmail" value="my_email@outlook.com" />
     <add key="SecretSanta:MaxImagesToLoad" value="25"/>
     <add key="SecretSanta:DefaultPreviewImage" value="~/Content/Images/photo_not_available.png"/>
@@ -34,5 +35,6 @@ SecretSanta is an easy to use gift exchange organizer that you can deploy to you
     <add key="SecretSanta:SmtpPort" value="587" />
     <add key="SecretSanta:SmtpUser" value="my_email_user@azure.com" />
     <add key="SecretSanta:SmtpPass" value="my_email_password" />
+```
 3. Deploy to any server running ASP.NET 4.5 or later
 4. Make sure the App_Data folder is writable by the ASP.NET user
