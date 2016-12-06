@@ -23,7 +23,7 @@ SecretSanta is an easy to use gift exchange organizer that you can deploy to you
 
 ## Set Up
 
-1. Add the following appSettings to web.config:
+1. Add the following appSettings to web.config, or [configure as app settings in Azure](https://azure.microsoft.com/en-us/blog/windows-azure-web-sites-how-application-strings-and-connection-strings-work/):
 ```xml
     <add key="SecretSanta:AdminEmail" value="my_email@outlook.com" />
     <add key="SecretSanta:MaxImagesToLoad" value="25"/>
