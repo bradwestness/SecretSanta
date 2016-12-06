@@ -141,9 +141,8 @@ namespace SecretSanta.Models
     {
         public static string TokenSignIn(string token, string returnUrl)
         {
-            var account = DataRepository.GetAll<Account>().FirstOrDefault(x =>
-                Crypto.Verify(token, Crypto.Encrypt(x.Id.ToString()))
-            );
+            var uid = GuidEncoder.Decode(token);
+            var account = DataRepository.Get<Account>(uid);
 
             if (account != null)
             {
@@ -187,11 +186,12 @@ namespace SecretSanta.Models
 
         public void Send(UrlHelper urlHelper)
         {
-            var account = DataRepository.GetAll<Account>().FirstOrDefault(x => x.Email.Equals(Email, StringComparison.InvariantCultureIgnoreCase));
+            var account = DataRepository.GetAll<Account>().FirstOrDefault(x => x.Email.Equals(Email, StringComparison.InvariantCultureIgnoreCase));            
 
-            if (account != null)
+            if (account != null && account.Id.HasValue)
             {
-                var url = urlHelper.Action("LogIn", "Account", new { token = Crypto.Encrypt(account.Id.ToString()) }, "http");
+                var token = GuidEncoder.Encode(account.Id.Value);
+                var url = urlHelper.Action("LogIn", "Account", new { token }, "http");
 
                 StringBuilder body = new StringBuilder()
                     .AppendLine($"Hey {account.DisplayName}!")
@@ -253,7 +253,8 @@ namespace SecretSanta.Models
 
             foreach (Account account in accounts)
             {
-                string url = urlHelper.Action("LogIn", "Account", new { token = Crypto.Encrypt(account.Id.ToString()) }, "http");
+                var token = GuidEncoder.Encode(account.Id.Value);
+                string url = urlHelper.Action("LogIn", "Account", new { token }, "http");
 
                 StringBuilder body = new StringBuilder()
                     .AppendLine($"Hey {account.DisplayName}!")
@@ -284,7 +285,8 @@ namespace SecretSanta.Models
 
             foreach (Account account in accounts)
             {
-                string url = urlHelper.Action("LogIn", "Account", new { token = Crypto.Encrypt(account.Id.ToString()) }, "http");
+                var token = GuidEncoder.Encode(account.Id.Value);
+                string url = urlHelper.Action("LogIn", "Account", new { token }, "http");
                 Account recipient = account.GetPicked();
 
                 StringBuilder body = new StringBuilder()

@@ -10,10 +10,6 @@ namespace SecretSanta.Controllers
         // GET: /Account/LogIn
         public ActionResult LogIn(string token, string returnUrl)
         {
-            Response.Write(token);
-            Response.Flush();
-            Response.End();
-
             var redirect = Url.Action("Index", "Home");
 
             if (!string.IsNullOrWhiteSpace(token))

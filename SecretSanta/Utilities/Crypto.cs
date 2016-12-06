@@ -1,38 +1,30 @@
 ﻿using System;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace SecretSanta.Utilities
 {
-    public static class Crypto
+    public static class GuidEncoder
     {
-        public static string Encrypt(string input)
+        public static string Encode(Guid input)
         {
-            var output = string.Empty;
+            var base64 = Convert.ToBase64String(input.ToByteArray());
+            base64 = base64.Replace("/", "_").Replace("+", "-");
 
-            using (var provider = new  RSACryptoServiceProvider())
-            {
-                var encryptedBytes = provider.Encrypt(Encoding.UTF8.GetBytes(input), true);
-                output = Encoding.UTF8.GetString(encryptedBytes);
-            }
-
-            return output;
+            return base64.Substring(0, 22);
         }
 
-        public static bool Verify(string input, string hash)
+        public static Guid? Decode(string encoded)
         {
-            if (string.IsNullOrWhiteSpace(input))
+            Guid? guid = null;
+
+            if (!string.IsNullOrWhiteSpace(encoded))
             {
-                return false;
+                encoded = encoded.Replace("_", "/").Replace("-", "+");
+
+                var buffer = Convert.FromBase64String(encoded);
+                guid = new Guid(buffer);
             }
 
-            if (string.IsNullOrWhiteSpace(hash))
-            {
-                return false;
-            }
-
-            var encryptedInput = Encrypt(input.Trim());
-            return encryptedInput.Equals(hash.Trim(), StringComparison.InvariantCultureIgnoreCase);
+            return guid;
         }
     }
 }
