@@ -8,7 +8,7 @@
         <div class="col-lg-6">
             <h1>Welcome to Secret Santa!</h1>
 
-            @using (Html.BeginForm("LogIn", "Account", FormMethod.Post, new { role = "form", @class = "form-horizontal" }))
+            @using (Html.BeginForm("SendLogInLink", "Account", FormMethod.Post, new { role = "form", @class = "form-horizontal" }))
             {
                 <fieldset>
                     <legend>@ViewBag.Title</legend>
