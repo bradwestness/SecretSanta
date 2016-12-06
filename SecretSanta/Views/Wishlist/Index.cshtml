@@ -11,7 +11,7 @@
     </div>
 
     <div id="AddItem" class="modal fade">
-        @Html.Partial("EditorTemplates/AddItem", Model.NewItem)
+        @Html.EditorFor(m => m.NewItem, "AddItem")
     </div>
 
     @if (Model.Items.Any())
@@ -56,10 +56,10 @@
                                 <button class="btn btn-default" data-toggle="modal" data-target="#DeleteItem@(i)">Delete</button>
                             </div>
                             <div id="EditItem@(i)" class="modal fade">
-                                @Html.Partial("EditorTemplates/EditItem", Model.Items[i])
+                                @Html.EditorFor(m => m.Items[i], "EditItem")
                             </div>
                             <div id="DeleteItem@(i)" class="modal fade">
-                                @Html.Partial("DisplayTemplates/DeleteItem", Model.Items[i])
+                                @Html.EditorFor(m => m.Items[i], "DeleteItem")
                             </div>
                         </td>
                     </tr>
