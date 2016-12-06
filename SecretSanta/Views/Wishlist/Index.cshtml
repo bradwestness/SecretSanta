@@ -3,18 +3,14 @@
     ViewBag.Title = Model.DisplayName + "'s Wish List";
 }
 
-<div class="row">
-    <div class="col-lg-8">
-        <h1>@ViewBag.Title</h1>
-    </div>
+<h1>@ViewBag.Title</h1>
 
-    <div class="col-lg-4 text-right">
-        <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#AddItem">Add Item</button>
+<div class="text-right">
+    <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#AddItem">Add Item</button>
+</div>
 
-        <div id="AddItem" class="modal fade">
-            @Html.EditorFor(m => m.NewItem, "AddItem")
-        </div>
-    </div>
+<div id="AddItem" class="modal fade">
+    @Html.EditorFor(m => m.NewItem, "AddItem")
 </div>
 
 @if (Model.Items.Any())
