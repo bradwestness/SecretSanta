@@ -69,9 +69,9 @@ namespace SecretSanta.Models
 
         public Account GetPickedBy()
         {
-            var pickedBy = DataRepository.GetAll<Account>().FirstOrDefault(x => 
-                x.Picked != null && x.Picked.Any(y => 
-                    y.Key == DateTime.Now.Year && 
+            var pickedBy = DataRepository.GetAll<Account>().FirstOrDefault(x =>
+                x.Picked != null && x.Picked.Any(y =>
+                    y.Key == DateTime.Now.Year &&
                     y.Value == Id
                 )
             );
@@ -139,47 +139,25 @@ namespace SecretSanta.Models
 
     public class LogInModel
     {
-        #region Variables
-
-        [DisplayName("E-Mail Address"), Required, DataType(DataType.EmailAddress)]
-        public string Email { get; set; }
-
-        #endregion
-
-        #region Public Methods
-
-        public bool IsValid()
+        public static string TokenSignIn(string token, string returnUrl)
         {
-            if (string.IsNullOrWhiteSpace(Email))
+            var account = DataRepository.GetAll<Account>().FirstOrDefault(x =>
+                Crypto.Verify(token, Crypto.Encrypt(x.Id.ToString()))
+            );
+
+            if (account != null)
             {
-                return false;
+                FormsAuthentication.SetAuthCookie(account.Email, true);
+
+                returnUrl = string.IsNullOrWhiteSpace(returnUrl)
+                    ? FormsAuthentication.GetRedirectUrl(account.Email, true)
+                    : returnUrl;
             }
 
-            if (Email.Equals(AppSettings.AdminEmail, StringComparison.CurrentCultureIgnoreCase))
-            {
-                return true;
-            }
-
-            IList<Account> accounts = DataRepository.GetAll<Account>();
-            return accounts.Any(a => a.Email.Equals(Email, StringComparison.CurrentCultureIgnoreCase));
-        }
-
-        public string SignIn(string returnUrl)
-        {
-            FormsAuthentication.SetAuthCookie(Email, true);
             return string.IsNullOrWhiteSpace(returnUrl)
-                ? FormsAuthentication.GetRedirectUrl(Email, true)
+                ? FormsAuthentication.DefaultUrl
                 : returnUrl;
         }
-
-        public static string GuidSignIn(Guid guid, string returnUrl)
-        {
-            var account = DataRepository.Get<Account>(guid);
-            var model = new LogInModel {Email = account.Email};
-            return model.SignIn(returnUrl);
-        }
-
-        #endregion
     }
 
     public class LogOutModel
@@ -196,6 +174,51 @@ namespace SecretSanta.Models
         #endregion
     }
 
+    public class SendLogInLinkModel
+    {
+        #region Variables
+
+        [Required, EmailAddress, DisplayName("E-Mail Address")]
+        public string Email { get; set; }
+
+        #endregion
+
+        #region Public Methods
+
+        public void Send(UrlHelper urlHelper)
+        {
+            var account = DataRepository.GetAll<Account>().FirstOrDefault(x => x.Email.Equals(Email, StringComparison.InvariantCultureIgnoreCase));
+
+            if (account != null)
+            {
+                var url = urlHelper.Action("LogIn", "Account", new { token = Crypto.Encrypt(account.Id.ToString()) }, "http");
+
+                StringBuilder body = new StringBuilder()
+                    .AppendLine($"Hey {account.DisplayName}!")
+                    .AppendLine()
+                    .Append("Santa here. Just sending you the log-in link ")
+                    .AppendLine("you requested for the Secret Santa website. ")
+                    .AppendLine()
+                    .Append("Please click the link below to access the website ")
+                    .AppendLine("and manage your wish list.")
+                    .AppendLine()
+                    .AppendLine($"<a href=\"{url}\">Secret Santa</a>")
+                    .AppendLine()
+                    .AppendLine("Ho ho ho, ")
+                    .AppendLine()
+                    .AppendLine("Santa")
+                    .AppendLine();
+
+                var from = new MailAddress("santa@thenorthpole.com", "Santa Claus");
+                var to = new MailAddressCollection { new MailAddress(account.Email, account.DisplayName) };
+
+                EmailMessage.Send(from, to, "Secret Santa Log-In Link", body.ToString());
+            }
+        }
+
+        #endregion
+    }
+
     public class EditUsersModel
     {
         #region Variables
@@ -204,51 +227,52 @@ namespace SecretSanta.Models
 
         public IList<EditUserModel> Users { get; set; }
 
-        public bool AllPicked => Users.All(u => 
-            u.Picked.HasValue && 
+        public bool AllPicked => Users.All(u =>
+            u.Picked.HasValue &&
             !string.IsNullOrWhiteSpace(u.PickedBy)
         );
 
         #endregion
 
         #region Public Methods
-        
+
         public EditUsersModel()
         {
             NewUser = new AddUserModel();
             Users = new List<EditUserModel>();
 
-            foreach(var id in DataRepository.GetAll<Account>().Select(x => x.Id.Value))
+            foreach (var id in DataRepository.GetAll<Account>().Select(x => x.Id.Value))
             {
                 Users.Add(new EditUserModel(id));
             }
         }
-        
+
         public static void SendInvitationMessages(UrlHelper urlHelper)
         {
             IList<Account> accounts = DataRepository.GetAll<Account>();
 
             foreach (Account account in accounts)
             {
-                string url = urlHelper.Action("LogIn", "Account", new {id = account.Id}, "http");
+                string url = urlHelper.Action("LogIn", "Account", new { token = Crypto.Encrypt(account.Id.ToString()) }, "http");
 
                 StringBuilder body = new StringBuilder()
-                    .AppendFormat("Hey {0}! ", account.DisplayName).AppendLine()
+                    .AppendLine($"Hey {account.DisplayName}!")
                     .AppendLine()
-                    .AppendFormat("Santa here. Just wanted to let you know that the ")
-                    .AppendFormat("Secret Santa website is ready! ").AppendLine()
+                    .Append("Santa here. Just wanted to let you know that the ")
+                    .AppendLine("Secret Santa website is ready!")
                     .AppendLine()
-                    .AppendFormat("Please visit the address below to pick your recipient and ")
-                    .AppendFormat("create your wish list. ").AppendLine()
+                    .Append("Please visit the address below to pick your recipient and ")
+                    .AppendLine("create your wish list.")
                     .AppendLine()
-                    .AppendFormat("<a href=\"{0}\">Secret Santa Website</a> ", url).AppendLine()
+                    .AppendLine($"<a href=\"{url}\">Secret Santa Website</a>")
                     .AppendLine()
-                    .AppendFormat("Ho ho ho, ").AppendLine()
+                    .AppendLine("Ho ho ho, ")
                     .AppendLine()
-                    .AppendFormat("Santa ").AppendLine();
+                    .AppendLine("Santa")
+                    .AppendLine();
 
                 var from = new MailAddress("santa@thenorthpole.com", "Santa Claus");
-                var to = new MailAddressCollection {new MailAddress(account.Email, account.DisplayName)};
+                var to = new MailAddressCollection { new MailAddress(account.Email, account.DisplayName) };
 
                 EmailMessage.Send(from, to, "Secret Santa Reminder", body.ToString());
             }
@@ -260,44 +284,43 @@ namespace SecretSanta.Models
 
             foreach (Account account in accounts)
             {
-                string url = urlHelper.Action("LogIn", "Account", new {id = account.Id}, "http");
+                string url = urlHelper.Action("LogIn", "Account", new { token = Crypto.Encrypt(account.Id.ToString()) }, "http");
                 Account recipient = account.GetPicked();
 
                 StringBuilder body = new StringBuilder()
-                    .AppendFormat("Hey {0}! ", account.DisplayName).AppendLine()
+                    .AppendLine($"Hey {account.DisplayName}!")
                     .AppendLine()
                     .AppendFormat("Santa here. Just wanted to let you know that everyone ")
-                    .AppendFormat("has now picked a person using the Secret Santa website. ").AppendLine()
+                    .AppendLine("has now picked a person using the Secret Santa website.")
                     .AppendLine()
-                    .AppendFormat("Thought I'd send a frindly reminder that you picked {0}! ", recipient.DisplayName)
+                    .AppendLine($"Thought I'd send a frindly reminder that you picked {recipient.DisplayName}!")
                     .AppendLine()
                     .AppendLine()
-                    .AppendFormat("Here's their wish list as it stands right now: ").AppendLine()
+                    .AppendLine("Here's their wish list as it stands right now:")
                     .AppendLine();
 
                 if (recipient.Wishlist.ContainsKey(DateTime.Now.Year))
                 {
                     foreach (WishlistItem item in recipient.Wishlist[DateTime.Now.Year])
                     {
-                        body.AppendFormat("Item: {0}", item.Name).AppendLine()
-                            .AppendFormat("Description: {0}", item.Description).AppendLine()
-                            .AppendFormat("Link: {0}", item.Url).AppendLine()
+                        body.AppendLine($"Item: {item.Name}")
+                            .AppendLine($"Description: {item.Description}")
+                            .AppendLine($"Link: {item.Url}")
                             .AppendLine();
                     }
                 }
 
-                body.AppendFormat(
-                    "Remember that you can always visit the address below to update your wish list and view ")
-                    .AppendFormat("any changes made by {0} too! ", recipient.DisplayName).AppendLine()
+                body.Append("Remember that you can always visit the address below ")
+                    .AppendLine($"to update your wish list and view any changes made by {recipient.DisplayName} too!")
                     .AppendLine()
-                    .AppendFormat("<a href=\"{0}\">Secret Santa Website</a> ", url).AppendLine()
+                    .AppendLine($"<a href=\"{url}\">Secret Santa Website</a>")
                     .AppendLine()
-                    .AppendFormat("Ho ho ho, ").AppendLine()
+                    .AppendLine("Ho ho ho,")
                     .AppendLine()
-                    .AppendFormat("Santa ").AppendLine();
+                    .AppendLine("Santa");
 
                 var from = new MailAddress("santa@thenorthpole.com", "Santa Claus");
-                var to = new MailAddressCollection {new MailAddress(account.Email, account.DisplayName)};
+                var to = new MailAddressCollection { new MailAddress(account.Email, account.DisplayName) };
 
                 EmailMessage.Send(from, to, "Secret Santa Reminder", body.ToString());
             }
@@ -307,7 +330,7 @@ namespace SecretSanta.Models
         {
             var users = DataRepository.GetAll<Account>();
 
-            foreach(var user in users)
+            foreach (var user in users)
             {
                 user.Picked.Remove(DateTime.Now.Year);
                 user.ReceivedGift.Remove(DateTime.Now.Year);
@@ -372,7 +395,7 @@ namespace SecretSanta.Models
 
         [Required, DisplayName("Display Name")]
         public string DisplayName { get; set; }
-                
+
         public Guid? Picked { get; set; }
 
         [DisplayName("PickedBy")]
@@ -394,8 +417,8 @@ namespace SecretSanta.Models
         {
             var accounts = DataRepository.GetAll<Account>();
             var account = accounts.Single(x => x.Id.Equals(id));
-            var pickedBy = accounts.SingleOrDefault(x => 
-                x.Picked.ContainsKey(DateTime.Now.Year) && 
+            var pickedBy = accounts.SingleOrDefault(x =>
+                x.Picked.ContainsKey(DateTime.Now.Year) &&
                 x.Picked[DateTime.Now.Year].Equals(id)
             );
 
@@ -406,7 +429,7 @@ namespace SecretSanta.Models
             PickedBy = pickedBy?.DisplayName;
             DoNotPick = account.DoNotPick ?? new List<Guid>();
         }
-        
+
         public void Save()
         {
             var account = DataRepository.Get<Account>(AccountId);

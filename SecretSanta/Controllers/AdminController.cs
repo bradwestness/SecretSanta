@@ -94,7 +94,6 @@ namespace SecretSanta.Controllers
         {
             model.Delete();
             this.SetResultMessage($"<strong>Successfully deleted</strong> {model.DisplayName}.");
-
             return RedirectToAction("Users");
         }
     }

@@ -1,28 +1,36 @@
-﻿@model Account
+﻿@model SendLogInLinkModel
 @{
-    ViewBag.Title = "Home Page";
-    Account person = Model.GetPicked();
+    ViewBag.Title = "Send Log In Link";
 }
 
 <div class="jumbotron">
     <div class="row">
         <div class="col-lg-6">
-            <h1>Welcome to Secret Santa, @Model.DisplayName!</h1>
-            @if (!Model.HasPicked() || person == null)
+            <h1>Welcome to Secret Santa!</h1>
+
+            @using (Html.BeginForm("LogIn", "Account", FormMethod.Post, new { role = "form", @class = "form-horizontal" }))
             {
-                <p>Looks like you haven't picked your recipient yet.</p>
-                <p>
-                    <a class="btn btn-primary btn-lg" href="@Url.Action("Pick", "Home")">Pick Your Recipient &raquo;</a>
-                    <a class="btn btn-default btn-lg" href="@Url.Action("Index", "Wishlist")">Manage Your Wish List &raquo;</a>
-                </p>
-            }
-            else
-            {
-                <p>You picked @person.DisplayName!</p>
-                <p>
-                    <a class="btn btn-primary btn-lg" href="@Url.Action("Details", "Wishlist", new {id = person.Id})">View @person.DisplayName's Wish List &raquo;</a>
-                    <a class="btn btn-default btn-lg" href="@Url.Action("Index", "Wishlist")">Manage Your Wish List &raquo;</a>
-                </p>
+                <fieldset>
+                    <legend>@ViewBag.Title</legend>
+
+                    <p>
+                        If you misplaced your log-in email, you can use this form to have another
+                        log-in link sent to you.
+                    </p>
+
+                    <div class="form-group">
+                        <small>@Html.LabelFor(m => m.Email, new { @class = "control-label col-sm-4" })</small>
+                        <div class="col-sm-6">
+                            @Html.EditorFor(m => m.Email)
+                            <small>@Html.ValidationMessageFor(m => m.Email)</small>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <button type="submit" class="btn btn-default">Send Log-In Link</button>
+                        </div>
+                    </div>
+                </fieldset>
             }
         </div>
         <div class="col-lg-6">

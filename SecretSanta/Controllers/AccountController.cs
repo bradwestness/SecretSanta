@@ -1,5 +1,5 @@
 ﻿using SecretSanta.Models;
-using System;
+using SecretSanta.Utilities;
 using System.Web.Mvc;
 
 namespace SecretSanta.Controllers
@@ -8,34 +8,16 @@ namespace SecretSanta.Controllers
     {
         //
         // GET: /Account/LogIn
-        public ActionResult LogIn(Guid? id, string ReturnUrl)
+        public ActionResult LogIn(string token, string returnUrl)
         {
-            if (id.HasValue)
+            var redirect = Url.Action("Index", "Home");
+
+            if (!string.IsNullOrWhiteSpace(token))
             {
-                return Redirect(LogInModel.GuidSignIn(id.Value, ReturnUrl));
+                redirect = LogInModel.TokenSignIn(token, returnUrl);
             }
 
-            var model = new LogInModel();
-            return View(model);
-        }
-
-        //
-        // POST: /Account/LogIn
-        [HttpPost]
-        public ActionResult LogIn(LogInModel model, string ReturnUrl)
-        {
-            if (!string.IsNullOrWhiteSpace(model.Email) && !model.IsValid())
-            {
-                ModelState.AddModelError("Email", "The E-Mail Address entered was not recognized.");
-            }
-
-            if (ModelState.IsValid)
-            {
-                ReturnUrl = model.SignIn(ReturnUrl);
-                return Redirect(ReturnUrl);
-            }
-
-            return View(model);
+            return Redirect(redirect);
         }
 
         //
@@ -44,6 +26,19 @@ namespace SecretSanta.Controllers
         public ActionResult LogOut()
         {
             return Redirect(LogOutModel.SignOut());
+        }
+
+        //
+        // POST: /Account/SendLogInLink
+        public ActionResult SendLogInLink(SendLogInLinkModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                model.Send(Url);
+            }
+
+            this.SetResultMessage("A log in link has been sent to the specified e-mail address.");
+            return RedirectToAction("Index", "Home");
         }
     }
 }
