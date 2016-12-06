@@ -373,19 +373,7 @@ namespace SecretSanta.Models
         [Required, DisplayName("Display Name")]
         public string DisplayName { get; set; }
                 
-        private Guid? picked;
-        public Guid? Picked
-        {
-            get
-            {
-                Guid? val;
-                return picked ?? (Account.Picked.TryGetValue(DateTime.Now.Year, out val) ? val : null);
-            }
-            set
-            {
-                picked = value;
-            }
-        }
+        public Guid? Picked { get; set; }
 
         [DisplayName("PickedBy")]
         public string PickedBy { get; set; }
