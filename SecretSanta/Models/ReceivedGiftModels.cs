@@ -32,7 +32,7 @@ namespace SecretSanta.Models
 
         public byte[] Image { get; set; }
 
-        [DisplayName("Photo with your gift"), Required, JsonIgnore]
+        [DisplayName("Photo with your gift"), Required, JsonIgnore, MaxFileSize(2000000)]
         public HttpPostedFileBase ImageUpload { get; set; }
 
         #endregion
