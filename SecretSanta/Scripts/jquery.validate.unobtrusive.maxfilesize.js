@@ -7,7 +7,7 @@
         }
     });
 
-    $.validator.unobtrusive.addMethod("maxfilesize", function(value, element, param) {
+    $.validator.addMethod("maxfilesize", function(value, element, param) {
         if (value === "") {
             // no file chosen
             return true;
