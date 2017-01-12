@@ -57,7 +57,9 @@ namespace SecretSanta.Models
             var account = DataRepository.Get<Account>(id);
             AccountId = account.Id.Value;
             DisplayName = account.DisplayName;
-            Items = account?.Wishlist?[DateTime.Now.Year] ?? new List<WishlistItem>();
+            Items = (account?.Wishlist?.ContainsKey(DateTime.Now.Year) ?? false)
+                ? account.Wishlist[DateTime.Now.Year]
+                : new List<WishlistItem>();
         }
         
         #endregion
