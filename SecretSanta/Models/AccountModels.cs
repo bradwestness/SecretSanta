@@ -59,9 +59,9 @@ namespace SecretSanta.Models
 
         public Account GetPicked()
         {
-            if (Picked != null && Picked.ContainsKey(DateTime.Now.Year))
+            if (Picked != null && Picked.ContainsKey(DateHelper.Year))
             {
-                return DataRepository.Get<Account>(Picked[DateTime.Now.Year]);
+                return DataRepository.Get<Account>(Picked[DateHelper.Year]);
             }
 
             return null;
@@ -71,7 +71,7 @@ namespace SecretSanta.Models
         {
             var pickedBy = DataRepository.GetAll<Account>().FirstOrDefault(x =>
                 x.Picked != null && x.Picked.Any(y =>
-                    y.Key == DateTime.Now.Year &&
+                    y.Key == DateHelper.Year &&
                     y.Value == Id
                 )
             );
@@ -125,12 +125,12 @@ namespace SecretSanta.Models
                 // if there's more than one potential candidate,
                 // make sure not to pick the same person as the previous year
                 candidates = candidates.Where(a =>
-                    !Picked.Any(y => y.Key == (DateTime.Now.Year - 1) && y.Value == a.Id)
+                    !Picked.Any(y => y.Key == (DateHelper.Year - 1) && y.Value == a.Id)
                 );
             }
 
             int rand = new Random().Next(0, candidates.Count());
-            Picked.Add(DateTime.Now.Year, candidates.ElementAt(rand).Id);
+            Picked.Add(DateHelper.Year, candidates.ElementAt(rand).Id);
             DataRepository.Save(this);
         }
 
@@ -301,9 +301,9 @@ namespace SecretSanta.Models
                     .AppendLine("Here's their wish list as it stands right now:")
                     .AppendLine();
 
-                if (recipient.Wishlist.ContainsKey(DateTime.Now.Year))
+                if (recipient.Wishlist.ContainsKey(DateHelper.Year))
                 {
-                    foreach (WishlistItem item in recipient.Wishlist[DateTime.Now.Year])
+                    foreach (WishlistItem item in recipient.Wishlist[DateHelper.Year])
                     {
                         body.AppendLine($"Item: {item.Name}")
                             .AppendLine($"Description: {item.Description}")
@@ -334,9 +334,9 @@ namespace SecretSanta.Models
 
             foreach (var user in users)
             {
-                user.Picked.Remove(DateTime.Now.Year);
-                user.ReceivedGift.Remove(DateTime.Now.Year);
-                user.Wishlist.Remove(DateTime.Now.Year);
+                user.Picked.Remove(DateHelper.Year);
+                user.ReceivedGift.Remove(DateHelper.Year);
+                user.Wishlist.Remove(DateHelper.Year);
 
                 DataRepository.Save(user);
             }
@@ -420,14 +420,16 @@ namespace SecretSanta.Models
             var accounts = DataRepository.GetAll<Account>();
             var account = accounts.Single(x => x.Id.Equals(id));
             var pickedBy = accounts.SingleOrDefault(x =>
-                x.Picked.ContainsKey(DateTime.Now.Year) &&
-                x.Picked[DateTime.Now.Year].Equals(id)
+                x.Picked.ContainsKey(DateHelper.Year) &&
+                x.Picked[DateHelper.Year].Equals(id)
             );
 
             AccountId = account.Id.Value;
             Email = account.Email;
             DisplayName = account.DisplayName;
-            Picked = account.Picked?[DateTime.Now.Year];
+            Picked = (account.Picked?.ContainsKey(DateHelper.Year) ?? false)
+                ? account.Picked[DateHelper.Year]
+                : null;
             PickedBy = pickedBy?.DisplayName;
             DoNotPick = account.DoNotPick ?? new List<Guid>();
         }
@@ -438,7 +440,7 @@ namespace SecretSanta.Models
 
             account.Email = Email;
             account.DisplayName = DisplayName;
-            account.Picked[DateTime.Now.Year] = Picked;
+            account.Picked[DateHelper.Year] = Picked;
             account.DoNotPick = DoNotPick;
 
             DataRepository.Save(account);

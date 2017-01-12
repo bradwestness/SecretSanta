@@ -54,7 +54,7 @@ namespace SecretSanta.Models
 
             Account account = HttpContext.Current.User.GetAccount();
             Id = account.Id;
-            account.ReceivedGift[DateTime.Now.Year] = this;
+            account.ReceivedGift[DateHelper.Year] = this;
             DataRepository.Save(account);
         }
 
@@ -76,18 +76,18 @@ namespace SecretSanta.Models
         public ReceivedGiftEditModel()
         {
             Gifts = DataRepository.GetAll<Account>().Where(x =>
-                        x.ReceivedGift.ContainsKey(DateTime.Now.Year) &&
-                        x.ReceivedGift[DateTime.Now.Year] != null &&
-                        !string.IsNullOrWhiteSpace(x.ReceivedGift[DateTime.Now.Year].Description)
+                        x.ReceivedGift.ContainsKey(DateHelper.Year) &&
+                        x.ReceivedGift[DateHelper.Year] != null &&
+                        !string.IsNullOrWhiteSpace(x.ReceivedGift[DateHelper.Year].Description)
                     )
-                    .Select(x => x.ReceivedGift[DateTime.Now.Year])
+                    .Select(x => x.ReceivedGift[DateHelper.Year])
                     .ToList();
         }
 
         public ReceivedGiftEditModel(Account account) : this()
         {
-            Item = account.ReceivedGift.ContainsKey(DateTime.Now.Year)
-                ? account.ReceivedGift[DateTime.Now.Year]
+            Item = account.ReceivedGift.ContainsKey(DateHelper.Year)
+                ? account.ReceivedGift[DateHelper.Year]
                 : new ReceivedGift();
             Item.Id = account.Id;
 
@@ -106,8 +106,8 @@ namespace SecretSanta.Models
         {
             var accounts = DataRepository.GetAll<Account>().Where(x => 
                 x.ReceivedGift == null || 
-                !x.ReceivedGift.ContainsKey(DateTime.Now.Year) ||
-                string.IsNullOrWhiteSpace(x.ReceivedGift[DateTime.Now.Year].Description)
+                !x.ReceivedGift.ContainsKey(DateHelper.Year) ||
+                string.IsNullOrWhiteSpace(x.ReceivedGift[DateHelper.Year].Description)
             );
 
             foreach (var account in accounts)
