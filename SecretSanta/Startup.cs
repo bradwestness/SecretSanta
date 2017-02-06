@@ -21,7 +21,7 @@ namespace SecretSanta
             Configuration = builder.Build();
             AppSettings.Initialize(Configuration);
             DataRepository.Initialize(env.ContentRootPath);
-            PreviewGenerator.Initialize(env.ContentRootPath);
+            PreviewGenerator.Initialize(env.WebRootPath);
         }
 
         public IConfigurationRoot Configuration { get; }

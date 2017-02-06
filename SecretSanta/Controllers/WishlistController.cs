@@ -58,8 +58,12 @@ namespace SecretSanta.Controllers
         [HttpPost]
         public IActionResult DeleteItem(WishlistItem model)
         {
-            WishlistManager.DeleteItem(User.GetAccount(), model);
-            this.SetResultMessage($"<strong>Successfully deleted</strong> {model.Name}.");
+            if (ModelState.IsValid)
+            {
+                WishlistManager.DeleteItem(User.GetAccount(), model);
+                this.SetResultMessage($"<strong>Successfully deleted</strong> {model.Name}.");
+            }
+
             return RedirectToAction("Index");
         }
 

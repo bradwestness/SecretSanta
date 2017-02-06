@@ -11,7 +11,8 @@ namespace SecretSanta.Controllers
     {
         //
         // GET: /Preview/FeaturedImage
-        [Route("Preview/{accountId:Guid}/{itemId:Guid}"), ResponseCache(Location = ResponseCacheLocation.Any, Duration = int.MaxValue, VaryByHeader = "Cookie", VaryByQueryKeys = new[] { "accountId", "itemId" })]
+        [Route("Preview/{accountId:Guid}/{itemId:Guid}")]
+        //[ResponseCache(Location = ResponseCacheLocation.Any, Duration = int.MaxValue, VaryByHeader = "Cookie", VaryByQueryKeys = new[] { "accountId", "itemId" })]
         public IActionResult FeaturedImage(Guid accountId, Guid itemId)
         {
             var account = DataRepository.Get<Account>(accountId);

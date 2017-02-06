@@ -6,17 +6,16 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace SecretSanta.Utilities
 {
     public static class PreviewGenerator
     {
-        private static string _contentRootPath;
+        private static string _webRootPath;
 
-        public static void Initialize(string contentRootPath)
+        public static void Initialize(string webRootPath)
         {
-            _contentRootPath = contentRootPath;
+            _webRootPath = webRootPath;
         }
 
         public static byte[] GetFeaturedImage(string url)
@@ -27,6 +26,8 @@ namespace SecretSanta.Utilities
             {
                 // download the page contents as a string
                 var request = HttpWebRequest.CreateHttp(url);
+                request.Accept = "text/html";
+
                 var result = request.GetResponseAsync().Result;
 
                 using (var reader = new StreamReader(result.GetResponseStream()))
@@ -47,7 +48,7 @@ namespace SecretSanta.Utilities
             }
             catch
             {
-                string fileName = Path.Combine(_contentRootPath, AppSettings.DefaultPreviewImage);
+                string fileName = Path.Combine(_webRootPath, AppSettings.DefaultPreviewImage);
                 output = File.ReadAllBytes(fileName);
             }
 
@@ -106,10 +107,11 @@ namespace SecretSanta.Utilities
                 try
                 {
                     var request = HttpWebRequest.CreateHttp(source);
-                    var response = request.GetResponseAsync().Result;
-                    var photoBytes = ReadAllBytes(response.GetResponseStream());
+                    request.Accept = "image/*";
 
-                    using (var inStream = new MemoryStream(photoBytes))
+                    var response = request.GetResponseAsync().Result;
+
+                    using (var inStream = response.GetResponseStream())
                     using (var outStream = new MemoryStream())
                     {
                         var tempImage = Image.FromStream(inStream);
@@ -130,49 +132,6 @@ namespace SecretSanta.Utilities
                 }
 
                 return output;
-            }
-
-            private static byte[] ReadAllBytes(Stream stream)
-            {
-                long originalPosition = stream.Position;
-                stream.Position = 0;
-
-                try
-                {
-                    byte[] readBuffer = new byte[4096];
-                    int totalBytesRead = 0;
-                    int bytesRead = 0;
-
-                    while ((bytesRead = stream.Read(readBuffer, totalBytesRead, readBuffer.Length - totalBytesRead)) > 0)
-                    {
-                        totalBytesRead += bytesRead;
-                        if (totalBytesRead == readBuffer.Length)
-                        {
-                            int nextByte = stream.ReadByte();
-                            if (nextByte != -1)
-                            {
-                                byte[] temp = new byte[readBuffer.Length * 2];
-                                Buffer.BlockCopy(readBuffer, 0, temp, 0, readBuffer.Length);
-                                Buffer.SetByte(temp, totalBytesRead, (byte)nextByte);
-                                readBuffer = temp;
-                                totalBytesRead++;
-                            }
-                        }
-                    }
-
-                    byte[] buffer = readBuffer;
-                    if (readBuffer.Length != totalBytesRead)
-                    {
-                        buffer = new byte[totalBytesRead];
-                        Buffer.BlockCopy(readBuffer, 0, buffer, 0, totalBytesRead);
-                    }
-
-                    return buffer;
-                }
-                finally
-                {
-                    stream.Position = originalPosition;
-                }
             }
 
             #endregion

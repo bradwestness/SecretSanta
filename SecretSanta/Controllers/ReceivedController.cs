@@ -34,7 +34,8 @@ namespace SecretSanta.Controllers
 
         //
         // GET: /Received/Image
-        [Route("Received/Image/{accountId:Guid}"), ResponseCache(Location = ResponseCacheLocation.Any, Duration = int.MaxValue, VaryByHeader = "Cookie", VaryByQueryKeys = new[] { "accountId" })]
+        [Route("Received/Image/{accountId:Guid}")]
+        //[ResponseCache(Location = ResponseCacheLocation.Any, Duration = int.MaxValue, VaryByHeader = "Cookie", VaryByQueryKeys = new[] { "accountId" })]
         public IActionResult Image(Guid accountId)
         {
             var account = DataRepository.Get<Account>(accountId);
