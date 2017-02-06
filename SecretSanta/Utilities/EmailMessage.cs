@@ -1,6 +1,7 @@
 ﻿using MailKit.Net.Smtp;
 using MimeKit;
 using MimeKit.Text;
+using System;
 using System.Collections.Generic;
 
 namespace SecretSanta.Utilities
@@ -15,7 +16,7 @@ namespace SecretSanta.Utilities
                 message.From.Add(from);
                 message.To.AddRange(to);
                 message.Subject = subject;
-                message.Body = new TextPart(TextFormat.Html) { Text = body };
+                message.Body = new TextPart(TextFormat.Html) { Text = body.Replace(Environment.NewLine, "<br />") };
 
                 smtp.Connect(AppSettings.SmtpHost, AppSettings.SmtpPort, true);
                 smtp.Authenticate(AppSettings.SmtpUser, AppSettings.SmtpPass);

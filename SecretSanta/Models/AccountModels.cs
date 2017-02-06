@@ -211,6 +211,17 @@ namespace SecretSanta.Models
         {
             var account = DataRepository.GetAll<Account>().FirstOrDefault(x => x.Email.Equals(Email, StringComparison.CurrentCultureIgnoreCase));
 
+            if (account == null && Email.Equals(AppSettings.AdminEmail))
+            {
+                account = new Account
+                {
+                    Email = AppSettings.AdminEmail,
+                    Id = Guid.NewGuid(),
+                    DisplayName = "Admin"
+                };
+                DataRepository.Save(account);
+            }
+
             if (account != null && account.Id.HasValue)
             {
                 var token = GuidEncoder.Encode(account.Id.Value);
