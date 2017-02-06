@@ -1,13 +1,12 @@
-﻿using SecretSanta.Utilities;
+﻿using Microsoft.AspNetCore.Mvc;
+using MimeKit;
+using SecretSanta.Utilities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Net.Mail;
 using System.Text;
-using System.Web;
-using System.Web.Mvc;
 
 namespace SecretSanta.Models
 {
@@ -61,7 +60,7 @@ namespace SecretSanta.Models
                 ? account.Wishlist[DateHelper.Year]
                 : new List<WishlistItem>();
         }
-        
+
         #endregion
     }
 
@@ -69,9 +68,8 @@ namespace SecretSanta.Models
     {
         #region Public Methods
 
-        public static void AddItem(WishlistItem item)
+        public static void AddItem(Account account, WishlistItem item)
         {
-            Account account = HttpContext.Current.User.GetAccount();
             if (!account.Wishlist.ContainsKey(DateHelper.Year))
             {
                 account.Wishlist.Add(DateHelper.Year, new List<WishlistItem>());
@@ -82,9 +80,8 @@ namespace SecretSanta.Models
             DataRepository.Save(account);
         }
 
-        public static void EditItem(WishlistItem item)
+        public static void EditItem(Account account, WishlistItem item)
         {
-            Account account = HttpContext.Current.User.GetAccount();
             WishlistItem remove = account.Wishlist[DateHelper.Year].SingleOrDefault(i => i.Id.Equals(item.Id));
             account.Wishlist[DateHelper.Year].Remove(remove);
             item.PreviewImage = PreviewGenerator.GetFeaturedImage(item.Url);
@@ -92,15 +89,14 @@ namespace SecretSanta.Models
             DataRepository.Save(account);
         }
 
-        public static void DeleteItem(WishlistItem item)
+        public static void DeleteItem(Account account, WishlistItem item)
         {
-            Account account = HttpContext.Current.User.GetAccount();
             WishlistItem remove = account.Wishlist[DateHelper.Year].SingleOrDefault(i => i.Id.Equals(item.Id));
             account.Wishlist[DateHelper.Year].Remove(remove);
             DataRepository.Save(account);
         }
 
-        public static void SendReminder(Guid id, UrlHelper urlHelper)
+        public static void SendReminder(Guid id, IUrlHelper urlHelper)
         {
             var account = DataRepository.Get<Account>(id);
             string url = urlHelper.Action("LogIn", "Account", new { id = account.Id }, "http");
@@ -119,8 +115,8 @@ namespace SecretSanta.Models
                 .AppendFormat("Santa ").AppendLine()
                 .ToString();
 
-            var from = new MailAddress("santa@thenorthpole.com", "Santa Claus");
-            var to = new MailAddressCollection { new MailAddress(account.Email, account.DisplayName) };
+            var from = new MailboxAddress("Santa Claus", "santa@thenorthpole.com");
+            var to = new List<MailboxAddress> { new MailboxAddress(account.DisplayName, account.Email) };
 
             EmailMessage.Send(from, to, "Secret Santa Reminder", body);
         }

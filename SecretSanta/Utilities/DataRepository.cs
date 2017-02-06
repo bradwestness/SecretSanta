@@ -6,7 +6,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Web;
 
 namespace SecretSanta.Utilities
 {
@@ -14,6 +13,7 @@ namespace SecretSanta.Utilities
     {
         #region Variables
 
+        private static string _contentRootPath;
         private static IList<Account> _accounts_singleton;
         private static object _lock = new object();
         private static IList<Account> _accounts
@@ -40,12 +40,17 @@ namespace SecretSanta.Utilities
 
         #region Public Methods
 
+        public static void Initialize(string contentRootPath)
+        {
+            _contentRootPath = contentRootPath;
+        }
+
         public static T Get<T>(Guid? id) where T : class
         {
             T theObject = null;
             string fileName = string.Empty;
 
-            if (typeof (T) == typeof (Account))
+            if (typeof(T) == typeof(Account))
             {
                 if (_accounts != null)
                 {
@@ -75,7 +80,7 @@ namespace SecretSanta.Utilities
             var list = new List<T>();
             string pattern = string.Empty;
 
-            if (typeof (T) == typeof (Account))
+            if (typeof(T) == typeof(Account))
             {
                 if (_accounts != null)
                 {
@@ -97,7 +102,7 @@ namespace SecretSanta.Utilities
                 list.Add(item);
             }
 
-            if (typeof (T) == typeof (Account))
+            if (typeof(T) == typeof(Account))
             {
                 _accounts = list as IList<Account>;
             }
@@ -110,7 +115,7 @@ namespace SecretSanta.Utilities
             string fileName = string.Empty;
             string output = string.Empty;
 
-            if (typeof (T) == typeof (Account))
+            if (typeof(T) == typeof(Account))
             {
                 var account = theObject as Account;
                 if (account != null)
@@ -135,7 +140,7 @@ namespace SecretSanta.Utilities
         {
             string fileName = string.Empty;
 
-            if (typeof (T) == typeof (Account))
+            if (typeof(T) == typeof(Account))
             {
                 fileName = AppSettings.AccountFilePattern.Replace("*", SanitizeFileName(id.ToString()));
                 _accounts = null;
@@ -169,7 +174,7 @@ namespace SecretSanta.Utilities
 
         private static string GetDataDirectory()
         {
-            string directory = HttpContext.Current.Server.MapPath(AppSettings.DataDirectory);
+            string directory = Path.Combine(_contentRootPath, AppSettings.DataDirectory);
 
             if (!Directory.Exists(directory))
             {

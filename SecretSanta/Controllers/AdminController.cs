@@ -1,6 +1,7 @@
-﻿using SecretSanta.Models;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using SecretSanta.Models;
 using SecretSanta.Utilities;
-using System.Web.Mvc;
 
 namespace SecretSanta.Controllers
 {
@@ -9,7 +10,7 @@ namespace SecretSanta.Controllers
     {
         //
         // GET: /Admin/Users
-        public ActionResult Users()
+        public IActionResult Users()
         {
             var model = new EditUsersModel();
             return View(model);
@@ -17,7 +18,7 @@ namespace SecretSanta.Controllers
 
         //
         // GET: /Admin/Reset
-        public ActionResult Reset()
+        public IActionResult Reset()
         {
             EditUsersModel.Reset();
             this.SetResultMessage("All user wishlists and picks have been reset.");
@@ -26,30 +27,27 @@ namespace SecretSanta.Controllers
 
         //
         // GET: /Admin/Invite
-        public ActionResult Invite()
+        public IActionResult Invite()
         {
-            var urlHelper = new UrlHelper(ControllerContext.RequestContext);
-            EditUsersModel.SendInvitationMessages(urlHelper);
+            EditUsersModel.SendInvitationMessages(Url);
             this.SetResultMessage("Invitations successfully sent to all users.");
             return RedirectToAction("Users");
         }
 
         //
         // GET: /Admin/AllPicked
-        public ActionResult AllPicked()
+        public IActionResult AllPicked()
         {
-            var urlHelper = new UrlHelper(ControllerContext.RequestContext);
-            EditUsersModel.SendAllPickedMessages(urlHelper);
+            EditUsersModel.SendAllPickedMessages(Url);
             this.SetResultMessage("Reminders successfully sent to all users.");
             return RedirectToAction("Users");
         }
 
         //
         // GET: /Admin/ReceivedGift
-        public ActionResult ReceivedGift()
+        public IActionResult ReceivedGift()
         {
-            var urlHelper = new UrlHelper(ControllerContext.RequestContext);
-            ReceivedGiftEditModel.SendReminders(urlHelper);
+            ReceivedGiftEditModel.SendReminders(Url);
             this.SetResultMessage("Reminders successfully sent to all users who have not entered their received gift info.");
             return RedirectToAction("Users");
         }
@@ -57,7 +55,7 @@ namespace SecretSanta.Controllers
         //
         // POST: /Admin/AddUser
         [HttpPost]
-        public ActionResult AddUser(AddUserModel model)
+        public IActionResult AddUser(AddUserModel model)
         {
             if (model.EmailConflict())
             {
@@ -76,7 +74,7 @@ namespace SecretSanta.Controllers
         //
         // POST: /Admin/EditUser
         [HttpPost]
-        public ActionResult EditUser(EditUserModel model)
+        public IActionResult EditUser(EditUserModel model)
         {
             if (ModelState.IsValid)
             {
@@ -90,7 +88,7 @@ namespace SecretSanta.Controllers
         //
         // POST: /Admin/DeleteUser
         [HttpPost]
-        public ActionResult DeleteUser(EditUserModel model)
+        public IActionResult DeleteUser(EditUserModel model)
         {
             model.Delete();
             this.SetResultMessage($"<strong>Successfully deleted</strong> {model.DisplayName}.");

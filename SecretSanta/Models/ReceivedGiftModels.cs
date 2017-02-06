@@ -1,16 +1,16 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using MimeKit;
+using Newtonsoft.Json;
 using SecretSanta.Utilities;
+using SecretSanta.Validation;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using System.Net.Mail;
 using System.Text;
-using System.Web;
-using System.Web.Mvc;
 
 namespace SecretSanta.Models
 {
@@ -33,26 +33,24 @@ namespace SecretSanta.Models
         public byte[] Image { get; set; }
 
         [DisplayName("Photo with your gift"), Required, JsonIgnore, MaxFileSize(2000000)]
-        public HttpPostedFileBase ImageUpload { get; set; }
+        public IFormFile ImageUpload { get; set; }
 
         #endregion
 
         #region Public Methods
 
-        public void Save()
+        public void Save(Account account)
         {
-            if (ImageUpload != null && ImageUpload.ContentLength > 0)
+            if (ImageUpload != null && ImageUpload.Length > 0)
             {
-                var tempImage = System.Drawing.Image.FromStream(ImageUpload.InputStream);
-
+                using (var inStream = ImageUpload.OpenReadStream())
                 using (var outStream = new MemoryStream())
                 {
-                    tempImage.Save(outStream, ImageFormat.Jpeg);
+                    inStream.CopyTo(outStream);
                     Image = outStream.ToArray();
                 }
             }
 
-            Account account = HttpContext.Current.User.GetAccount();
             Id = account.Id;
             account.ReceivedGift[DateHelper.Year] = this;
             DataRepository.Save(account);
@@ -102,10 +100,10 @@ namespace SecretSanta.Models
             }
         }
 
-        public static void SendReminders(UrlHelper urlHelper)
+        public static void SendReminders(IUrlHelper urlHelper)
         {
-            var accounts = DataRepository.GetAll<Account>().Where(x => 
-                x.ReceivedGift == null || 
+            var accounts = DataRepository.GetAll<Account>().Where(x =>
+                x.ReceivedGift == null ||
                 !x.ReceivedGift.ContainsKey(DateHelper.Year) ||
                 string.IsNullOrWhiteSpace(x.ReceivedGift[DateHelper.Year].Description)
             );
@@ -128,8 +126,8 @@ namespace SecretSanta.Models
                     .AppendFormat("Santa ").AppendLine()
                     .ToString();
 
-                var from = new MailAddress("santa@thenorthpole.com", "Santa Claus");
-                var to = new MailAddressCollection { new MailAddress(account.Email, account.DisplayName) };
+                var from = new MailboxAddress("Santa Claus", "santa@thenorthpole.com");
+                var to = new List<MailboxAddress> { new MailboxAddress(account.DisplayName, account.Email) };
 
                 EmailMessage.Send(from, to, "Secret Santa Reminder", body);
             }

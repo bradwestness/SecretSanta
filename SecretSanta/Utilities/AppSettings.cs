@@ -1,18 +1,35 @@
-﻿using System.Configuration;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 
 namespace SecretSanta.Utilities
 {
     public struct AppSettings
     {
-        public static string AdminEmail => ConfigurationManager.AppSettings["SecretSanta:AdminEmail"];
-        public static string DataDirectory => ConfigurationManager.AppSettings["SecretSanta:DataDirectory"];
-        public static int MaxImagesToLoad => int.Parse(ConfigurationManager.AppSettings["SecretSanta:MaxImagesToLoad"]);
-        public static string DefaultPreviewImage => ConfigurationManager.AppSettings["SecretSanta:DefaultPreviewImage"];
-        public static string AccountFilePattern => ConfigurationManager.AppSettings["SecretSanta:AccountFilePattern"];
-        public static int GiftDollarLimit => int.Parse(ConfigurationManager.AppSettings["SecretSanta:GiftDollarLimit"]);
-        public static string SmtpHost => ConfigurationManager.AppSettings["SecretSanta:SmtpHost"];
-        public static int SmtpPort => int.Parse(ConfigurationManager.AppSettings["SecretSanta:SmtpPort"]);
-        public static string SmtpUser => ConfigurationManager.AppSettings["SecretSanta:SmtpUser"];
-        public static string SmtpPass => ConfigurationManager.AppSettings["SecretSanta:SmtpPass"];
+        private static IConfigurationRoot _configuration;
+
+        public static void Initialize(IConfigurationRoot configuration)
+        {
+            _configuration = configuration;
+        }
+
+        public static string AdminEmail => _configuration.GetValue<string>("SecretSanta:AdminEmail");
+        public static string DataDirectory => _configuration.GetValue<string>("SecretSanta:DataDirectory");
+        public static int MaxImagesToLoad => _configuration.GetValue<int>("SecretSanta:MaxImagesToLoad");
+        public static string DefaultPreviewImage => _configuration.GetValue<string>("SecretSanta:DefaultPreviewImage");
+        public static string AccountFilePattern => _configuration.GetValue<string>("SecretSanta:AccountFilePattern");
+        public static int GiftDollarLimit => _configuration.GetValue<int>("SecretSanta:GiftDollarLimit");
+        public static string SmtpHost => _configuration.GetValue<string>("SecretSanta:SmtpHost");
+        public static int SmtpPort => _configuration.GetValue<int>("SecretSanta:SmtpPort");
+        public static string SmtpUser => _configuration.GetValue<string>("SecretSanta:SmtpUser");
+        public static string SmtpPass => _configuration.GetValue<string>("SecretSanta:SmtpPass");
+        public static CookieAuthenticationOptions Authentication => new CookieAuthenticationOptions
+        {
+            AuthenticationScheme = "SecretSantaAuthentication",
+            LoginPath = new PathString("/Account/LogIn"),
+            AccessDeniedPath = new PathString("/Home/Index"),
+            AutomaticAuthenticate = true,
+            AutomaticChallenge = true
+        };
     }
 }

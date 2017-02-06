@@ -1,34 +1,26 @@
-﻿using System;
-using System.Net;
-using System.Net.Mail;
+﻿using MailKit.Net.Smtp;
+using MimeKit;
+using MimeKit.Text;
+using System.Collections.Generic;
 
 namespace SecretSanta.Utilities
 {
     public static class EmailMessage
     {
-        public static void Send(MailAddress from, MailAddressCollection to, string subject, string body)
+        public static void Send(MailboxAddress from, IEnumerable<MailboxAddress> to, string subject, string body)
         {
-            using (var smtp = new SmtpClient(AppSettings.SmtpHost, AppSettings.SmtpPort))
+            using (var smtp = new SmtpClient())
             {
-                smtp.UseDefaultCredentials = false;
-                smtp.Credentials = new NetworkCredential(AppSettings.SmtpUser, AppSettings.SmtpPass);
-                smtp.EnableSsl = true;
+                var message = new MimeMessage();
+                message.From.Add(from);
+                message.To.AddRange(to);
+                message.Subject = subject;
+                message.Body = new TextPart(TextFormat.Html) { Text = body };
 
-                using (var message = new MailMessage())
-                {
-                    foreach (MailAddress recipient in to)
-                    {
-                        message.To.Add(recipient);
-                    }
-                    message.Subject = subject;
-                    message.Body = body.Replace(Environment.NewLine, "<br />");
-                    message.From = from;
-                    message.ReplyToList.Clear();
-                    message.ReplyToList.Add(from);
-                    message.IsBodyHtml = true;
-
-                    smtp.Send(message);
-                }
+                smtp.Connect(AppSettings.SmtpHost, AppSettings.SmtpPort, true);
+                smtp.Authenticate(AppSettings.SmtpUser, AppSettings.SmtpPass);
+                smtp.Send(message);
+                smtp.Disconnect(true);
             }
         }
     }

@@ -1,14 +1,16 @@
-﻿using SecretSanta.Models;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
+using SecretSanta.Models;
 using SecretSanta.Utilities;
-using System.Web.Mvc;
 
 namespace SecretSanta.Controllers
 {
     public class HomeController : Controller
     {
-        public ActionResult Index()
+        public IActionResult Index()
         {
-            if (Request.IsAuthenticated)
+            if (User.Identity.IsAuthenticated)
             {
                 return RedirectToAction("Dashboard", "Home");
             }
@@ -18,14 +20,14 @@ namespace SecretSanta.Controllers
         }
 
         [Authorize]
-        public ActionResult Dashboard()
+        public IActionResult Dashboard()
         {
             Account model = User.GetAccount();
             return View(model);
         }
 
         [Authorize]
-        public ActionResult Pick()
+        public IActionResult Pick()
         {
             Account model = User.GetAccount();
             model.Pick();

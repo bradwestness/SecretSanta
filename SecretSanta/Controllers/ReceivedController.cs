@@ -1,16 +1,17 @@
-﻿using SecretSanta.Models;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using SecretSanta.Models;
 using SecretSanta.Utilities;
 using System;
-using System.Web;
-using System.Web.Mvc;
 
 namespace SecretSanta.Controllers
 {
+    [Authorize]
     public class ReceivedController : Controller
     {
         //
         // GET: /Received/
-        public ActionResult Index()
+        public IActionResult Index()
         {
             var account = User.GetAccount();
             ReceivedGiftEditModel model = new ReceivedGiftEditModel(account);
@@ -20,11 +21,11 @@ namespace SecretSanta.Controllers
         //
         // POST: /Received/Save
         [HttpPost]
-        public ActionResult Save(ReceivedGift model)
+        public IActionResult Save(ReceivedGift model)
         {
             if (ModelState.IsValid)
             {
-                model.Save();
+                model.Save(User.GetAccount());
                 this.SetResultMessage("Successfully updated your recieved gift info.");
             }
 
@@ -33,8 +34,8 @@ namespace SecretSanta.Controllers
 
         //
         // GET: /Received/Image
-        [Route("Received/Image/{accountId:Guid}")]
-        public ActionResult Image(Guid accountId)
+        [Route("Received/Image/{accountId:Guid}"), ResponseCache(Location = ResponseCacheLocation.Any, Duration = int.MaxValue, VaryByHeader = "Cookie", VaryByQueryKeys = new[] { "accountId" })]
+        public IActionResult Image(Guid accountId)
         {
             var account = DataRepository.Get<Account>(accountId);
             ReceivedGift gift = account.ReceivedGift[DateHelper.Year];
@@ -43,12 +44,6 @@ namespace SecretSanta.Controllers
             {
                 return null;
             }
-
-            Response.Cache.SetValidUntilExpires(true);
-            Response.Cache.SetCacheability(HttpCacheability.Public);
-            Response.Cache.VaryByHeaders["Cookie"] = true;
-            Response.Cache.VaryByHeaders["Accept-Encoding"] = true;
-            Response.Cache.VaryByParams["accountId"] = true;
 
             return File(gift.Image, "image/jpg");
         }

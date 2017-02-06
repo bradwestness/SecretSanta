@@ -1,7 +1,8 @@
-﻿using SecretSanta.Models;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using SecretSanta.Models;
 using SecretSanta.Utilities;
 using System;
-using System.Web.Mvc;
 
 namespace SecretSanta.Controllers
 {
@@ -10,7 +11,7 @@ namespace SecretSanta.Controllers
     {
         //
         // GET: /Wishlist/
-        public ActionResult Index()
+        public IActionResult Index()
         {
             var model = new WishlistEditModel(User.GetAccount().Id.Value);
             return View(model);
@@ -18,7 +19,7 @@ namespace SecretSanta.Controllers
 
         //
         // GET: /Wishlist/Details
-        public ActionResult Details(Guid id)
+        public IActionResult Details(Guid id)
         {
             var model = new WishlistEditModel(id);
             return View(model);
@@ -27,11 +28,11 @@ namespace SecretSanta.Controllers
         //
         // POST: /Wishlist/AddItem
         [HttpPost]
-        public ActionResult AddItem(WishlistItem model)
+        public IActionResult AddItem(WishlistItem model)
         {
             if (ModelState.IsValid)
             {
-                WishlistManager.AddItem(model);
+                WishlistManager.AddItem(User.GetAccount(), model);
                 this.SetResultMessage($"<strong>Successfully added</strong> {model.Name}.");
             }
 
@@ -41,11 +42,11 @@ namespace SecretSanta.Controllers
         //
         // POST: /Wishlist/EditItem
         [HttpPost]
-        public ActionResult EditItem(WishlistItem model)
+        public IActionResult EditItem(WishlistItem model)
         {
             if (ModelState.IsValid)
             {
-                WishlistManager.EditItem(model);
+                WishlistManager.EditItem(User.GetAccount(), model);
                 this.SetResultMessage($"<strong>Successfully updated</strong> {model.Name}.");
             }
 
@@ -55,21 +56,20 @@ namespace SecretSanta.Controllers
         //
         // POST: /Wishlist/DeleteItem
         [HttpPost]
-        public ActionResult DeleteItem(WishlistItem model)
+        public IActionResult DeleteItem(WishlistItem model)
         {
-            WishlistManager.DeleteItem(model);
+            WishlistManager.DeleteItem(User.GetAccount(), model);
             this.SetResultMessage($"<strong>Successfully deleted</strong> {model.Name}.");
             return RedirectToAction("Index");
         }
 
         //
         // GET: /Wishlist/Remind
-        public ActionResult Remind(Guid id)
+        public IActionResult Remind(Guid id)
         {
-            var urlHelper = new UrlHelper(ControllerContext.RequestContext);
-            WishlistManager.SendReminder(id, urlHelper);
+            WishlistManager.SendReminder(id, Url);
             this.SetResultMessage("<strong>Reminder sent</strong> successfully.");
-            return RedirectToAction("Details", new {id});
+            return RedirectToAction("Details", new { id });
         }
     }
 }

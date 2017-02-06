@@ -1,14 +1,16 @@
-﻿using SecretSanta.Utilities;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using MimeKit;
+using SecretSanta.Utilities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Net.Mail;
+using System.Security.Claims;
+using System.Security.Principal;
 using System.Text;
-using System.Web;
-using System.Web.Mvc;
-using System.Web.Security;
 
 namespace SecretSanta.Models
 {
@@ -139,23 +141,43 @@ namespace SecretSanta.Models
 
     public class LogInModel
     {
-        public static string TokenSignIn(string token, string returnUrl)
+        public static string TokenSignIn(HttpContext httpContext, string token, string returnUrl)
         {
             var uid = GuidEncoder.Decode(token);
             var account = DataRepository.Get<Account>(uid);
 
             if (account != null)
             {
-                FormsAuthentication.SetAuthCookie(account.Email, true);
+                var principal = new ClaimsPrincipal(new Identity(account.Email));
+                httpContext.Authentication.SignInAsync(AppSettings.Authentication.AuthenticationScheme, principal);
 
                 returnUrl = string.IsNullOrWhiteSpace(returnUrl)
-                    ? FormsAuthentication.GetRedirectUrl(account.Email, true)
+                    ? AppSettings.Authentication.LoginPath.ToString()
                     : returnUrl;
             }
 
             return string.IsNullOrWhiteSpace(returnUrl)
-                ? FormsAuthentication.DefaultUrl
+                ? AppSettings.Authentication.LoginPath.ToString()
                 : returnUrl;
+        }
+
+        protected class Identity : IIdentity
+        {
+            public string AuthenticationType => AppSettings.Authentication.AuthenticationScheme;
+
+            public bool IsAuthenticated => !string.IsNullOrWhiteSpace(Name);
+
+            public string Name { get; private set; }
+
+            public Identity()
+            {
+
+            }
+
+            public Identity(string name)
+            {
+                Name = name;
+            }
         }
     }
 
@@ -163,11 +185,12 @@ namespace SecretSanta.Models
     {
         #region Public Methods
 
-        public static string SignOut()
+        public static string SignOut(HttpContext httpContext)
         {
-            FormsAuthentication.SignOut();
-            HttpContext.Current.Session.Abandon();
-            return FormsAuthentication.DefaultUrl;
+            httpContext.Authentication.SignOutAsync(AppSettings.Authentication.AuthenticationScheme);
+            httpContext.Session = null;
+
+            return AppSettings.Authentication.LoginPath;
         }
 
         #endregion
@@ -184,9 +207,9 @@ namespace SecretSanta.Models
 
         #region Public Methods
 
-        public void Send(UrlHelper urlHelper)
+        public void Send(IUrlHelper urlHelper)
         {
-            var account = DataRepository.GetAll<Account>().FirstOrDefault(x => x.Email.Equals(Email, StringComparison.InvariantCultureIgnoreCase));            
+            var account = DataRepository.GetAll<Account>().FirstOrDefault(x => x.Email.Equals(Email, StringComparison.CurrentCultureIgnoreCase));
 
             if (account != null && account.Id.HasValue)
             {
@@ -209,8 +232,8 @@ namespace SecretSanta.Models
                     .AppendLine("Santa")
                     .AppendLine();
 
-                var from = new MailAddress("santa@thenorthpole.com", "Santa Claus");
-                var to = new MailAddressCollection { new MailAddress(account.Email, account.DisplayName) };
+                var from = new MailboxAddress("Santa Claus", "santa@thenorthpole.com");
+                var to = new List<MailboxAddress> { new MailboxAddress(account.DisplayName, account.Email) };
 
                 EmailMessage.Send(from, to, "Secret Santa Log-In Link", body.ToString());
             }
@@ -247,7 +270,7 @@ namespace SecretSanta.Models
             }
         }
 
-        public static void SendInvitationMessages(UrlHelper urlHelper)
+        public static void SendInvitationMessages(IUrlHelper urlHelper)
         {
             IList<Account> accounts = DataRepository.GetAll<Account>();
 
@@ -272,14 +295,14 @@ namespace SecretSanta.Models
                     .AppendLine("Santa")
                     .AppendLine();
 
-                var from = new MailAddress("santa@thenorthpole.com", "Santa Claus");
-                var to = new MailAddressCollection { new MailAddress(account.Email, account.DisplayName) };
+                var from = new MailboxAddress("Santa Claus", "santa@thenorthpole.com");
+                var to = new List<MailboxAddress> { new MailboxAddress(account.DisplayName, account.Email) };
 
                 EmailMessage.Send(from, to, "Secret Santa Reminder", body.ToString());
             }
         }
 
-        public static void SendAllPickedMessages(UrlHelper urlHelper)
+        public static void SendAllPickedMessages(IUrlHelper urlHelper)
         {
             IList<Account> accounts = DataRepository.GetAll<Account>();
 
@@ -321,8 +344,8 @@ namespace SecretSanta.Models
                     .AppendLine()
                     .AppendLine("Santa");
 
-                var from = new MailAddress("santa@thenorthpole.com", "Santa Claus");
-                var to = new MailAddressCollection { new MailAddress(account.Email, account.DisplayName) };
+                var from = new MailboxAddress("Santa Claus", "santa@thenorthpole.com");
+                var to = new List<MailboxAddress> { new MailboxAddress(account.DisplayName, account.Email) };
 
                 EmailMessage.Send(from, to, "Secret Santa Reminder", body.ToString());
             }

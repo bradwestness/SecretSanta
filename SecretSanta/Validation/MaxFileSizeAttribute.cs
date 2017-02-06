@@ -1,46 +1,58 @@
-using Humanizer;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Web;
-using System.Web.Mvc;
 
-namespace SecretSanta
+namespace SecretSanta.Validation
 {
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property, AllowMultiple = false, Inherited = true)]
-    public class MaxFileSizeAttribute : ValidationAttribute, IClientValidatable
+    public class MaxFileSizeAttribute : ValidationAttribute, IClientModelValidator
     {
-        public int? MaxBytes { get; set; }
+        public int MaxBytes { get; set; }
 
         public MaxFileSizeAttribute(int maxBytes)
             : base("File exceeds the maximum supported size.")
         {
             MaxBytes = maxBytes;
-            ErrorMessage = $"Please upload a file of less than {maxBytes.Bytes()}.";
+            ErrorMessage = $"Please upload a file of less than {maxBytes} bytes.";
         }
 
         public override bool IsValid(object value)
         {
-            HttpPostedFileBase file = value as HttpPostedFileBase;
+            var file = value as IFormFile;
             bool result = true;
 
-            if (file != null && MaxBytes.HasValue)
+            if (file != null)
             {
-                result &= (file.ContentLength < MaxBytes.Value);
+                result &= (file.Length < MaxBytes);
             }
 
             return result;
         }
 
-        public IEnumerable<ModelClientValidationRule> GetClientValidationRules(ModelMetadata metadata, ControllerContext context)
+        public void AddValidation(ClientModelValidationContext context)
         {
-            var rule = new ModelClientValidationRule
+            if (context == null)
             {
-                ValidationType = "maxfilesize",
-                ErrorMessage = FormatErrorMessage(metadata.DisplayName)
-            };
-            rule.ValidationParameters["maxbytes"] = MaxBytes;
-            yield return rule;
+                throw new ArgumentNullException(nameof(context));
+            }
+
+            MergeAttribute(context.Attributes, "data-val", "true");
+            MergeAttribute(context.Attributes, "data-val-maxfilesize", ErrorMessage);
+            MergeAttribute(context.Attributes, "data-val-maxfilesize-maxbytes", MaxBytes.ToString());
+        }
+
+        private void MergeAttribute(IDictionary<string, string> attributes, string key, string value)
+        {
+            if (attributes.ContainsKey(key))
+            {
+                attributes[key] = value;
+            }
+            else
+            {
+                attributes.Add(key, value);
+            }
         }
     }
 }

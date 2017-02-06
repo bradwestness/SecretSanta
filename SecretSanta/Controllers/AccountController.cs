@@ -1,6 +1,7 @@
-﻿using SecretSanta.Models;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using SecretSanta.Models;
 using SecretSanta.Utilities;
-using System.Web.Mvc;
 
 namespace SecretSanta.Controllers
 {
@@ -8,13 +9,13 @@ namespace SecretSanta.Controllers
     {
         //
         // GET: /Account/LogIn
-        public ActionResult LogIn(string token, string returnUrl)
+        public IActionResult LogIn(string token, string returnUrl)
         {
             var redirect = Url.Action("Index", "Home");
 
             if (!string.IsNullOrWhiteSpace(token))
             {
-                redirect = LogInModel.TokenSignIn(token, returnUrl);
+                redirect = LogInModel.TokenSignIn(Request.HttpContext, token, returnUrl);
             }
 
             return Redirect(redirect);
@@ -23,14 +24,14 @@ namespace SecretSanta.Controllers
         //
         // GET: /Account/LogOut
         [Authorize]
-        public ActionResult LogOut()
+        public IActionResult LogOut()
         {
-            return Redirect(LogOutModel.SignOut());
+            return Redirect(LogOutModel.SignOut(Request.HttpContext));
         }
 
         //
         // POST: /Account/SendLogInLink
-        public ActionResult SendLogInLink(SendLogInLinkModel model)
+        public IActionResult SendLogInLink(SendLogInLinkModel model)
         {
             if (ModelState.IsValid)
             {
