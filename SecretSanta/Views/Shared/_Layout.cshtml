@@ -38,9 +38,9 @@
                                 @if (ViewBag.CurrentUserAccount.HasPicked())
                                 {
                                     Account picked = ViewBag.CurrentUserAccount.GetPicked();
-                                    <li><a asp-area="" asp-controller="Wishlist" asp-action="Details" asp-id="picked.Id">@picked.DisplayName's Wish List</a></li>
+                                    <li><a asp-area="" asp-controller="Wishlist" asp-action="Details" asp-route-id="@picked.Id">@picked.DisplayName's Wish List</a></li>
                                 }
-                                <li><a asp-area="" asp-controller="Received" asp-index="Index">Received Gifts</a></li>
+                                <li><a asp-area="" asp-controller="Received" asp-action="Index">Received Gifts</a></li>
                             </ul>
                         </li>
                     </ul>
