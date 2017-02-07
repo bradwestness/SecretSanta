@@ -4,6 +4,7 @@ using SecretSanta.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace SecretSanta.Controllers
 {
@@ -13,7 +14,7 @@ namespace SecretSanta.Controllers
         // GET: /Preview/FeaturedImage
         [Route("Preview/{accountId:Guid}/{itemId:Guid}")]
         //[ResponseCache(Location = ResponseCacheLocation.Any, Duration = int.MaxValue, VaryByHeader = "Cookie", VaryByQueryKeys = new[] { "accountId", "itemId" })]
-        public IActionResult FeaturedImage(Guid accountId, Guid itemId)
+        public async Task<IActionResult> FeaturedImage(Guid accountId, Guid itemId)
         {
             var account = DataRepository.Get<Account>(accountId);
             var item = new KeyValuePair<int, WishlistItem>();
@@ -30,7 +31,7 @@ namespace SecretSanta.Controllers
             if (item.Value.PreviewImage == null || item.Value.PreviewImage.Length == 0)
             {
                 account.Wishlist[item.Key].Remove(item.Value);
-                item.Value.PreviewImage = PreviewGenerator.GetFeaturedImage(item.Value.Url);
+                item.Value.PreviewImage = await PreviewGenerator.GetFeaturedImage(item.Value.Url);
                 account.Wishlist[item.Key].Add(item.Value);
                 DataRepository.Save(account);
             }

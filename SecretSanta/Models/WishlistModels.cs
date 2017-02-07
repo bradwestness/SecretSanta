@@ -68,23 +68,23 @@ namespace SecretSanta.Models
     {
         #region Public Methods
 
-        public static void AddItem(Account account, WishlistItem item)
+        public static async void AddItem(Account account, WishlistItem item)
         {
             if (!account.Wishlist.ContainsKey(DateHelper.Year))
             {
                 account.Wishlist.Add(DateHelper.Year, new List<WishlistItem>());
             }
             item.Id = Guid.NewGuid();
-            item.PreviewImage = PreviewGenerator.GetFeaturedImage(item.Url);
+            item.PreviewImage = await PreviewGenerator.GetFeaturedImage(item.Url);
             account.Wishlist[DateHelper.Year].Add(item);
             DataRepository.Save(account);
         }
 
-        public static void EditItem(Account account, WishlistItem item)
+        public static async void EditItem(Account account, WishlistItem item)
         {
             WishlistItem remove = account.Wishlist[DateHelper.Year].SingleOrDefault(i => i.Id.Equals(item.Id));
             account.Wishlist[DateHelper.Year].Remove(remove);
-            item.PreviewImage = PreviewGenerator.GetFeaturedImage(item.Url);
+            item.PreviewImage = await PreviewGenerator.GetFeaturedImage(item.Url);
             account.Wishlist[DateHelper.Year].Add(item);
             DataRepository.Save(account);
         }

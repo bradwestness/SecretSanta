@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace SecretSanta.Utilities
 {
@@ -18,7 +19,7 @@ namespace SecretSanta.Utilities
             _webRootPath = webRootPath;
         }
 
-        public static byte[] GetFeaturedImage(string url)
+        public static async Task<byte[]> GetFeaturedImage(string url)
         {
             byte[] output;
 
@@ -28,7 +29,7 @@ namespace SecretSanta.Utilities
                 var request = HttpWebRequest.CreateHttp(url);
                 request.Accept = "text/html";
 
-                var result = request.GetResponseAsync().Result;
+                var result = await request.GetResponseAsync();
 
                 using (var reader = new StreamReader(result.GetResponseStream()))
                 {
@@ -39,7 +40,7 @@ namespace SecretSanta.Utilities
                     IList<ImageTag> imageTags = new List<ImageTag>();
                     for (int i = 0; i < matches.Count && i < AppSettings.MaxImagesToLoad; i++)
                     {
-                        imageTags.Add(new ImageTag(matches[i].Value, url));
+                        imageTags.Add(await ImageTag.GetFromUrl(matches[i].Value, url));
                     }
 
                     var featured = imageTags.OrderByDescending(t => t.Width * t.Height).First();
@@ -69,20 +70,19 @@ namespace SecretSanta.Utilities
 
             #region Public Methods
 
-            public ImageTag(string tag, string url)
+            public static async Task<ImageTag> GetFromUrl(string tag, string url)
             {
                 tag = tag.Replace('\'', '"');
                 string source = ExtractSource(tag, url);
-                ImageBytes = DownloadImage(source, out int height, out int width);
-                Height = height;
-                Width = width;
+
+                return await DownloadImage(source);
             }
 
             #endregion
 
             #region Private Methods
 
-            private string ExtractSource(string tag, string url)
+            private static string ExtractSource(string tag, string url)
             {
                 Match match = Regex.Match(tag, "src=\"([^\"]+)");
                 string source = string.Empty;
@@ -100,38 +100,38 @@ namespace SecretSanta.Utilities
                 return source;
             }
 
-            private byte[] DownloadImage(string source, out int height, out int width)
+            private static async Task<ImageTag> DownloadImage(string source)
             {
-                byte[] output;
+                ImageTag imageTag;
 
                 try
                 {
                     var request = HttpWebRequest.CreateHttp(source);
                     request.Accept = "image/*";
 
-                    var response = request.GetResponseAsync().Result;
+                    var response = await request.GetResponseAsync();
 
                     using (var inStream = response.GetResponseStream())
                     using (var outStream = new MemoryStream())
                     {
                         var tempImage = Image.FromStream(inStream);
-
-                        height = tempImage.Height;
-                        width = tempImage.Width;
-
                         var thumbnail = tempImage.GetThumbnailImage(200, 200, new Image.GetThumbnailImageAbort(() => false), IntPtr.Zero);
                         thumbnail.Save(outStream, ImageFormat.Jpeg);
-                        output = outStream.ToArray();
+
+                        imageTag = new ImageTag
+                        {
+                            Height = tempImage.Height,
+                            Width = tempImage.Width,
+                            ImageBytes = outStream.ToArray()
+                        };
                     }
                 }
                 catch
                 {
-                    height = 0;
-                    width = 0;
-                    output = new byte[] { };
+                    imageTag = new ImageTag();
                 }
 
-                return output;
+                return imageTag;
             }
 
             #endregion
