@@ -27,8 +27,8 @@ SecretSanta is an easy to use gift exchange organizer that you can deploy to you
 ```xml
     <add key="SecretSanta:AdminEmail" value="my_email@outlook.com" />
     <add key="SecretSanta:MaxImagesToLoad" value="25"/>
-    <add key="SecretSanta:DefaultPreviewImage" value="~/Content/Images/photo_not_available.png"/>
-    <add key="SecretSanta:DataDirectory" value="~/App_Data/" />
+    <add key="SecretSanta:DefaultPreviewImage" value="images/photo_not_available.png"/>
+    <add key="SecretSanta:DataDirectory" value="App_Data" />
     <add key="SecretSanta:AccountFilePattern" value="*.account.json" />
     <add key="SecretSanta:GiftDollarLimit" value="40" />
     <add key="SecretSanta:SmtpHost" value="smtp.sendgrid.net" />
@@ -36,5 +36,5 @@ SecretSanta is an easy to use gift exchange organizer that you can deploy to you
     <add key="SecretSanta:SmtpUser" value="my_email_user@azure.com" />
     <add key="SecretSanta:SmtpPass" value="my_email_password" />
 ```
-3. Deploy to any server running ASP.NET 4.5 or later
-4. Make sure the App_Data folder is writable by the ASP.NET user
+3. Deploy to any server capable of running ASP.NET Core 1 or later
+4. Make sure the folder specified in the `DataDirectory` appSetting is writable
