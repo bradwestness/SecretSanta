@@ -133,7 +133,7 @@ namespace SecretSanta.Models
 
             int rand = new Random().Next(0, candidates.Count());
             
-            if (!Picked.ContainsKey[DateHelper.Year])
+            if (!Picked.ContainsKey(DateHelper.Year))
             {
                 Picked.Add(DateHelper.Year, null);
             }
