@@ -132,7 +132,13 @@ namespace SecretSanta.Models
             }
 
             int rand = new Random().Next(0, candidates.Count());
-            Picked.Add(DateHelper.Year, candidates.ElementAt(rand).Id);
+            
+            if (!Picked.ContainsKey[DateHelper.Year])
+            {
+                Picked.Add(DateHelper.Year, null);
+            }
+
+            Picked[DateHelper.Year] = candidates.ElementAt(rand).Id;
             DataRepository.Save(this);
         }
 
