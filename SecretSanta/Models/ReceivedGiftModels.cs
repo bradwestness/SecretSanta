@@ -8,6 +8,9 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -16,6 +19,13 @@ namespace SecretSanta.Models
 {
     public class ReceivedGift
     {
+        #region Constants
+
+        private const double IMAGE_MAX_WIDTH = 1024;
+        private const double IMAGE_MAX_HEIGHT = 768;
+
+        #endregion
+
         #region Variables
 
         [Required]
@@ -44,10 +54,35 @@ namespace SecretSanta.Models
             if (ImageUpload != null && ImageUpload.Length > 0)
             {
                 using (var inStream = ImageUpload.OpenReadStream())
-                using (var outStream = new MemoryStream())
+                using (var inImage = new Bitmap(inStream))
                 {
-                    inStream.CopyTo(outStream);
-                    Image = outStream.ToArray();
+                    var scaleWidth = IMAGE_MAX_WIDTH / inImage.Width;
+                    var scaleHeight = IMAGE_MAX_HEIGHT / inImage.Height;
+                    var scaleFactor = Math.Min(scaleWidth, scaleHeight);
+                    var outRect = new Rectangle(
+                        0,
+                        0,
+                        (int)Math.Round(scaleFactor * inImage.Width),
+                        (int)Math.Floor(scaleFactor * inImage.Height)
+                    );
+
+                    using (var outImage = new Bitmap(outRect.Width, outRect.Height))
+                    using (var outStream = new MemoryStream())
+                    using (var gfx = Graphics.FromImage(outImage))
+                    using (var imageAttributes = new ImageAttributes())
+                    {
+                        gfx.CompositingMode = CompositingMode.SourceCopy;
+                        gfx.CompositingQuality = CompositingQuality.HighQuality;
+                        gfx.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                        gfx.SmoothingMode = SmoothingMode.HighQuality;
+                        gfx.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                        imageAttributes.SetWrapMode(WrapMode.TileFlipXY);
+
+                        gfx.DrawImage(inImage, outRect, 0, 0, inImage.Width, inImage.Height, GraphicsUnit.Pixel, imageAttributes);
+
+                        outImage.Save(outStream, ImageFormat.Jpeg);
+                        Image = outStream.ToArray();
+                    }
                 }
             }
 

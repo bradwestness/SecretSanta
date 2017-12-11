@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 
 namespace SecretSanta.Utilities
@@ -23,13 +22,7 @@ namespace SecretSanta.Utilities
         public static int SmtpPort => _configuration.GetValue<int>("SecretSanta:SmtpPort");
         public static string SmtpUser => _configuration.GetValue<string>("SecretSanta:SmtpUser");
         public static string SmtpPass => _configuration.GetValue<string>("SecretSanta:SmtpPass");
-        public static CookieAuthenticationOptions Authentication => new CookieAuthenticationOptions
-        {
-            AuthenticationScheme = "SecretSantaAuthentication",
-            LoginPath = new PathString("/Account/LogIn"),
-            AccessDeniedPath = new PathString("/Home/Index"),
-            AutomaticAuthenticate = true,
-            AutomaticChallenge = true
-        };
+        public static string LoginPath => new PathString("/Account/LogIn");
+        public static string LogoutPath => new PathString("/Home/Index");
     }
 }

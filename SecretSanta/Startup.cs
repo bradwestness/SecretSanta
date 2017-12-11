@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -33,10 +33,19 @@ namespace SecretSanta
             services.AddMvc();
 
             services.AddDistributedMemoryCache();
+
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(o =>
+                {
+                    o.LoginPath = AppSettings.LoginPath;
+                    o.LogoutPath = AppSettings.LogoutPath;
+                    o.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+                    o.SlidingExpiration = true;
+                });
+
             services.AddSession(options =>
             {
                 options.IdleTimeout = TimeSpan.FromMinutes(60);
-                options.CookieHttpOnly = true;
             });
         }
 
@@ -56,7 +65,7 @@ namespace SecretSanta
             }
 
             app.UseStaticFiles();
-            app.UseCookieAuthentication(AppSettings.Authentication);
+            app.UseAuthentication();
             app.UseSession();
             app.UseMvcWithDefaultRoute();
         }

@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using MimeKit;
@@ -132,7 +134,7 @@ namespace SecretSanta.Models
             }
 
             int rand = new Random().Next(0, candidates.Count());
-            
+
             if (!Picked.ContainsKey(DateHelper.Year))
             {
                 Picked.Add(DateHelper.Year, null);
@@ -155,21 +157,21 @@ namespace SecretSanta.Models
             if (account != null)
             {
                 var principal = new ClaimsPrincipal(new Identity(account.Email));
-                httpContext.Authentication.SignInAsync(AppSettings.Authentication.AuthenticationScheme, principal);
+                httpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
                 returnUrl = string.IsNullOrWhiteSpace(returnUrl)
-                    ? AppSettings.Authentication.LoginPath.ToString()
+                    ? AppSettings.LoginPath.ToString()
                     : returnUrl;
             }
 
             return string.IsNullOrWhiteSpace(returnUrl)
-                ? AppSettings.Authentication.LoginPath.ToString()
+                ? AppSettings.LoginPath.ToString()
                 : returnUrl;
         }
 
         protected class Identity : IIdentity
         {
-            public string AuthenticationType => AppSettings.Authentication.AuthenticationScheme;
+            public string AuthenticationType => CookieAuthenticationDefaults.AuthenticationScheme;
 
             public bool IsAuthenticated => !string.IsNullOrWhiteSpace(Name);
 
@@ -193,10 +195,10 @@ namespace SecretSanta.Models
 
         public static string SignOut(HttpContext httpContext)
         {
-            httpContext.Authentication.SignOutAsync(AppSettings.Authentication.AuthenticationScheme);
+            httpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             httpContext.Session = null;
 
-            return AppSettings.Authentication.LoginPath;
+            return AppSettings.LoginPath;
         }
 
         #endregion

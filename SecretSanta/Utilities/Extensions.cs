@@ -24,9 +24,11 @@ namespace SecretSanta.Utilities
 
             if (account == null)
             {
-                var model = new AddUserModel();
-                model.DisplayName = user.Identity.Name;
-                model.Email = user.Identity.Name;
+                var model = new AddUserModel
+                {
+                    DisplayName = user.Identity.Name,
+                    Email = user.Identity.Name
+                };
                 account = model.CreateAccount();
             }
 
@@ -40,8 +42,7 @@ namespace SecretSanta.Utilities
 
         public static IHtmlContent ResultMessage(this IHtmlHelper helper)
         {
-            byte[] messageBytes;
-            helper.ViewContext.HttpContext.Session.TryGetValue("ResultMessage", out messageBytes);
+            helper.ViewContext.HttpContext.Session.TryGetValue("ResultMessage", out byte[] messageBytes);
             string output = string.Empty;
 
             if (messageBytes != null && messageBytes.Length > 0)
