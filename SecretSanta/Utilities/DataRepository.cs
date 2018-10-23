@@ -43,6 +43,7 @@ namespace SecretSanta.Utilities
         public static void Initialize(string contentRootPath)
         {
             _contentRootPath = contentRootPath;
+            DeleteOldData();
         }
 
         public static T Get<T>(Guid? id) where T : class
@@ -182,6 +183,30 @@ namespace SecretSanta.Utilities
             }
 
             return directory;
+        }
+
+        public static void DeleteOldData()
+        {
+            var mostRecentYearToKeep = DateHelper.Year - 1;
+            var accounts = GetAll<Account>();
+
+            foreach (var account in accounts)
+            {
+                for (var i = mostRecentYearToKeep; i >= DateTime.MinValue.Year; i--)
+                {
+                    if (account.Picked?.ContainsKey(i) ?? false)
+                    {
+                        account.Picked.Remove(i);
+                    }
+
+                    if (account.ReceivedGift?.ContainsKey(i) ?? false)
+                    {
+                        account.ReceivedGift.Remove(i);
+                    }
+                }
+
+                Save(account);
+            }
         }
 
         #endregion
