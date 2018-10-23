@@ -187,12 +187,12 @@ namespace SecretSanta.Utilities
 
         public static void DeleteOldData()
         {
-            var mostRecentYearToKeep = DateHelper.Year - 1;
+            var mostRecentYearToDelete = DateHelper.Year - 1;
             var accounts = GetAll<Account>();
 
             foreach (var account in accounts)
             {
-                for (var i = mostRecentYearToKeep; i >= DateTime.MinValue.Year; i--)
+                for (var i = mostRecentYearToDelete; i >= DateTime.MinValue.Year; i--)
                 {
                     if (account.Picked?.ContainsKey(i) ?? false)
                     {
