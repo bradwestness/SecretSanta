@@ -18,6 +18,7 @@ namespace SecretSanta.Utilities
         public static string DefaultPreviewImage => _configuration.GetValue<string>("SecretSanta:DefaultPreviewImage");
         public static string AccountFilePattern => _configuration.GetValue<string>("SecretSanta:AccountFilePattern");
         public static int GiftDollarLimit => _configuration.GetValue<int>("SecretSanta:GiftDollarLimit");
+        public static string SmtpFrom => _configuration.GetValue<string>("SecretSanta:SmtpFrom");
         public static string SmtpHost => _configuration.GetValue<string>("SecretSanta:SmtpHost");
         public static int SmtpPort => _configuration.GetValue<int>("SecretSanta:SmtpPort");
         public static string SmtpUser => _configuration.GetValue<string>("SecretSanta:SmtpUser");

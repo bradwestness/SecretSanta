@@ -251,7 +251,7 @@ namespace SecretSanta.Models
                     .AppendLine("Santa")
                     .AppendLine();
 
-                var from = new MailboxAddress("Santa Claus", "santa@thenorthpole.com");
+                var from = new MailboxAddress("Santa Claus", AppSettings.SmtpFrom);
                 var to = new List<MailboxAddress> { new MailboxAddress(account.DisplayName, account.Email) };
 
                 EmailMessage.Send(from, to, "Secret Santa Log-In Link", body.ToString());
@@ -314,7 +314,7 @@ namespace SecretSanta.Models
                     .AppendLine("Santa")
                     .AppendLine();
 
-                var from = new MailboxAddress("Santa Claus", "santa@thenorthpole.com");
+                var from = new MailboxAddress("Santa Claus", AppSettings.SmtpFrom);
                 var to = new List<MailboxAddress> { new MailboxAddress(account.DisplayName, account.Email) };
 
                 EmailMessage.Send(from, to, "Secret Santa Reminder", body.ToString());
@@ -363,7 +363,7 @@ namespace SecretSanta.Models
                     .AppendLine()
                     .AppendLine("Santa");
 
-                var from = new MailboxAddress("Santa Claus", "santa@thenorthpole.com");
+                var from = new MailboxAddress("Santa Claus", AppSettings.SmtpFrom);
                 var to = new List<MailboxAddress> { new MailboxAddress(account.DisplayName, account.Email) };
 
                 EmailMessage.Send(from, to, "Secret Santa Reminder", body.ToString());
