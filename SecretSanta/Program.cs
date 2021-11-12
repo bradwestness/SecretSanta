@@ -1,20 +1,42 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using SecretSanta.Utilities;
 
-namespace SecretSanta
+var builder = WebApplication.CreateBuilder();
+
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(o =>
+    {
+        o.LoginPath = AppSettings.LoginPath;
+        o.LogoutPath = AppSettings.LogoutPath;
+        o.ExpireTimeSpan = AppSettings.SessionTimeout;
+        o.SlidingExpiration = true;
+    });
+
+builder.Services.AddSession(o => o.IdleTimeout = AppSettings.SessionTimeout);
+builder.Services.AddControllersWithViews();
+
+var app = builder.Build();
+
+AppSettings.Initialize(app.Configuration);
+DataRepository.Initialize(app.Environment.ContentRootPath);
+PreviewGenerator.Initialize(app.Environment.WebRootPath);
+
+if (!app.Environment.IsDevelopment())
 {
-	public class Program
-	{
-		public static void Main(string[] args)
-		{
-			CreateHostBuilder(args).Build().Run();
-		}
-
-		public static IHostBuilder CreateHostBuilder(string[] args) =>
-			Host.CreateDefaultBuilder(args)
-				.ConfigureWebHostDefaults(webBuilder =>
-				{
-					webBuilder.UseStartup<Startup>();
-				});
-	}
+    app.UseExceptionHandler(AppSettings.ErrorPath);
+    app.UseHsts();
 }
+
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
+app.UseSession();
+
+app.UseEndpoints(endpoints => endpoints.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}"));
+
+app.Run();

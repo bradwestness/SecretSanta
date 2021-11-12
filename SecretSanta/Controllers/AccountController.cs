@@ -3,43 +3,42 @@ using Microsoft.AspNetCore.Mvc;
 using SecretSanta.Models;
 using SecretSanta.Utilities;
 
-namespace SecretSanta.Controllers
+namespace SecretSanta.Controllers;
+
+public class AccountController : Controller
 {
-    public class AccountController : Controller
+    //
+    // GET: /Account/LogIn
+    public IActionResult LogIn(string token, string returnUrl)
     {
-        //
-        // GET: /Account/LogIn
-        public IActionResult LogIn(string token, string returnUrl)
+        var redirect = Url.Action("Index", "Home");
+
+        if (!string.IsNullOrWhiteSpace(token))
         {
-            var redirect = Url.Action("Index", "Home");
-
-            if (!string.IsNullOrWhiteSpace(token))
-            {
-                redirect = LogInModel.TokenSignIn(Request.HttpContext, token, returnUrl);
-            }
-
-            return Redirect(redirect);
+            redirect = LogInModel.TokenSignIn(Request.HttpContext, token, returnUrl);
         }
 
-        //
-        // GET: /Account/LogOut
-        [Authorize]
-        public IActionResult LogOut()
+        return Redirect(redirect);
+    }
+
+    //
+    // GET: /Account/LogOut
+    [Authorize]
+    public IActionResult LogOut()
+    {
+        return Redirect(LogOutModel.SignOut(Request.HttpContext));
+    }
+
+    //
+    // POST: /Account/SendLogInLink
+    public IActionResult SendLogInLink(SendLogInLinkModel model)
+    {
+        if (ModelState.IsValid)
         {
-            return Redirect(LogOutModel.SignOut(Request.HttpContext));
+            model.Send(Url);
+            this.SetResultMessage($"A log in link will be sent to {model.Email}.");
         }
 
-        //
-        // POST: /Account/SendLogInLink
-        public IActionResult SendLogInLink(SendLogInLinkModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                model.Send(Url);
-                this.SetResultMessage($"A log in link will be sent to {model.Email}.");
-            }
-
-            return RedirectToAction("Index", "Home");
-        }
+        return RedirectToAction("Index", "Home");
     }
 }

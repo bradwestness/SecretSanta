@@ -2,78 +2,76 @@
 using Microsoft.AspNetCore.Mvc;
 using SecretSanta.Models;
 using SecretSanta.Utilities;
-using System;
 
-namespace SecretSanta.Controllers
+namespace SecretSanta.Controllers;
+
+[Authorize]
+public class WishlistController : Controller
 {
-    [Authorize]
-    public class WishlistController : Controller
+    //
+    // GET: /Wishlist/
+    public IActionResult Index()
     {
-        //
-        // GET: /Wishlist/
-        public IActionResult Index()
+        var model = new WishlistEditModel(User.GetAccount().Id.Value);
+        return View(model);
+    }
+
+    //
+    // GET: /Wishlist/Details
+    public IActionResult Details(Guid id)
+    {
+        var model = new WishlistEditModel(id);
+        return View(model);
+    }
+
+    //
+    // POST: /Wishlist/AddItem
+    [HttpPost]
+    public IActionResult AddItem(WishlistItem model)
+    {
+        if (ModelState.IsValid)
         {
-            var model = new WishlistEditModel(User.GetAccount().Id.Value);
-            return View(model);
+            WishlistManager.AddItem(User.GetAccount(), model);
+            this.SetResultMessage($"<strong>Successfully added</strong> {model.Name}.");
         }
 
-        //
-        // GET: /Wishlist/Details
-        public IActionResult Details(Guid id)
+        return RedirectToAction("Index");
+    }
+
+    //
+    // POST: /Wishlist/EditItem
+    [HttpPost]
+    public IActionResult EditItem(WishlistItem model)
+    {
+        if (ModelState.IsValid)
         {
-            var model = new WishlistEditModel(id);
-            return View(model);
+            WishlistManager.EditItem(User.GetAccount(), model);
+            this.SetResultMessage($"<strong>Successfully updated</strong> {model.Name}.");
         }
 
-        //
-        // POST: /Wishlist/AddItem
-        [HttpPost]
-        public IActionResult AddItem(WishlistItem model)
-        {
-            if (ModelState.IsValid)
-            {
-                WishlistManager.AddItem(User.GetAccount(), model);
-                this.SetResultMessage($"<strong>Successfully added</strong> {model.Name}.");
-            }
+        return RedirectToAction("Index");
+    }
 
-            return RedirectToAction("Index");
+    //
+    // POST: /Wishlist/DeleteItem
+    [HttpPost]
+    public IActionResult DeleteItem(WishlistItem model)
+    {
+        if (ModelState.IsValid)
+        {
+            WishlistManager.DeleteItem(User.GetAccount(), model);
+            this.SetResultMessage($"<strong>Successfully deleted</strong> {model.Name}.");
         }
 
-        //
-        // POST: /Wishlist/EditItem
-        [HttpPost]
-        public IActionResult EditItem(WishlistItem model)
-        {
-            if (ModelState.IsValid)
-            {
-                WishlistManager.EditItem(User.GetAccount(), model);
-                this.SetResultMessage($"<strong>Successfully updated</strong> {model.Name}.");
-            }
+        return RedirectToAction("Index");
+    }
 
-            return RedirectToAction("Index");
-        }
-
-        //
-        // POST: /Wishlist/DeleteItem
-        [HttpPost]
-        public IActionResult DeleteItem(WishlistItem model)
-        {
-            if (ModelState.IsValid)
-            {
-                WishlistManager.DeleteItem(User.GetAccount(), model);
-                this.SetResultMessage($"<strong>Successfully deleted</strong> {model.Name}.");
-            }
-
-            return RedirectToAction("Index");
-        }
-
-        //
-        // GET: /Wishlist/Remind
-        public IActionResult Remind(Guid id)
-        {
-            WishlistManager.SendReminder(id, Url);
-            this.SetResultMessage("<strong>Reminder sent</strong> successfully.");
-            return RedirectToAction("Details", new { id });
-        }
+    //
+    // GET: /Wishlist/Remind
+    public IActionResult Remind(Guid id)
+    {
+        WishlistManager.SendReminder(id, Url);
+        this.SetResultMessage("<strong>Reminder sent</strong> successfully.");
+        return RedirectToAction("Details", new { id });
     }
 }
