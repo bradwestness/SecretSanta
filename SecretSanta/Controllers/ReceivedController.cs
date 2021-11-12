@@ -8,8 +8,7 @@ namespace SecretSanta.Controllers;
 [Authorize]
 public class ReceivedController : Controller
 {
-    //
-    // GET: /Received/
+    [HttpGet]
     public IActionResult Index()
     {
         var account = User.GetAccount();
@@ -17,8 +16,6 @@ public class ReceivedController : Controller
         return View(model);
     }
 
-    //
-    // POST: /Received/Save
     [HttpPost]
     public IActionResult Save(ReceivedGift model)
     {
@@ -31,9 +28,7 @@ public class ReceivedController : Controller
         return RedirectToAction("Index");
     }
 
-    //
-    // GET: /Received/Image
-    [Route("Received/Image/{accountId:Guid}")]
+    [HttpGet, Route("Received/Image/{accountId:Guid}")]
     //[ResponseCache(Location = ResponseCacheLocation.Any, Duration = int.MaxValue, VaryByHeader = "Cookie", VaryByQueryKeys = new[] { "accountId" })]
     public IActionResult Image(Guid accountId)
     {

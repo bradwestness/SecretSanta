@@ -7,8 +7,7 @@ namespace SecretSanta.Controllers;
 
 public class AccountController : Controller
 {
-    //
-    // GET: /Account/LogIn
+    [HttpGet]
     public IActionResult LogIn(string token, string returnUrl)
     {
         var redirect = Url.Action("Index", "Home");
@@ -21,16 +20,13 @@ public class AccountController : Controller
         return Redirect(redirect);
     }
 
-    //
-    // GET: /Account/LogOut
-    [Authorize]
+    [Authorize, HttpGet]
     public IActionResult LogOut()
     {
         return Redirect(LogOutModel.SignOut(Request.HttpContext));
     }
 
-    //
-    // POST: /Account/SendLogInLink
+    [HttpPost]
     public IActionResult SendLogInLink(SendLogInLinkModel model)
     {
         if (ModelState.IsValid)

@@ -7,6 +7,7 @@ namespace SecretSanta.Controllers;
 
 public class HomeController : Controller
 {
+    [HttpGet]
     public IActionResult Index()
     {
         if (User.Identity.IsAuthenticated)
@@ -18,14 +19,14 @@ public class HomeController : Controller
         return View(model);
     }
 
-    [Authorize]
+    [Authorize, HttpGet]
     public IActionResult Dashboard()
     {
         Account model = User.GetAccount();
         return View(model);
     }
 
-    [Authorize]
+    [Authorize, HttpGet]
     public IActionResult Pick()
     {
         Account model = User.GetAccount();

@@ -6,10 +6,8 @@ namespace SecretSanta.Controllers;
 
 public class PreviewController : Controller
 {
-    //
-    // GET: /Preview/FeaturedImage
-    [Route("Preview/{accountId:Guid}/{itemId:Guid}")]
-    [ResponseCache(Location = ResponseCacheLocation.Any, Duration = int.MaxValue, VaryByHeader = "Cookie", VaryByQueryKeys = new[] { "accountId", "itemId" })]
+    [HttpGet, Route("Preview/{accountId:Guid}/{itemId:Guid}")]
+    //[ResponseCache(Location = ResponseCacheLocation.Any, Duration = int.MaxValue, VaryByHeader = "Cookie", VaryByQueryKeys = new[] { "accountId", "itemId" })]
     public async Task<IActionResult> FeaturedImage(Guid accountId, Guid itemId)
     {
         var account = DataRepository.Get<Account>(accountId);

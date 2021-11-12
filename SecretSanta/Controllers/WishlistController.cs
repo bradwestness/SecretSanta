@@ -8,24 +8,20 @@ namespace SecretSanta.Controllers;
 [Authorize]
 public class WishlistController : Controller
 {
-    //
-    // GET: /Wishlist/
+    [HttpGet]
     public IActionResult Index()
     {
         var model = new WishlistEditModel(User.GetAccount().Id.Value);
         return View(model);
     }
 
-    //
-    // GET: /Wishlist/Details
+    [HttpGet]
     public IActionResult Details(Guid id)
     {
         var model = new WishlistEditModel(id);
         return View(model);
     }
 
-    //
-    // POST: /Wishlist/AddItem
     [HttpPost]
     public IActionResult AddItem(WishlistItem model)
     {
@@ -38,8 +34,6 @@ public class WishlistController : Controller
         return RedirectToAction("Index");
     }
 
-    //
-    // POST: /Wishlist/EditItem
     [HttpPost]
     public IActionResult EditItem(WishlistItem model)
     {
@@ -52,8 +46,6 @@ public class WishlistController : Controller
         return RedirectToAction("Index");
     }
 
-    //
-    // POST: /Wishlist/DeleteItem
     [HttpPost]
     public IActionResult DeleteItem(WishlistItem model)
     {
@@ -66,8 +58,7 @@ public class WishlistController : Controller
         return RedirectToAction("Index");
     }
 
-    //
-    // GET: /Wishlist/Remind
+    [HttpGet]
     public IActionResult Remind(Guid id)
     {
         WishlistManager.SendReminder(id, Url);

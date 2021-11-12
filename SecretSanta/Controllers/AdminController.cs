@@ -8,16 +8,14 @@ namespace SecretSanta.Controllers;
 [Authorize]
 public class AdminController : Controller
 {
-    //
-    // GET: /Admin/Users
+    [HttpGet]
     public IActionResult Users()
     {
         var model = new EditUsersModel();
         return View(model);
     }
 
-    //
-    // GET: /Admin/Reset
+    [HttpGet]
     public IActionResult Reset()
     {
         EditUsersModel.Reset();
@@ -25,8 +23,7 @@ public class AdminController : Controller
         return RedirectToAction("Users");
     }
 
-    //
-    // GET: /Admin/Invite
+    [HttpGet]
     public IActionResult Invite()
     {
         EditUsersModel.SendInvitationMessages(Url);
@@ -34,8 +31,7 @@ public class AdminController : Controller
         return RedirectToAction("Users");
     }
 
-    //
-    // GET: /Admin/AllPicked
+    [HttpGet]
     public IActionResult AllPicked()
     {
         EditUsersModel.SendAllPickedMessages(Url);
@@ -43,8 +39,7 @@ public class AdminController : Controller
         return RedirectToAction("Users");
     }
 
-    //
-    // GET: /Admin/ReceivedGift
+    [HttpGet]
     public IActionResult ReceivedGift()
     {
         ReceivedGiftEditModel.SendReminders(Url);
@@ -52,8 +47,6 @@ public class AdminController : Controller
         return RedirectToAction("Users");
     }
 
-    //
-    // POST: /Admin/AddUser
     [HttpPost]
     public IActionResult AddUser(AddUserModel model)
     {
@@ -71,8 +64,6 @@ public class AdminController : Controller
         return RedirectToAction("Users");
     }
 
-    //
-    // POST: /Admin/EditUser
     [HttpPost]
     public IActionResult EditUser(EditUserModel model)
     {
@@ -85,8 +76,6 @@ public class AdminController : Controller
         return RedirectToAction("Users");
     }
 
-    //
-    // POST: /Admin/DeleteUser
     [HttpPost]
     public IActionResult DeleteUser(EditUserModel model)
     {
