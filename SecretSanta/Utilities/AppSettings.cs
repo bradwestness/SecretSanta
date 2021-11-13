@@ -9,13 +9,13 @@ public struct AppSettings
 
     public static string AdminEmail => _configuration.GetValue<string>("SecretSanta:AdminEmail");
 
-    public static string DataDirectory => _configuration.GetValue<string>("SecretSanta:DataDirectory");
+    public static string DataDirectory => _configuration.GetValue<string>("SecretSanta:DataDirectory") ?? "App_Data";
 
     public static int MaxImagesToLoad => _configuration.GetValue<int>("SecretSanta:MaxImagesToLoad");
 
     public static string DefaultPreviewImage => _configuration.GetValue<string>("SecretSanta:DefaultPreviewImage");
 
-    public static string AccountFilePattern => _configuration.GetValue<string>("SecretSanta:AccountFilePattern");
+    public static string AccountFilePattern => _configuration.GetValue<string>("SecretSanta:AccountFilePattern") ?? "*.account.json";
 
     public static int GiftDollarLimit => _configuration.GetValue<int>("SecretSanta:GiftDollarLimit");
 

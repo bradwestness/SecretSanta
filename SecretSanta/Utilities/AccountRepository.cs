@@ -132,7 +132,7 @@ public static class AccountRepository
 
     private static string GetDataDirectory()
     {
-        string directory = Path.Combine(_contentRootPath, AppSettings.DataDirectory);
+        string directory = Path.Combine(_contentRootPath, AppSettings.DataDirectory ?? "App_Data");
 
         if (!Directory.Exists(directory))
         {
