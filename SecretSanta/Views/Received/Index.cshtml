@@ -5,14 +5,14 @@
 
 <h1>@ViewBag.Title</h1>
 
-@if (DateHelper.EnableReceivedGifts && Model.Item != null && !string.IsNullOrWhiteSpace(Model.Item.From))
+@if (DateHelper.EnableReceivedGifts && !string.IsNullOrWhiteSpace(Model?.Item?.From))
 {
     <div class="text-right">
         <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#UpdateGift">Update My Received Gift</button>
     </div>
 
     <div id="UpdateGift" class="modal fade">
-        @Html.Partial("EditorTemplates/UpdateGift", Model.Item)
+        @await Html.PartialAsync("EditorTemplates/UpdateGift", Model?.Item)
     </div>
 }
 
@@ -20,7 +20,7 @@
 {
     <p>Check back here after the holiday to share a picture of the gift you received!</p>
 }
-else if (Model.Gifts != null && Model.Gifts.Any())
+else if (Model?.Gifts is not null && Model.Gifts.Any())
 {
     <table class="table table-striped">
         <thead>

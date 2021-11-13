@@ -1,15 +1,15 @@
 ﻿@model Account
 @{
     ViewBag.Title = "Home Page";
-    Account person = Model.GetPicked();
+    var person = Model?.GetPicked();
 }
 
 <div class="jumbotron">
     <div class="row">
         <div class="col-lg-6">
-            <h1>You picked @person.DisplayName!</h1>
+            <h1>You picked @person?.DisplayName!</h1>
             <p>Ho ho ho!</p>
-            <p><a href="@Url.Action("Details", "Wishlist", new {id = person.Id})" class="btn btn-primary btn-lg">View @person.DisplayName's Wish List &raquo;</a></p>
+            <p><a href="@Url.Action("Details", "Wishlist", new {id = person?.Id})" class="btn btn-primary btn-lg">View @person?.DisplayName's Wish List &raquo;</a></p>
         </div>
         <div class="col-lg-6">
             <img class="img-responsive" src="@Url.Content("~/images/santa.png")" alt="Santa" />

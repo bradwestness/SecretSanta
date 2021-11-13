@@ -63,7 +63,7 @@
     <div class="container body-content">
         @Html.ResultMessage()
         @RenderBody()
-        @if (User.Identity.IsAuthenticated)
+        @if (User?.Identity?.IsAuthenticated == true)
         {
             <div class="row">
                 <div class="col-lg-12">

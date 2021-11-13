@@ -65,16 +65,19 @@ public static class AccountRepository
 
     public static IList<Account> GetAll()
     {
-        var list = new List<Account>();
+        if (Accounts.Any())
+        {
+            return Accounts;
+        }
 
+        var list = new List<Account>();
         foreach (string file in Directory.EnumerateFiles(GetDataDirectory(), AppSettings.AccountFilePattern))
         {
             var input = File.ReadAllText(file);
-            var item = JsonSerializer.Deserialize<Account>(input);
-
-            if (item is not null)
+            
+            if (JsonSerializer.Deserialize<Account>(input) is Account account)
             {
-                list.Add(item);
+                list.Add(account);
             }
         }
 

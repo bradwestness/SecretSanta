@@ -32,7 +32,7 @@
                 <div class="form-group">
                     @Html.LabelFor(m => m.Picked, new {@class = "control-label col-sm-4"})
                     <div class="col-sm-8">
-                        @Html.DropDownListFor(m => m.Picked, Model.GetPickOptions(), "", new {@class = "form-control"})
+                        @Html.DropDownListFor(m => m.Picked, Model?.GetPickOptions(), "", new {@class = "form-control"})
                         @Html.ValidationMessageFor(m => m.Picked)
                     </div>
                 </div>
@@ -45,7 +45,7 @@
                 <div class="form-group">
                     @Html.LabelFor(m => m.DoNotPick, new {@class = "control-label col-sm-4"})
                     <div class="col-sm-8">
-                        @Html.ListBoxFor(m => m.DoNotPick, Model.GetDoNotPickOptions(), new {@class = "form-control", multiple = "multiple"})
+                        @Html.ListBoxFor(m => m.DoNotPick, Model?.GetDoNotPickOptions(), new {@class = "form-control", multiple = "multiple"})
                         @Html.ValidationMessageFor(m => m.DoNotPick)
                     </div>
                 </div>

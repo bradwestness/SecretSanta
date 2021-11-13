@@ -1,14 +1,14 @@
 ﻿@model Account
 @{
     ViewBag.Title = "Home Page";
-    Account person = Model.GetPicked();
+    var person = Model?.GetPicked();
 }
 
 <div class="jumbotron">
     <div class="row">
         <div class="col-lg-6">
-            <h1>Welcome to Secret Santa, @Model.DisplayName!</h1>
-            @if (!Model.HasPicked() || person == null)
+            <h1>Welcome to Secret Santa, @Model?.DisplayName!</h1>
+            @if (person is null)
             {
                 <p>Looks like you haven't picked your recipient yet.</p>
                 <p>
