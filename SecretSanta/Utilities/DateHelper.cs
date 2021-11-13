@@ -7,6 +7,5 @@ public static class DateHelper
         : DateTime.Now.Year;
 
     public static bool EnableReceivedGifts => (DateTime.Now.Month <= 6)
-        ? true
-        : (DateTime.Now.Month == 12 && DateTime.Now.Day > 25);
+        || (DateTime.Now.Month == 12 && DateTime.Now.Day > 25);
 }

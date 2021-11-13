@@ -11,16 +11,19 @@ public static class Extensions
 {
     public static Account? GetAccount(this ClaimsPrincipal user)
     {
-        if (!user.Identity.IsAuthenticated || string.IsNullOrWhiteSpace(user.Identity.Name))
+        if (user?.Identity?.IsAuthenticated != true
+            || string.IsNullOrWhiteSpace(user?.Identity?.Name))
         {
             return null;
         }
 
-        Account account = DataRepository.GetAll<Account>().SingleOrDefault(a =>
-            a.Email.Equals(user.Identity.Name, StringComparison.OrdinalIgnoreCase)
-        );
+        var account = AccountRepository.GetAll()
+            .SingleOrDefault(
+                a => a.Email?.Equals(
+                    user.Identity.Name,
+                    StringComparison.OrdinalIgnoreCase) ?? false);
 
-        if (account == null)
+        if (account is null)
         {
             var model = new AddUserModel
             {
@@ -33,17 +36,15 @@ public static class Extensions
         return account;
     }
 
-    public static void SetResultMessage(this Controller controller, string message)
-    {
+    public static void SetResultMessage(this Controller controller, string message) =>
         controller.HttpContext.Session.Set("ResultMessage", Encoding.UTF8.GetBytes(message));
-    }
 
     public static IHtmlContent ResultMessage(this IHtmlHelper helper)
     {
-        helper.ViewContext.HttpContext.Session.TryGetValue("ResultMessage", out byte[] messageBytes);
-        string output = string.Empty;
+        helper.ViewContext.HttpContext.Session.TryGetValue("ResultMessage", out var messageBytes);
+        var output = string.Empty;
 
-        if (messageBytes != null && messageBytes.Length > 0)
+        if (messageBytes?.Length > 0)
         {
             var message = Encoding.UTF8.GetString(messageBytes);
 

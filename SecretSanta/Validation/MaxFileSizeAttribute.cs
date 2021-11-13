@@ -15,18 +15,9 @@ public class MaxFileSizeAttribute : ValidationAttribute, IClientModelValidator
         ErrorMessage = $"Please upload a file of less than {maxBytes} bytes.";
     }
 
-    public override bool IsValid(object value)
-    {
-        var file = value as IFormFile;
-        bool result = true;
-
-        if (file != null)
-        {
-            result &= (file.Length < MaxBytes);
-        }
-
-        return result;
-    }
+    public override bool IsValid(object? value) =>
+        value is null
+        || value is IFormFile file && file.Length < MaxBytes;
 
     public void AddValidation(ClientModelValidationContext context)
     {
@@ -35,20 +26,8 @@ public class MaxFileSizeAttribute : ValidationAttribute, IClientModelValidator
             throw new ArgumentNullException(nameof(context));
         }
 
-        MergeAttribute(context.Attributes, "data-val", "true");
-        MergeAttribute(context.Attributes, "data-val-maxfilesize", ErrorMessage);
-        MergeAttribute(context.Attributes, "data-val-maxfilesize-maxbytes", MaxBytes.ToString());
-    }
-
-    private void MergeAttribute(IDictionary<string, string> attributes, string key, string value)
-    {
-        if (attributes.ContainsKey(key))
-        {
-            attributes[key] = value;
-        }
-        else
-        {
-            attributes.Add(key, value);
-        }
+        context.Attributes["data-val"] = "true";
+        context.Attributes["data-val-maxfilesize"] = ErrorMessage ?? string.Empty;
+        context.Attributes["data-val-maxfilesize-maxbytes"] = MaxBytes.ToString();
     }
 }

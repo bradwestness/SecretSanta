@@ -1,41 +1,48 @@
 ﻿using System.Drawing;
 using System.Drawing.Imaging;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
 
 namespace SecretSanta.Utilities;
 
 public static class PreviewGenerator
 {
-    private static string _webRootPath;
+    private static string _webRootPath = string.Empty;
+    private static IHttpClientFactory? _httpClientFactory = null;
 
-    public static void Initialize(string webRootPath)
+    public static void Initialize(string webRootPath, IHttpClientFactory httpClientFactory)
     {
         _webRootPath = webRootPath;
+        _httpClientFactory = httpClientFactory;
     }
 
-    public static async Task<byte[]> GetFeaturedImage(string url)
+    public static async Task<byte[]> GetFeaturedImage(string? url, CancellationToken token)
     {
+        if (string.IsNullOrWhiteSpace(url))
+        {
+            return Array.Empty<byte>();
+        }
+
         byte[] output;
 
         try
         {
             // download the page contents as a string
-            var request = WebRequest.CreateHttp(url);
-            request.Accept = "text/html";
+            var client = _httpClientFactory.CreateClient();
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("text/html"));
 
-            var result = await request.GetResponseAsync();
+            var result = await client.GetAsync(url, token);
 
-            using var reader = new StreamReader(result.GetResponseStream());
-
-            string pageContents = reader.ReadToEnd();
-            MatchCollection matches = Regex.Matches(pageContents, @"<img ([^>]+)>");
+            var pageContents = await result.Content.ReadAsStringAsync(token);
+            var matches = Regex.Matches(pageContents, @"<img ([^>]+)>");
 
             // build a list of all img tags
-            IList<ImageTag> imageTags = new List<ImageTag>();
+            var imageTags = new List<ImageTag>();
             for (int i = 0; i < matches.Count && i < AppSettings.MaxImagesToLoad; i++)
             {
-                imageTags.Add(await ImageTag.GetFromUrl(matches[i].Value, url));
+                imageTags.Add(await ImageTag.GetFromUrl(matches[i].Value, url, token));
             }
 
             var featured = imageTags.OrderByDescending(t => t.Width * t.Height).First();
@@ -43,7 +50,7 @@ public static class PreviewGenerator
         }
         catch
         {
-            string fileName = Path.Combine(_webRootPath, AppSettings.DefaultPreviewImage);
+            var fileName = Path.Combine(_webRootPath, AppSettings.DefaultPreviewImage);
             output = File.ReadAllBytes(fileName);
         }
 
@@ -52,54 +59,55 @@ public static class PreviewGenerator
 
     private class ImageTag
     {
-        public byte[] ImageBytes { get; private set; }
+        public byte[] ImageBytes { get; private set; } = Array.Empty<byte>();
 
         public int Height { get; private set; }
 
         public int Width { get; private set; }
 
-        public static async Task<ImageTag> GetFromUrl(string tag, string url)
+        public static async Task<ImageTag> GetFromUrl(string tag, string url, CancellationToken token)
         {
             tag = tag.Replace('\'', '"');
-            string source = ExtractSource(tag, url);
+            var source = ExtractSource(tag, url);
 
-            return await DownloadImage(source);
+            return await DownloadImage(source, token);
         }
 
         private static string ExtractSource(string tag, string url)
         {
-            Match match = Regex.Match(tag, "src=\"([^\"]+)");
-            string source = string.Empty;
-            if (match.Groups.Count > 0)
+            var match = Regex.Match(tag, "src=\"([^\"]+)");
+            var source = string.Empty;
+
+            if (match.Groups.Count > 0 && !match.Groups[1].Value.StartsWith("http"))
             {
-                source = match.Groups[1].Value;
-                if (!source.StartsWith("http"))
-                {
-                    List<string> tokens = url.Split('/').ToList();
-                    tokens.RemoveAt(tokens.Count - 1);
-                    tokens.Add(source.TrimStart('/'));
-                    source = string.Join("/", tokens);
-                }
+                List<string> tokens = url.Split('/').ToList();
+                tokens.RemoveAt(tokens.Count - 1);
+                tokens.Add(match.Groups[1].Value.TrimStart('/'));
+                source = string.Join("/", tokens);
             }
+
             return source;
         }
 
-        private static async Task<ImageTag> DownloadImage(string source)
+        private static async Task<ImageTag> DownloadImage(string source, CancellationToken token)
         {
             ImageTag imageTag;
 
             try
             {
-                var request = WebRequest.CreateHttp(source);
-                request.Accept = "image/*";
+                var client = _httpClientFactory.CreateClient();
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("image/*"));
 
-                var response = await request.GetResponseAsync();
-
-                using var inStream = response.GetResponseStream();
-                using var outStream = new MemoryStream();
+                var response = await client.GetAsync(source, token);
+                
+                using var inStream = await response.Content.ReadAsStreamAsync(token);
 
                 var tempImage = Image.FromStream(inStream);
                 var thumbnail = tempImage.GetThumbnailImage(200, 200, new Image.GetThumbnailImageAbort(() => false), IntPtr.Zero);
+
+                using var outStream = new MemoryStream();
+
                 thumbnail.Save(outStream, ImageFormat.Jpeg);
 
                 imageTag = new ImageTag

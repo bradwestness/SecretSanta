@@ -15,24 +15,25 @@ namespace SecretSanta.Models;
 public class ReceivedGift
 {
     private const double IMAGE_MAX_WIDTH = 1024;
+
     private const double IMAGE_MAX_HEIGHT = 768;
 
     [Required]
     public Guid? Id { get; set; }
 
     [Required]
-    public string From { get; set; }
+    public string? From { get; set; }
 
     [Required]
-    public string To { get; set; }
+    public string? To { get; set; }
 
     [DisplayName("Note"), Required]
-    public string Description { get; set; }
+    public string? Description { get; set; }
 
-    public byte[] Image { get; set; }
+    public byte[]? Image { get; set; }
 
     [DisplayName("Photo with your gift"), Required, JsonIgnore, MaxFileSize(2000000)]
-    public IFormFile ImageUpload { get; set; }
+    public IFormFile? ImageUpload { get; set; }
 
     public void Save(Account account)
     {
@@ -71,25 +72,26 @@ public class ReceivedGift
 
         Id = account.Id;
         account.ReceivedGift[DateHelper.Year] = this;
-        DataRepository.Save(account);
+        AccountRepository.Save(account);
     }
 }
 
 public class ReceivedGiftEditModel
 {
-    public ReceivedGift Item { get; set; }
+    public ReceivedGift Item { get; set; } = new();
 
     public IEnumerable<ReceivedGift> Gifts { get; set; }
 
     public ReceivedGiftEditModel()
     {
-        Gifts = DataRepository.GetAll<Account>().Where(x =>
-                    x.ReceivedGift.ContainsKey(DateHelper.Year) &&
-                    x.ReceivedGift[DateHelper.Year] != null &&
-                    !string.IsNullOrWhiteSpace(x.ReceivedGift[DateHelper.Year].Description)
-                )
-                .Select(x => x.ReceivedGift[DateHelper.Year])
-                .ToList();
+        Gifts = AccountRepository
+            .GetAll()
+            .Where(
+                x => x.ReceivedGift.ContainsKey(DateHelper.Year)
+                && x.ReceivedGift[DateHelper.Year] != null
+                && !string.IsNullOrWhiteSpace(x.ReceivedGift[DateHelper.Year].Description))
+            .Select(x => x.ReceivedGift[DateHelper.Year])
+            .ToList();
     }
 
     public ReceivedGiftEditModel(Account account) : this()
@@ -99,29 +101,27 @@ public class ReceivedGiftEditModel
             : new ReceivedGift();
         Item.Id = account.Id;
 
-        if (string.IsNullOrWhiteSpace(Item.From))
+        if (string.IsNullOrWhiteSpace(Item.From)
+            && account.GetPickedBy() is Account pickedBy)
         {
-            var pickedBy = account.GetPickedBy();
-            if (pickedBy != null)
-            {
-                Item.From = pickedBy.DisplayName;
-                Item.To = account.DisplayName;
-            }
+            Item.From = pickedBy.DisplayName;
+            Item.To = account.DisplayName;
         }
     }
 
     public static void SendReminders(IUrlHelper urlHelper)
     {
-        var accounts = DataRepository.GetAll<Account>().Where(x =>
-            x.ReceivedGift == null ||
-            !x.ReceivedGift.ContainsKey(DateHelper.Year) ||
-            string.IsNullOrWhiteSpace(x.ReceivedGift[DateHelper.Year].Description)
-        );
+        var accounts = AccountRepository
+            .GetAll()
+            .Where(
+                x => x.ReceivedGift == null
+                || !x.ReceivedGift.ContainsKey(DateHelper.Year)
+                || string.IsNullOrWhiteSpace(x.ReceivedGift[DateHelper.Year].Description));
 
         foreach (var account in accounts)
         {
-            string url = urlHelper.Action("LogIn", "Account", new { id = account.Id }, "http");
-            string body = new StringBuilder()
+            var url = urlHelper.Action("LogIn", "Account", new { id = account.Id }, "http");
+            var body = new StringBuilder()
                 .AppendFormat("Hey {0}, ", account.DisplayName).AppendLine()
                 .AppendLine()
                 .AppendFormat("Santa again. Just wanted to remind you that once you've received your gift, ")

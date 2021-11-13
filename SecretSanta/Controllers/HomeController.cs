@@ -10,7 +10,7 @@ public class HomeController : Controller
     [HttpGet]
     public IActionResult Index()
     {
-        if (User.Identity.IsAuthenticated)
+        if (User?.Identity?.IsAuthenticated == true)
         {
             return RedirectToAction("Dashboard", "Home");
         }
@@ -19,18 +19,28 @@ public class HomeController : Controller
         return View(model);
     }
 
-    [Authorize, HttpGet]
+    [Authorize]
+    [HttpGet]
     public IActionResult Dashboard()
     {
-        Account model = User.GetAccount();
-        return View(model);
+        if (User.GetAccount() is Account account)
+        {
+            return View(account);
+        }
+
+        return RedirectToAction("Index", "Home");
     }
 
-    [Authorize, HttpGet]
+    [Authorize]
+    [HttpGet]
     public IActionResult Pick()
     {
-        Account model = User.GetAccount();
-        model.Pick();
-        return View(model);
+        if (User.GetAccount() is Account account)
+        {
+            account.Pick();
+            return View(account);
+        }
+
+        return RedirectToAction("Index", "Home");
     }
 }

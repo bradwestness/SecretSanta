@@ -11,8 +11,14 @@ public class WishlistController : Controller
     [HttpGet]
     public IActionResult Index()
     {
-        var model = new WishlistEditModel(User.GetAccount().Id.Value);
-        return View(model);
+        if (User.GetAccount() is Account account
+            && account.Id.HasValue)
+        {
+            var model = new WishlistEditModel(account.Id.Value);
+            return View(model);
+        }
+
+        return RedirectToAction("Index", "Home");
     }
 
     [HttpGet]
@@ -23,11 +29,11 @@ public class WishlistController : Controller
     }
 
     [HttpPost]
-    public IActionResult AddItem(WishlistItem model)
+    public IActionResult AddItem(WishlistItem model, CancellationToken token = default)
     {
-        if (ModelState.IsValid)
+        if (ModelState.IsValid && User.GetAccount() is Account account)
         {
-            WishlistManager.AddItem(User.GetAccount(), model);
+            WishlistManager.AddItem(account, model, token);
             this.SetResultMessage($"<strong>Successfully added</strong> {model.Name}.");
         }
 
@@ -35,11 +41,11 @@ public class WishlistController : Controller
     }
 
     [HttpPost]
-    public IActionResult EditItem(WishlistItem model)
+    public IActionResult EditItem(WishlistItem model, CancellationToken token = default)
     {
-        if (ModelState.IsValid)
+        if (ModelState.IsValid && User.GetAccount() is Account account)
         {
-            WishlistManager.EditItem(User.GetAccount(), model);
+            WishlistManager.EditItem(account, model, token);
             this.SetResultMessage($"<strong>Successfully updated</strong> {model.Name}.");
         }
 
@@ -49,9 +55,9 @@ public class WishlistController : Controller
     [HttpPost]
     public IActionResult DeleteItem(WishlistItem model)
     {
-        if (ModelState.IsValid)
+        if (ModelState.IsValid && User.GetAccount() is Account account)
         {
-            WishlistManager.DeleteItem(User.GetAccount(), model);
+            WishlistManager.DeleteItem(account, model);
             this.SetResultMessage($"<strong>Successfully deleted</strong> {model.Name}.");
         }
 

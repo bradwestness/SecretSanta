@@ -8,23 +8,15 @@ namespace SecretSanta.Controllers;
 public class AccountController : Controller
 {
     [HttpGet]
-    public IActionResult LogIn(string token, string returnUrl)
-    {
-        var redirect = Url.Action("Index", "Home");
+    public IActionResult LogIn(string token, string returnUrl) =>
+        Redirect(string.IsNullOrWhiteSpace(token)
+            ? Url.Action("Index", "Home") ?? string.Empty
+            : LogInModel.TokenSignIn(Request.HttpContext, token, returnUrl));
 
-        if (!string.IsNullOrWhiteSpace(token))
-        {
-            redirect = LogInModel.TokenSignIn(Request.HttpContext, token, returnUrl);
-        }
-
-        return Redirect(redirect);
-    }
-
-    [Authorize, HttpGet]
-    public IActionResult LogOut()
-    {
-        return Redirect(LogOutModel.SignOut(Request.HttpContext));
-    }
+    [Authorize]
+    [HttpGet]
+    public IActionResult LogOut() =>
+        Redirect(LogOutModel.SignOut(Request.HttpContext));
 
     [HttpPost]
     public IActionResult SendLogInLink(SendLogInLinkModel model)

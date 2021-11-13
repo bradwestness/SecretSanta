@@ -1,7 +1,7 @@
 ﻿@{
-    ViewBag.IsAdmin = User.Identity.IsAuthenticated &&
-                      User.Identity.Name.Equals(AppSettings.AdminEmail, StringComparison.CurrentCultureIgnoreCase);
-    ViewBag.CurrentUserAccount = User.Identity.IsAuthenticated
+    ViewBag.IsAdmin = (User.Identity?.IsAuthenticated ?? false)
+        && (User.Identity?.Name?.Equals(AppSettings.AdminEmail, StringComparison.OrdinalIgnoreCase) ?? false);
+    ViewBag.CurrentUserAccount = User.Identity?.IsAuthenticated ?? false
         ? User.GetAccount()
         : null;
 }
@@ -28,7 +28,7 @@
                 <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">Secret Santa</a>
             </div>
             <div class="navbar-collapse collapse">
-                @if (User.Identity.IsAuthenticated)
+                @if (User.Identity?.IsAuthenticated ?? false)
                 {
                     <ul class="nav navbar-nav nav">
                         <li class="dropdown">

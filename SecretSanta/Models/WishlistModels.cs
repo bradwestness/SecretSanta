@@ -12,21 +12,23 @@ public class WishlistItem
     public Guid? Id { get; set; }
 
     [Required]
-    public string Name { get; set; }
+    public string? Name { get; set; }
 
-    public string Description { get; set; }
+    public string? Description { get; set; }
 
     [DisplayName("Link"), DataType(DataType.Url)]
-    public string Url { get; set; }
+    public string? Url { get; set; }
 
-    public byte[] PreviewImage { get; set; }
+    public byte[]? PreviewImage { get; set; }
 }
 
 public class WishlistEditModel
 {
-    public Guid AccountId { get; set; }
+    [Required]
+    public Guid? AccountId { get; set; }
 
-    public string DisplayName { get; set; }
+    [Required]
+    public string? DisplayName { get; set; }
 
     public WishlistItem NewItem { get; set; }
 
@@ -40,9 +42,10 @@ public class WishlistEditModel
 
     public WishlistEditModel(Guid id)
     {
-        var account = DataRepository.Get<Account>(id);
-        AccountId = account.Id.Value;
-        DisplayName = account.DisplayName;
+        var account = AccountRepository.Get(id);
+        AccountId = account?.Id;
+        DisplayName = account?.DisplayName;
+        NewItem = new WishlistItem();
         Items = (account?.Wishlist?.ContainsKey(DateHelper.Year) ?? false)
             ? account.Wishlist[DateHelper.Year]
             : new List<WishlistItem>();
@@ -51,39 +54,48 @@ public class WishlistEditModel
 
 public static class WishlistManager
 {
-    public static async void AddItem(Account account, WishlistItem item)
+    public static async void AddItem(Account account, WishlistItem item, CancellationToken token)
     {
         if (!account.Wishlist.ContainsKey(DateHelper.Year))
         {
             account.Wishlist.Add(DateHelper.Year, new List<WishlistItem>());
         }
+
         item.Id = Guid.NewGuid();
-        item.PreviewImage = await PreviewGenerator.GetFeaturedImage(item.Url);
+        item.PreviewImage = await PreviewGenerator.GetFeaturedImage(item.Url, token);
         account.Wishlist[DateHelper.Year].Add(item);
-        DataRepository.Save(account);
+        AccountRepository.Save(account);
     }
 
-    public static async void EditItem(Account account, WishlistItem item)
+    public static async void EditItem(Account account, WishlistItem item, CancellationToken token)
     {
-        WishlistItem remove = account.Wishlist[DateHelper.Year].SingleOrDefault(i => i.Id.Equals(item.Id));
-        account.Wishlist[DateHelper.Year].Remove(remove);
-        item.PreviewImage = await PreviewGenerator.GetFeaturedImage(item.Url);
-        account.Wishlist[DateHelper.Year].Add(item);
-        DataRepository.Save(account);
+        var remove = account.Wishlist[DateHelper.Year].SingleOrDefault(i => i.Id.Equals(item.Id));
+
+        if (remove is not null && item is not null)
+        {
+            account.Wishlist[DateHelper.Year].Remove(remove);
+            item.PreviewImage = await PreviewGenerator.GetFeaturedImage(item.Url, token);
+            account.Wishlist[DateHelper.Year].Add(item);
+            AccountRepository.Save(account);
+        }
     }
 
     public static void DeleteItem(Account account, WishlistItem item)
     {
-        WishlistItem remove = account.Wishlist[DateHelper.Year].SingleOrDefault(i => i.Id.Equals(item.Id));
-        account.Wishlist[DateHelper.Year].Remove(remove);
-        DataRepository.Save(account);
+        var remove = account.Wishlist[DateHelper.Year].SingleOrDefault(i => i.Id.Equals(item.Id));
+
+        if (remove is not null)
+        {
+            account.Wishlist[DateHelper.Year].Remove(remove);
+            AccountRepository.Save(account);
+        }
     }
 
     public static void SendReminder(Guid id, IUrlHelper urlHelper)
     {
-        var account = DataRepository.Get<Account>(id);
-        string url = urlHelper.Action("LogIn", "Account", new { id = account.Id }, "http");
-        string body = new StringBuilder()
+        var account = AccountRepository.Get(id);
+        var url = urlHelper.Action("LogIn", "Account", new { id = account.Id }, "http");
+        var body = new StringBuilder()
             .AppendFormat("Hey {0}, ", account.DisplayName).AppendLine()
             .AppendLine()
             .AppendFormat("Santa here. A little birdie told me you haven't added any items to your ")
@@ -99,7 +111,10 @@ public static class WishlistManager
             .ToString();
 
         var from = new MailboxAddress("Santa Claus", AppSettings.SmtpFrom);
-        var to = new List<MailboxAddress> { new MailboxAddress(account.DisplayName, account.Email) };
+        var to = new[]
+        {
+            new MailboxAddress(account.DisplayName, account.Email)
+        };
 
         EmailMessage.Send(from, to, "Secret Santa Reminder", body);
     }

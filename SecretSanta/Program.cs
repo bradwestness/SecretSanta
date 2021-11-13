@@ -19,10 +19,14 @@ builder.Services.AddControllersWithViews();
 var app = builder.Build();
 
 AppSettings.Initialize(app.Configuration);
-DataRepository.Initialize(app.Environment.ContentRootPath);
-PreviewGenerator.Initialize(app.Environment.WebRootPath);
+AccountRepository.Initialize(app.Environment.ContentRootPath);
+PreviewGenerator.Initialize(app.Environment.WebRootPath, app.Services.GetRequiredService<IHttpClientFactory>());
 
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+}
+else
 {
     app.UseExceptionHandler(AppSettings.ErrorPath);
     app.UseHsts();
@@ -34,9 +38,7 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseSession();
-
 app.UseEndpoints(endpoints => endpoints.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}"));
-
 app.Run();
