@@ -10,7 +10,7 @@ public class WishlistController : Controller
 {
     [HttpGet]
     [ResponseCache(VaryByQueryKeys = new[] { "t" } )]
-    public IActionResult Index(long? t = null)
+    public IActionResult Index()
     {
         if (User.GetAccount() is Account account
             && account.Id.HasValue)
