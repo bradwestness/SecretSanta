@@ -9,7 +9,8 @@ namespace SecretSanta.Controllers;
 public class WishlistController : Controller
 {
     [HttpGet]
-    public IActionResult Index()
+    [ResponseCache(VaryByQueryKeys = new[] { "t" } )]
+    public IActionResult Index(long? t = null)
     {
         if (User.GetAccount() is Account account
             && account.Id.HasValue)
@@ -37,7 +38,7 @@ public class WishlistController : Controller
             this.SetResultMessage($"<strong>Successfully added</strong> {model.Name}.");
         }
 
-        return RedirectToAction("Index");
+        return RedirectToAction("Index", new { t = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() });
     }
 
     [HttpPost]
@@ -49,7 +50,7 @@ public class WishlistController : Controller
             this.SetResultMessage($"<strong>Successfully updated</strong> {model.Name}.");
         }
 
-        return RedirectToAction("Index");
+        return RedirectToAction("Index", new { t = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() });
     }
 
     [HttpPost]
@@ -61,7 +62,7 @@ public class WishlistController : Controller
             this.SetResultMessage($"<strong>Successfully deleted</strong> {model.Name}.");
         }
 
-        return RedirectToAction("Index");
+        return RedirectToAction("Index", new { t = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() });
     }
 
     [HttpGet]
