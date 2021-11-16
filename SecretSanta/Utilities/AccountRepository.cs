@@ -147,7 +147,7 @@ public static class AccountRepository
         var mostRecentYearToKeep = DateHelper.Year - 1;
         var accounts = GetAll();
 
-        foreach (var account in accounts)
+        foreach (var account in accounts.ToArray())
         {
             for (var i = DateTime.MinValue.Year; i < mostRecentYearToKeep; i++)
             {
