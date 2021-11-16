@@ -9,7 +9,6 @@ namespace SecretSanta.Controllers;
 public class WishlistController : Controller
 {
     [HttpGet]
-    [ResponseCache(VaryByQueryKeys = new[] { "t" } )]
     public IActionResult Index()
     {
         if (User.GetAccount() is Account account
