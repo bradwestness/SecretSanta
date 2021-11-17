@@ -15,8 +15,8 @@ public class PreviewController : Controller
         _previewGenerator = previewGenerator ?? throw new ArgumentNullException(nameof(previewGenerator));
     }
 
-    [HttpGet, Route("Preview/{accountId:Guid}/{itemId:Guid}")]
-    public async Task<IActionResult> GetPreview(Guid accountId, Guid itemId, CancellationToken token = default)
+    [HttpGet, Route("preview/{accountId:Guid}/{itemId:Guid}", Name = "preview")]
+    public async Task<IActionResult> WishlistItem(Guid accountId, Guid itemId, CancellationToken token = default)
     {
         var account = await _accountRepository.GetAsync(accountId, token);
         var item = new KeyValuePair<int, WishlistItem>();

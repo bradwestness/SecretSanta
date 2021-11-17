@@ -26,7 +26,7 @@
                     <td>
                         @if (!string.IsNullOrWhiteSpace(item.Url))
                         {
-                            <a class="preview" target="_blank" href="@item.Url"><img class="img-thumbnail img-responsive" src="@Url.Action("FeaturedImage", "Preview", new {accountId = Model.AccountId, itemId = item.Id})" /></a>
+                            <a class="preview" target="_blank" href="@item.Url"><img class="img-thumbnail img-responsive" src="@Url.RouteUrl("preview", new { accountId = Model.AccountId, itemId = item.Id })" /></a>
                         }
                         <p>&nbsp;</p>
                     </td>

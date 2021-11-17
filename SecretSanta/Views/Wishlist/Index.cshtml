@@ -34,7 +34,7 @@
                     <td>
                         @if (!string.IsNullOrWhiteSpace(Model?.Items[i].Url))
                         {
-                            <a class="preview" target="_blank" href="@Model.Items[i].Url"><img class="img-thumbnail img-responsive" src="@Url.Action("FeaturedImage", "Preview", new {accountId = Model.AccountId, itemId = Model.Items[i].Id})" /></a>
+                            <a class="preview" target="_blank" href="@Model.Items[i].Url"><img class="img-thumbnail img-responsive" src="@Url.RouteUrl("preview", new { accountId = Model.AccountId, itemId = Model.Items[i].Id })" /></a>
                         }
                         <p>&nbsp;</p>
                     </td>
