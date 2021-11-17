@@ -148,7 +148,13 @@ public class WishlistController : Controller
 
     private async Task SendWishListReminder(Account account, CancellationToken token)
     {
-        var url = Url.Action("LogIn", "Account", new { id = account.Id }, "http");
+        if (account?.Id is null)
+        {
+            return;
+        }
+
+        var guid = GuidEncoder.Encode(account.Id.Value);
+        var url = Url.Action("LogIn", "Account", new { token = guid }, "http");
         var body = new StringBuilder()
             .AppendFormat("Hey {0}, ", account.DisplayName).AppendLine()
             .AppendLine()

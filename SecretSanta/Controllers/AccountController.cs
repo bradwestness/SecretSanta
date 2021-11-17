@@ -99,7 +99,7 @@ public class AccountController : Controller
         }
 
         var guid = GuidEncoder.Encode(account.Id.Value);
-        var url = Url.Action("LogIn", "Account", new { guid }, "http");
+        var url = Url.Action("LogIn", "Account", new { token = guid }, "http");
         var body = new StringBuilder()
             .AppendLine($"Hey {account.DisplayName}!")
             .AppendLine()

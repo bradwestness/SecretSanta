@@ -159,13 +159,13 @@ public class AdminController : Controller
         {
             foreach (var account in chunk)
             {
-                if (account?.Id is null)
+                if (account.Id is null)
                 {
                     continue;
                 }
 
                 var guid = GuidEncoder.Encode(account.Id.Value);
-                var url = Url.Action("LogIn", "Account", new { guid }, "http");
+                var url = Url.Action("LogIn", "Account", new { token = guid }, "http");
                 var body = new StringBuilder()
                     .AppendLine($"Hey {account.DisplayName}!")
                     .AppendLine()
@@ -202,16 +202,16 @@ public class AdminController : Controller
         {
             foreach (var account in chunk)
             {
-                var recipientId = account?.Picked?[DateHelper.Year];
+                var recipientId = account.Picked?[DateHelper.Year];
 
-                if (account?.Id is null || recipientId is null)
+                if (account.Id is null || recipientId is null)
                 {
                     continue;
                 }
 
                 var recipient = await _accountRepository.GetAsync(recipientId.Value, token);
                 var guid = GuidEncoder.Encode(account.Id.Value);
-                var url = Url.Action("LogIn", "Account", new { guid }, "http");
+                var url = Url.Action("LogIn", "Account", new { token = guid }, "http");
                 var body = new StringBuilder()
                     .AppendLine($"Hey {account.DisplayName}!")
                     .AppendLine()
@@ -267,7 +267,13 @@ public class AdminController : Controller
         {
             foreach (var account in chunk)
             {
-                var url = Url.Action("LogIn", "Account", new { id = account.Id }, "http");
+                if (account.Id is null)
+                {
+                    continue;
+                }
+
+                var guid = GuidEncoder.Encode(account.Id.Value);
+                var url = Url.Action("LogIn", "Account", new { token = guid }, "http");
                 var body = new StringBuilder()
                     .AppendFormat("Hey {0}, ", account.DisplayName).AppendLine()
                     .AppendLine()
