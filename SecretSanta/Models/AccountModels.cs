@@ -26,15 +26,6 @@ public class Account
     public IDictionary<int, ReceivedGift> ReceivedGift { get; set; } = new Dictionary<int, ReceivedGift>();
 }
 
-public class DashboardModel
-{
-    public string DisplayName { get; set; } = string.Empty;
-
-    public Guid? PickedAccountId { get; set; }
-
-    public string? PickedDisplayName { get; set; }
-}
-
 public class SendLogInLinkModel
 {
     [Required, EmailAddress, DisplayName("E-Mail Address")]

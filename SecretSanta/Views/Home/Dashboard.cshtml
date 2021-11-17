@@ -1,13 +1,12 @@
-﻿@model DashboardModel
-@{
+﻿@{
     ViewBag.Title = "Home Page";
 }
 
 <div class="jumbotron">
     <div class="row">
         <div class="col-lg-6">
-            <h1>Welcome to Secret Santa, @Model?.DisplayName!</h1>
-            @if (Model?.PickedAccountId is null)
+            <h1>Welcome to Secret Santa, @ViewBag.CurrentUserAccount?.DisplayName!</h1>
+            @if (!ViewBag.HasPicked)
             {
                 <p>Looks like you haven't picked your recipient yet.</p>
                 <p>
@@ -17,9 +16,9 @@
             }
             else
             {
-                <p>You picked @Model?.PickedDisplayName!</p>
+                <p>You picked @ViewBag.PickedAccountDisplayName!</p>
                 <p>
-                    <a class="btn btn-primary btn-lg" href="@Url.Action("Details", "Wishlist", new {id = Model?.PickedAccountId })">View @Model?.PickedDisplayName's Wish List &raquo;</a>
+                    <a class="btn btn-primary btn-lg" href="@Url.Action("Details", "Wishlist", new {id = ViewBag.PickedAccountId })">View @ViewBag.PickedAccountDisplayName's Wish List &raquo;</a>
                     <a class="btn btn-default btn-lg" href="@Url.Action("Index", "Wishlist")">Manage Your Wish List &raquo;</a>
                 </p>
             }

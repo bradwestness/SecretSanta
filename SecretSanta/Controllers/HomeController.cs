@@ -33,7 +33,7 @@ public class HomeController : Controller
     {
         if (await this.GetAccountAsync(_accountRepository, token) is Account account)
         {
-            return View(account);
+            return View();
         }
 
         return RedirectToAction("Index", "Home");
@@ -46,7 +46,7 @@ public class HomeController : Controller
         if (await this.GetAccountAsync(_accountRepository, token) is Account account)
         {
             await PickRecipient(account, token);
-            return View(account);
+            return View();
         }
 
         return RedirectToAction("Index", "Home");
