@@ -6,7 +6,7 @@
     <div class="row">
         <div class="col-lg-6">
             <h1>Welcome to Secret Santa, @ViewBag.CurrentUserAccount?.DisplayName!</h1>
-            @if (!ViewBag.HasPicked)
+            @if (ViewBag.HasPicked != true)
             {
                 <p>Looks like you haven't picked your recipient yet.</p>
                 <p>
