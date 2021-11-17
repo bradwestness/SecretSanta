@@ -1,13 +1,14 @@
-﻿@{
+﻿@model DashboardModel
+@{
     ViewBag.Title = "Home Page";
 }
 
 <div class="jumbotron">
     <div class="row">
         <div class="col-lg-6">
-            <h1>You picked @ViewBag.PickedAccountDisplayName!</h1>
+            <h1>You picked @Model?.PickedAccountDisplayName!</h1>
             <p>Ho ho ho!</p>
-            <p><a href="@Url.Action("Details", "Wishlist", new {id = ViewBag.PickedAccountId })" class="btn btn-primary btn-lg">View @ViewBag.PickedAccountDisplayName's Wish List &raquo;</a></p>
+            <p><a href="@Url.Action("Details", "Wishlist", new { id = Model?.PickedAccountId })" class="btn btn-primary btn-lg">View @Model?.PickedAccountDisplayName's Wish List &raquo;</a></p>
         </div>
         <div class="col-lg-6">
             <img class="img-responsive" src="@Url.Content("~/images/santa.png")" alt="Santa" />

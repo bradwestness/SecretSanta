@@ -33,7 +33,19 @@ public class HomeController : Controller
     {
         if (await this.GetAccountAsync(_accountRepository, token) is Account account)
         {
-            return View();
+            var pickedAccountId = account.GetPickedAccountId();
+            var pickedAccount = pickedAccountId.HasValue
+                ? await _accountRepository.GetAsync(pickedAccountId.Value, token)
+                : null;
+
+            var model = new DashboardModel
+            {
+                DisplayName = account.DisplayName ?? string.Empty,
+                PickedAccountId = pickedAccountId,
+                PickedAccountDisplayName = pickedAccount?.DisplayName
+            };
+
+            return View(model);
         }
 
         return RedirectToAction("Index", "Home");
@@ -46,7 +58,20 @@ public class HomeController : Controller
         if (await this.GetAccountAsync(_accountRepository, token) is Account account)
         {
             await PickRecipient(account, token);
-            return View();
+
+            var pickedAccountId = account.GetPickedAccountId();
+            var pickedAccount = pickedAccountId.HasValue
+                ? await _accountRepository.GetAsync(pickedAccountId.Value, token)
+                : null;
+
+            var model = new DashboardModel
+            {
+                DisplayName = account.DisplayName ?? string.Empty,
+                PickedAccountId = pickedAccountId,
+                PickedAccountDisplayName = pickedAccount?.DisplayName
+            };
+
+            return View(model);
         }
 
         return RedirectToAction("Index", "Home");
