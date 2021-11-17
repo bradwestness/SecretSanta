@@ -7,21 +7,18 @@ builder.Services.AddDistributedMemoryCache();
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(o =>
     {
-        o.LoginPath = AppSettings.LoginPath;
-        o.LogoutPath = AppSettings.LogoutPath;
-        o.ExpireTimeSpan = AppSettings.SessionTimeout;
+        o.LoginPath = "/Account/LogIn";
+        o.LogoutPath = "/Account/LogOut";
+        o.ExpireTimeSpan = TimeSpan.FromHours(1);
         o.SlidingExpiration = true;
     });
 
-builder.Services.AddSession(o => o.IdleTimeout = AppSettings.SessionTimeout);
+builder.Services.AddSession(o => o.IdleTimeout = TimeSpan.FromHours(1));
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpClient();
+builder.Services.AddSecretSanta(builder.Configuration);
 
 var app = builder.Build();
-
-AppSettings.Initialize(app.Configuration);
-AccountRepository.Initialize(app.Environment.ContentRootPath);
-PreviewGenerator.Initialize(app.Environment.WebRootPath, app.Services.GetRequiredService<IHttpClientFactory>());
 
 if (app.Environment.IsDevelopment())
 {
@@ -29,7 +26,7 @@ if (app.Environment.IsDevelopment())
 }
 else
 {
-    app.UseExceptionHandler(AppSettings.ErrorPath);
+    app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
 

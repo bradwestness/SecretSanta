@@ -1,21 +1,29 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SecretSanta.Models;
-using SecretSanta.Utilities;
+using SecretSanta.Services;
 
 namespace SecretSanta.Controllers;
 
 public class PreviewController : Controller
 {
-    [HttpGet, Route("Preview/{accountId:Guid}/{itemId:Guid}")]
-    //[ResponseCache(Location = ResponseCacheLocation.Any, Duration = int.MaxValue, VaryByHeader = "Cookie", VaryByQueryKeys = new[] { "accountId", "itemId" })]
-    public async Task<IActionResult> FeaturedImage(Guid accountId, Guid itemId, CancellationToken token = default)
+    private readonly IAccountRepository _accountRepository;
+    private readonly IPreviewGenerator _previewGenerator;
+
+    public PreviewController(IAccountRepository accountRepository, IPreviewGenerator previewGenerator)
     {
-        var account = AccountRepository.Get(accountId);
+        _accountRepository = accountRepository ?? throw new ArgumentNullException(nameof(accountRepository));
+        _previewGenerator = previewGenerator ?? throw new ArgumentNullException(nameof(previewGenerator));
+    }
+
+    [HttpGet, Route("Preview/{accountId:Guid}/{itemId:Guid}")]
+    public async Task<IActionResult> GetPreview(Guid accountId, Guid itemId, CancellationToken token = default)
+    {
+        var account = await _accountRepository.GetAsync(accountId, token);
         var item = new KeyValuePair<int, WishlistItem>();
+
         foreach (var year in account.Wishlist.Keys)
         {
-            var match = account.Wishlist[year].FirstOrDefault(x => x.Id == itemId);
-            if (match != null)
+            if (account.Wishlist[year].FirstOrDefault(x => x.Id == itemId) is WishlistItem match)
             {
                 item = new KeyValuePair<int, WishlistItem>(year, match);
                 break;
@@ -25,9 +33,10 @@ public class PreviewController : Controller
         if (item.Value.PreviewImage == null || item.Value.PreviewImage.Length == 0)
         {
             account.Wishlist[item.Key].Remove(item.Value);
-            item.Value.PreviewImage = await PreviewGenerator.GetFeaturedImage(item.Value.Url, token);
+            item.Value.PreviewImage = await _previewGenerator.GeneratePreviewAsync(item.Value.Url, token);
             account.Wishlist[item.Key].Add(item.Value);
-            AccountRepository.Save(account);
+
+            await _accountRepository.SaveAsync(account, token);
         }
 
         return File(item.Value.PreviewImage, "image/jpg");

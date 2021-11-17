@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SecretSanta.Models;
+using SecretSanta.Services;
 using SecretSanta.Utilities;
 
 namespace SecretSanta.Controllers;
@@ -8,12 +9,34 @@ namespace SecretSanta.Controllers;
 [Authorize]
 public class ReceivedController : Controller
 {
-    [HttpGet]
-    public IActionResult Index()
+    private readonly IAccountRepository _accountRepository;
+
+    public ReceivedController(IAccountRepository accountRepository)
     {
-        if (User.GetAccount() is Account account)
+        _accountRepository = accountRepository ?? throw new ArgumentNullException(nameof(accountRepository));
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Index(CancellationToken token = default)
+    {
+        if (await this.GetAccountAsync(_accountRepository, token) is Account account)
         {
-            var model = new ReceivedGiftEditModel(account);
+            var model = new ReceivedGiftEditModel
+            {
+                Item = account.ReceivedGift.ContainsKey(DateHelper.Year)
+                    ? account.ReceivedGift[DateHelper.Year]
+                    : new(),
+            };
+
+            model.Item.Id = account.Id;
+
+            if (string.IsNullOrWhiteSpace(model.Item.From))
+            {
+                var accounts = await _accountRepository.GetAllAsync(token);
+                model.Item.From = account.GetPickedByDisplayName(accounts);
+                model.Item.To = account.DisplayName;
+            }
+
             return View(model);
         }
 
@@ -21,11 +44,20 @@ public class ReceivedController : Controller
     }
 
     [HttpPost]
-    public IActionResult Save(ReceivedGift model)
+    public async Task<IActionResult> Save(ReceivedGift model, CancellationToken token = default)
     {
-        if (ModelState.IsValid && User.GetAccount() is Account account)
+        if (ModelState.IsValid && await this.GetAccountAsync(_accountRepository, token) is Account account)
         {
-            model.Save(account);
+            if (model.ImageUpload is not null && model.ImageUpload.Length > 0)
+            {
+                using var imageStream = model.ImageUpload.OpenReadStream();
+
+                model.Image = ImageResizer.ResizeJpg(imageStream);
+            }
+
+            account.ReceivedGift[DateHelper.Year] = model;
+
+            await _accountRepository.SaveAsync(account, token);
             this.SetResultMessage("Successfully updated your recieved gift info.");
         }
 
@@ -34,13 +66,12 @@ public class ReceivedController : Controller
 
     [HttpGet]
     [Route("Received/Image/{accountId:Guid}")]
-    //[ResponseCache(Location = ResponseCacheLocation.Any, Duration = int.MaxValue, VaryByHeader = "Cookie", VaryByQueryKeys = new[] { "accountId" })]
-    public IActionResult Image(Guid accountId)
+    public async Task<IActionResult> Image(Guid accountId, CancellationToken token = default)
     {
-        var account = AccountRepository.Get(accountId);
-        ReceivedGift gift = account.ReceivedGift[DateHelper.Year];
+        var account = await _accountRepository.GetAsync(accountId, token);
+        var gift = account.ReceivedGift[DateHelper.Year];
 
-        if (gift.Image == null || gift.Image.Length == 0)
+        if (gift?.Image is null || gift.Image.Length == 0)
         {
             return NoContent();
         }

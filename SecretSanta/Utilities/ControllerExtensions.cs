@@ -1,36 +1,39 @@
-﻿using System.Security.Claims;
-using System.Text;
+﻿using System.Text;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using SecretSanta.Models;
+using SecretSanta.Services;
 
 namespace SecretSanta.Utilities;
 
-public static class Extensions
+public static class ControllerExtensions
 {
-    public static Account? GetAccount(this ClaimsPrincipal user)
+    public static async Task<Account?> GetAccountAsync(
+        this Controller controller,
+        IAccountRepository accountRepository,
+        CancellationToken token)
     {
-        if (user?.Identity?.IsAuthenticated != true
-            || string.IsNullOrWhiteSpace(user?.Identity?.Name))
+        if (controller?.User?.Identity?.IsAuthenticated != true ||
+            string.IsNullOrEmpty(controller?.User?.Identity?.Name))
         {
             return null;
         }
 
-        var account = AccountRepository.GetAll()
-            .SingleOrDefault(
-                a => a.Email?.Equals(
-                    user.Identity.Name,
-                    StringComparison.OrdinalIgnoreCase) ?? false);
+        var email = controller.User.Identity.Name;
+        var accounts = await accountRepository.GetAllAsync(token);
+        var account = accounts.SingleOrDefault(a => a.Email?.Equals(email, StringComparison.OrdinalIgnoreCase) ?? false);
 
         if (account is null)
         {
-            var model = new AddUserModel
+            account = new Account
             {
-                DisplayName = user.Identity.Name,
-                Email = user.Identity.Name
+                Id = Guid.NewGuid(),
+                Email = email,
+                DisplayName = email
             };
-            account = model.CreateAccount();
+
+            await accountRepository.SaveAsync(account, token);
         }
 
         return account;

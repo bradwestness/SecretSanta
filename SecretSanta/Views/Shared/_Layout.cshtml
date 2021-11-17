@@ -1,9 +1,28 @@
-﻿@{
-    ViewBag.IsAdmin = (User.Identity?.IsAuthenticated ?? false)
-        && (User.Identity?.Name?.Equals(AppSettings.AdminEmail, StringComparison.OrdinalIgnoreCase) ?? false);
-    ViewBag.CurrentUserAccount = User.Identity?.IsAuthenticated ?? false
-        ? User.GetAccount()
+﻿@using SecretSanta.Services
+@inject IAppSettings appSettings
+@inject IAccountRepository accountRepository
+@{
+    var accounts = await accountRepository.GetAllAsync(default);
+    var isAuthenticated =  User.Identity?.IsAuthenticated ?? false;
+    var isAdmin = isAuthenticated
+        ? User.Identity?.Name?.Equals(appSettings.AdminEmail, StringComparison.OrdinalIgnoreCase) ?? false
+        : false;
+    var currentUser = isAuthenticated
+        ? accounts.SingleOrDefault(a => User.Identity?.Name?.Equals(a?.Email, StringComparison.OrdinalIgnoreCase) ?? false)
         : null;
+    var hasPicked = (currentUser?.Picked.ContainsKey(DateHelper.Year) ?? false)
+        && currentUser.Picked[DateHelper.Year] is not null;
+    var pickedAccount = hasPicked 
+        ? accounts.SingleOrDefault(a => a.Id == currentUser?.Picked[DateHelper.Year])
+        : null;
+
+    ViewBag.IsAuthenticated = isAuthenticated;
+    ViewBag.IsAdmin = isAdmin;
+    ViewBag.CurrentUserAccount = currentUser;
+    ViewBag.HasPicked = hasPicked;
+    ViewBag.PickedAccountId = pickedAccount?.Id; 
+    ViewBag.PickedAccountDisplayName = pickedAccount?.DisplayName;
+    ViewBag.GiftDollarLimit = appSettings.GiftDollarLimit.ToString("$0.00");
 }
 <!DOCTYPE html>
 <html>
@@ -28,17 +47,16 @@
                 <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">Secret Santa</a>
             </div>
             <div class="navbar-collapse collapse">
-                @if (User.Identity?.IsAuthenticated ?? false)
+                @if (ViewBag.IsAuthenticated)
                 {
                     <ul class="nav navbar-nav nav">
                         <li class="dropdown">
                             <a class="dropdown-toggle" data-toggle="dropdown" href="#">Gifts <b class="caret"></b></a>
                             <ul class="dropdown-menu">
                                 <li><a asp-area="" asp-controller="Wishlist" asp-action="Index">My Wish List</a>
-                                @if (ViewBag.CurrentUserAccount.HasPicked())
+                                @if (ViewBag.HasPicked)
                                 {
-                                    Account picked = ViewBag.CurrentUserAccount.GetPicked();
-                                    <li><a asp-area="" asp-controller="Wishlist" asp-action="Details" asp-route-id="@picked.Id">@picked.DisplayName's Wish List</a></li>
+                                    <li><a asp-area="" asp-controller="Wishlist" asp-action="Details" asp-route-id="@ViewBag.PickedAccountId">@ViewBag.PickedAccountDisplayName's Wish List</a></li>
                                 }
                                 <li><a asp-area="" asp-controller="Received" asp-action="Index">Received Gifts</a></li>
                             </ul>
@@ -63,14 +81,14 @@
     <div class="container body-content">
         @Html.ResultMessage()
         @RenderBody()
-        @if (User?.Identity?.IsAuthenticated == true)
+        @if (ViewBag.IsAuthenticated)
         {
             <div class="row">
                 <div class="col-lg-12">
                     <h2>Notes</h2>
                     <ul>
                         <li>Once you pick a recipient, you will get an e-mail with a reminder, plus the person's wish list.</li>
-                        <li>The dollar limit per person is @AppSettings.GiftDollarLimit.ToString("$0.00")@(".")</li>
+                        <li>The dollar limit per person is @ViewBag.GiftDollarLimit@(".")</li>
                         <li>Log back into this website with your e-mail address at any time to manage your wish list and view your recipient's wish list.</li>
                         <li>Preview images are pulled automagically from the given link address and may not be the correct picture, it's recommended that you click through to the actual linked page.</li>
                         <li>Click "Received Gifts" at the top to view the gifts everyone got and add your own!</li>
@@ -107,6 +125,6 @@
 
         })(window.jQuery);
     </script>
-    @RenderSection("scripts", required: false)
+    @await RenderSectionAsync("scripts", required: false)
 </body>
 </html>
