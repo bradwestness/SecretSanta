@@ -115,15 +115,15 @@ public class WishlistController : Controller
         return RedirectToAction("Index", new { t = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() });
     }
 
-    [HttpPost]
-    public async Task<IActionResult> DeleteItem(WishlistItem model, CancellationToken token = default)
+    [HttpGet]
+    public async Task<IActionResult> DeleteItem(Guid id, CancellationToken token = default)
     {
         if (ModelState.IsValid && await this.GetAccountAsync(_accountRepository, token) is Account account
-            && account.Wishlist[DateHelper.Year].SingleOrDefault(i => i.Id == model.Id) is WishlistItem remove
+            && account.Wishlist[DateHelper.Year].SingleOrDefault(i => i.Id == id) is WishlistItem remove
             && account.Wishlist[DateHelper.Year].Remove(remove))
         {
             await _accountRepository.SaveAsync(account, token);
-            this.SetResultMessage($"<strong>Successfully deleted</strong> {model.Name}.");
+            this.SetResultMessage($"<strong>Successfully deleted</strong> {remove.Name}.");
         }
 
         return RedirectToAction("Index", new { t = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() });
