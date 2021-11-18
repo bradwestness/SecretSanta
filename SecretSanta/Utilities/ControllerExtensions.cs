@@ -24,18 +24,6 @@ public static class ControllerExtensions
         var accounts = await accountRepository.GetAllAsync(token);
         var account = accounts.SingleOrDefault(a => a.Email?.Equals(email, StringComparison.OrdinalIgnoreCase) ?? false);
 
-        if (account is null)
-        {
-            account = new Account
-            {
-                Id = Guid.NewGuid(),
-                Email = email,
-                DisplayName = email
-            };
-
-            await accountRepository.SaveAsync(account, token);
-        }
-
         return account;
     }
 

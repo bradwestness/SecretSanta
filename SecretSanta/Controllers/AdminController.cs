@@ -103,6 +103,7 @@ public class AdminController : Controller
         if (accounts.Any(a => model?.Email?.Equals(a.Email, StringComparison.OrdinalIgnoreCase) ?? false))
         {
             ModelState.AddModelError("NewUser.Email", "A user already exists with the specified E-Mail Address.");
+            return RedirectToAction("Users");
         }
 
         if (ModelState.IsValid)
