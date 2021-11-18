@@ -6,18 +6,18 @@
 <h1>@ViewBag.Title</h1>
 
 <div class="text-right">
-    @Html.ActionLink("Send Invitations", "Invite", null, new { @class = "btn btn-default" })
-    @Html.ActionLink("Send Received Gift Reminders", "ReceivedGift", null, new { @class = "btn btn-default" })
+    <a asp-controller="Admin" asp-action="Invite" class="btn btn-default">Send Invitations</a>
+    <a asp-controller="Admin" asp-action="ReceivedGift" class="btn btn-default">Send Received Gift Reminders</a>
     @if (Model?.AllPicked == true)
     {
-        @Html.ActionLink("Send All Picked Reminders", "AllPicked", null, new { @class = "btn btn-default" })
+        <a asp-controller="Admin" asp-action="AllPicked" class="btn btn-default">Send All Picked Reminders</a>
     }
-    @Html.ActionLink("Reset User Data", "Reset", "Admin", null, new { @class = "btn btn-danger" })
+    <a asp-controller="Admin" asp-action="Reset" class="btn btn-danger">Reset User Data</a>
     <button class="btn btn-primary" data-toggle="modal" data-target="#AddUser">Add User</button>
 </div>
 
 <div id="AddUser" class="modal fade">
-    @await Html.PartialAsync("EditorTemplates/AddUser", Model?.NewUser)
+    <partial name="EditorTemplates/AddUser" for="NewUser" />
 </div>
 
 <table class="table table-striped">
@@ -34,13 +34,13 @@
         @for (int i = 0; i < (Model?.Users.Count ?? 0); i++)
         {
             <tr>
-                <td>@Html.DisplayFor(m => m.Users[i].DisplayName)</td>
-                <td>@Html.DisplayFor(m => m.Users[i].Email)</td>
+                <td>@Model?.Users[i].DisplayName</td>
+                <td>@Model?.Users[i].Email</td>
                 <td>@Html.CheckBox("Users[" + i + "].HasPicked", Model?.Users[i].Picked.HasValue, new { disabled = "disabled" })</td>
                 <td>@Html.CheckBox("Users[" + i + "].HasBeenPicked", !string.IsNullOrWhiteSpace(Model?.Users[i].PickedBy), new { disabled = "disabled" })</td>
                 <td>
                     <div class="pull-right">
-                        <a class="btn btn-link" href="@Url.Action("Details", "Wishlist", new {id = Model?.Users[i].AccountId})">View Wishlist &raquo;</a>
+                        <a asp-controller="Wishlist" asp-action="Details" asp-route-id="Model?.Users[i].AccountId" class="btn btn-link">View Wishlist &raquo;</a>
                         <button class="btn btn-primary" data-toggle="modal" data-target="#EditUser@(i)">Edit</button>
                         <button class="btn btn-default" data-toggle="modal" data-target="#DeleteUser@(i)">Delete</button>
                     </div>

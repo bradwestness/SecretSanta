@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace SecretSanta.Models;
@@ -61,7 +62,7 @@ public class AddUserModel
 
 public class EditUserModel
 {
-    [Required]
+    [Required, HiddenInput]
     public Guid? AccountId { get; set; }
 
     [Required, EmailAddress, DisplayName("E-Mail Address")]

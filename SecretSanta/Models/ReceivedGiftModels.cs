@@ -1,19 +1,20 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Mvc;
 using SecretSanta.Validation;
 
 namespace SecretSanta.Models;
 
 public class ReceivedGift
 {
-    [Required]
+    [Required, HiddenInput]
     public Guid? Id { get; set; }
 
     [Required]
     public string? From { get; set; }
 
-    [Required]
+    [Required, HiddenInput]
     public string? To { get; set; }
 
     [DisplayName("Note"), Required]

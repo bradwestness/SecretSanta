@@ -8,10 +8,12 @@
         <div class="col-lg-6">
             <h1>You picked @Model?.PickedAccountDisplayName!</h1>
             <p>Ho ho ho!</p>
-            <p><a href="@Url.Action("Details", "Wishlist", new { id = Model?.PickedAccountId })" class="btn btn-primary btn-lg">View @Model?.PickedAccountDisplayName's Wish List &raquo;</a></p>
+            <p>
+                <a asp-controller="Wishlist" asp-action="Details" asp-route-id="Model?.PickedAccountId" class="btn btn-primary btn-lg">View @Model?.PickedAccountDisplayName's Wish List &raquo;</a>
+            </p>
         </div>
         <div class="col-lg-6">
-            <img class="img-responsive" src="@Url.Content("~/images/santa.png")" alt="Santa" />
+            <img src="~/images/santa.png" alt="Santa" class="img-responsive" />
         </div>
     </div>
 </div>

@@ -1,10 +1,12 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc;
 
 namespace SecretSanta.Models;
 
 public class WishlistItem
 {
+    [HiddenInput]
     public Guid? Id { get; set; }
 
     [Required]

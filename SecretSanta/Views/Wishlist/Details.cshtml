@@ -20,13 +20,15 @@
             {
                 <tr>
                     <td>
-                        <h3>@Html.DisplayFor(m => item.Name)</h3>
-                        <p><small>@Html.DisplayFor(m => item.Description)</small></p>
+                        <h3>@item.Name</h3>
+                        <p><small>@item.Description</small></p>
                     </td>
                     <td>
                         @if (!string.IsNullOrWhiteSpace(item.Url))
                         {
-                            <a class="preview" target="_blank" href="@item.Url"><img class="img-thumbnail img-responsive" src="@Url.RouteUrl("preview", new { accountId = Model.AccountId, itemId = item.Id })" /></a>
+                            <a class="preview" target="_blank" href="@item.Url">
+                                <img class="img-thumbnail img-responsive" src="@Url.RouteUrl("preview", new { accountId = Model.AccountId, itemId = item.Id })" />
+                            </a>
                         }
                         <p>&nbsp;</p>
                     </td>
@@ -51,6 +53,6 @@ else
 {
     <p>Looks like @Model?.DisplayName has not added any items yet.</p>
     <p>
-        <a href="@Url.Action("Remind", "Wishlist", new {id = Model?.AccountId})" class="btn btn-primary btn-lg">Send a Reminder &raquo;</a>
+        <a asp-controller="Wishlist" asp-action="Remind" asp-route-id="Model?.AccountId" class="btn btn-primary btn-lg">Send a Reminder &raquo;</a>
     </p>
 }
