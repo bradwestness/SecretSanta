@@ -23,18 +23,19 @@ SecretSanta is an easy to use gift exchange organizer that you can deploy to you
 
 ## Set Up
 
-1. Add the following appSettings to web.config, or [configure as app settings in Azure](https://azure.microsoft.com/en-us/blog/windows-azure-web-sites-how-application-strings-and-connection-strings-work/):
-```xml
-    <add key="SecretSanta:AdminEmail" value="my_email@outlook.com" />
-    <add key="SecretSanta:MaxImagesToLoad" value="25"/>
-    <add key="SecretSanta:DefaultPreviewImage" value="images/photo_not_available.png"/>
-    <add key="SecretSanta:DataDirectory" value="App_Data" />
-    <add key="SecretSanta:AccountFilePattern" value="*.account.json" />
-    <add key="SecretSanta:GiftDollarLimit" value="40" />
-    <add key="SecretSanta:SmtpHost" value="smtp.sendgrid.net" />
-    <add key="SecretSanta:SmtpPort" value="587" />
-    <add key="SecretSanta:SmtpUser" value="my_email_user@azure.com" />
-    <add key="SecretSanta:SmtpPass" value="my_email_password" />
+1. Add the following appSettings to appsettings.json, or [configure as app settings in Azure](https://azure.microsoft.com/en-us/blog/windows-azure-web-sites-how-application-strings-and-connection-strings-work/):
+```json
+{
+    "SecretSanta:AdminEmail": "my_email@outlook.com",
+    "SecretSanta:DefaultPreviewImage": "images/photo_not_available.png",
+    "SecretSanta:DataDirectory": "App_Data",
+    "SecretSanta:AccountFilePattern": "*.account.json",
+    "SecretSanta:GiftDollarLimit": 40,
+    "SecretSanta:SmtpHost": "smtp.sendgrid.net"
+    "SecretSanta:SmtpPort": "587"
+    "SecretSanta:SmtpUser": "my_email_user@azure.com"
+    "SecretSanta:SmtpPass": "my_email_password"
+}
 ```
-3. Deploy to any server capable of running ASP.NET Core 1 or later
-4. Make sure the folder specified in the `DataDirectory` appSetting is writable
+3. Deploy to any server capable of running ASP.NET Core 6 or later
+4. Make sure the folder specified in the `SecretSanta:DataDirectory` setting is writable
