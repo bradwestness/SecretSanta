@@ -74,7 +74,7 @@ public class AccountRepository : IAccountRepository
 
         var filePath = GetAccountFilePath(account.Id.Value);
 
-        using var file = File.OpenWrite(filePath);
+        using var file = File.Open(filePath, FileMode.Create, FileAccess.Write, FileShare.None);
 
         await JsonSerializer.SerializeAsync(file, account, cancellationToken: token);
 

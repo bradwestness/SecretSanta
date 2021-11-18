@@ -118,15 +118,10 @@ public class WishlistController : Controller
     [HttpPost]
     public async Task<IActionResult> DeleteItem(WishlistItem model, CancellationToken token = default)
     {
-        if (ModelState.IsValid && await this.GetAccountAsync(_accountRepository, token) is Account account)
+        if (ModelState.IsValid && await this.GetAccountAsync(_accountRepository, token) is Account account
+            && account.Wishlist[DateHelper.Year].SingleOrDefault(i => i.Id == model.Id) is WishlistItem remove
+            && account.Wishlist[DateHelper.Year].Remove(remove))
         {
-            var remove = account.Wishlist[DateHelper.Year].SingleOrDefault(i => i.Id.Equals(model.Id));
-
-            if (remove is not null)
-            {
-                account.Wishlist[DateHelper.Year].Remove(remove);
-            }
-
             await _accountRepository.SaveAsync(account, token);
             this.SetResultMessage($"<strong>Successfully deleted</strong> {model.Name}.");
         }
