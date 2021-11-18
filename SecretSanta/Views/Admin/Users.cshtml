@@ -40,7 +40,7 @@
                 <td>@Html.CheckBox("Users[" + i + "].HasBeenPicked", !string.IsNullOrWhiteSpace(Model?.Users[i].PickedBy), new { disabled = "disabled" })</td>
                 <td>
                     <div class="pull-right">
-                        <a asp-controller="Wishlist" asp-action="Details" asp-route-id="Model?.Users[i].AccountId" class="btn btn-link">View Wishlist &raquo;</a>
+                        <a asp-controller="Wishlist" asp-action="Details" asp-route-id="@Model?.Users[i].AccountId" class="btn btn-link">View Wishlist &raquo;</a>
                         <button class="btn btn-primary" data-toggle="modal" data-target="#EditUser@(i)">Edit</button>
                         <button class="btn btn-default" data-toggle="modal" data-target="#DeleteUser@(i)">Delete</button>
                     </div>

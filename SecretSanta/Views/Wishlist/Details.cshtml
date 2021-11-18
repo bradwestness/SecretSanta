@@ -53,6 +53,6 @@ else
 {
     <p>Looks like @Model?.DisplayName has not added any items yet.</p>
     <p>
-        <a asp-controller="Wishlist" asp-action="Remind" asp-route-id="Model?.AccountId" class="btn btn-primary btn-lg">Send a Reminder &raquo;</a>
+        <a asp-controller="Wishlist" asp-action="Remind" asp-route-id="@Model?.AccountId" class="btn btn-primary btn-lg">Send a Reminder &raquo;</a>
     </p>
 }

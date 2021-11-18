@@ -19,7 +19,7 @@
             {
                 <p>You picked @Model?.PickedAccountDisplayName!</p>
                 <p>
-                    <a asp-controller="Wishlist" asp-action="Details" asp-route-id="Model?.PickedAccountId" class="btn btn-primary btn-lg">View @Model?.PickedAccountDisplayName's Wish List &raquo;</a>                    
+                    <a asp-controller="Wishlist" asp-action="Details" asp-route-id="@Model?.PickedAccountId" class="btn btn-primary btn-lg">View @Model?.PickedAccountDisplayName's Wish List &raquo;</a>                    
                     <a asp-controller="Wishlist" asp-action="Index" class="btn btn-default btn-lg">Manage Your Wish List &raquo;</a>
                 </p>
             }
