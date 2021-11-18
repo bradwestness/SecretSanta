@@ -6,7 +6,8 @@
 
 <div class="modal-dialog">
     <div class="modal-content">
-        <form asp-controller="Wishlist" asp-action="DeleteItem" asp-route-id="@Model?.Id" method="get" class="form-control" role="form">
+        <form asp-controller="Wishlist" asp-action="DeleteItem" method="post" class="form-control" role="form">
+            <input asp-for="Id" />
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                 <h4 class="modal-title">Delete Item</h4>
@@ -22,7 +23,7 @@
                 <div class="form-group">
                     <label asp-for="Description" class="control-label col-sm-4"></label>
                     <div class="col-sm-8">
-                        <textarea asp-for="Description" class="form-control" readonly />
+                        <textarea asp-for="Description" class="form-control" readonly></textarea>
                     </div>
                 </div>
             </div>
