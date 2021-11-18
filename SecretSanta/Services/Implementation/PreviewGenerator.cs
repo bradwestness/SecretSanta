@@ -15,11 +15,11 @@ public class PreviewGenerator : IPreviewGenerator
     public PreviewGenerator(
         IAppSettings appSettings,
         IHttpClientFactory httpClientFactory,
-        IWebHostEnvironment environment)
+        IWebHostEnvironment webHostEnvironment)
     {
         _appSettings = appSettings ?? throw new ArgumentNullException(nameof(appSettings));
         _httpClientFactory = httpClientFactory ?? throw new ArgumentNullException(nameof(httpClientFactory));
-        _webHostEnvironment = environment ?? throw new ArgumentNullException(nameof(environment));
+        _webHostEnvironment = webHostEnvironment ?? throw new ArgumentNullException(nameof(webHostEnvironment));
     }
 
     public async Task<byte[]> GeneratePreviewAsync(string? url, CancellationToken token)
@@ -95,7 +95,7 @@ public class PreviewGenerator : IPreviewGenerator
 
     private Task<byte[]> GetDefaultPreviewImageBytes(CancellationToken token)
     {
-        var defaultPreviewImagePath = Path.Combine(_webHostEnvironment.ContentRootPath, _appSettings.DefaultPreviewImage);
+        var defaultPreviewImagePath = Path.Combine(_webHostEnvironment.WebRootPath, _appSettings.DefaultPreviewImage);
         return File.ReadAllBytesAsync(defaultPreviewImagePath, token);
     }
 }
