@@ -25,52 +25,51 @@
     ViewBag.GiftDollarLimit = appSettings.GiftDollarLimit.ToString("$0.00");
 }
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
     <title>@ViewBag.Title - SecretSanta</title>
 
-    <link rel="stylesheet" href="~/css/bootstrap.css" />
+    <link rel="stylesheet" href="~/css/bootswatch.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap-icons/font/bootstrap-icons.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
 <body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
+    <div class="navbar navbar-expand-lg sticky-top navbar-light bg-light">
+        <div class="container">            
+            <a asp-controller="Home" asp-action="Index" class="navbar-brand">Secret Santa</a>
             <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
                 </button>
-                <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">Secret Santa</a>
             </div>
             <div class="navbar-collapse collapse">
                 @if (ViewBag.IsAuthenticated)
                 {
-                    <ul class="nav navbar-nav nav">
-                        <li class="dropdown">
-                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">Gifts <b class="caret"></b></a>
+                    <ul class="navbar-nav">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button">Gifts</a>
                             <ul class="dropdown-menu">
-                                <li><a asp-area="" asp-controller="Wishlist" asp-action="Index">My Wish List</a>
+                                <li><a asp-controller="Wishlist" asp-action="Index" class="dropdown-item">My Wish List</a></li>
                                 @if (ViewBag.HasPicked)
                                 {
-                                    <li><a asp-area="" asp-controller="Wishlist" asp-action="Details" asp-route-id="@ViewBag.PickedAccountId">@ViewBag.PickedAccountDisplayName's Wish List</a></li>
+                                    <li><a asp-controller="Wishlist" asp-action="Details" asp-route-id="@ViewBag.PickedAccountId" class="dropdown-item">@ViewBag.PickedAccountDisplayName's Wish List</a></li>
                                 }
-                                <li><a asp-area="" asp-controller="Received" asp-action="Index">Received Gifts</a></li>
-                            </ul>
+                                <li><a asp-controller="Received" asp-action="Index" class="dropdown-item">Received Gifts</a></li>
+                            </ul>                            
                         </li>
                     </ul>
-                    <ul class="nav navbar-nav navbar-right">
-                        <li class="dropdown">
-                            <a class="dropdown-toggle" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-lock"></span> @ViewBag.CurrentUserAccount.DisplayName <b class="caret"></b></a>
+                    <ul class="navbar-nav">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#"><span class="bi bi-lock"></span> @ViewBag.CurrentUserAccount.DisplayName <b class="caret"></b></a>
                             <ul class="dropdown-menu">
                                 @if (ViewBag.IsAdmin)
                                 {
-                                    <li><a asp-area="" asp-controller="Admin" asp-action="Users">Manage Users</a></li>
+                                    <li><a asp-controller="Admin" asp-action="Users" class="dropdown-item">Manage Users</a></li>
                                 }
-                                <li><a asp-area="" asp-controller="Account" asp-action="LogOut">Log Out</a></li>
+                                <li><a asp-controller="Account" asp-action="LogOut" class="dropdown-item">Log Out</a></li>
                             </ul>
                         </li>
                     </ul>
@@ -79,7 +78,7 @@
         </div>
     </div>
     <div class="container body-content">
-        @Html.ResultMessage()
+        <result-message></result-message>
         @RenderBody()
         @if (ViewBag.IsAuthenticated)
         {
@@ -103,20 +102,15 @@
         </footer>
     </div>
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery/jquery.min.js"></script>
+    <script src="~/lib/jquery-validate/jquery.validate.min.js"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="~/lib/bootstrap/js/bootstrap.min.js"></script>
     <script src="~/js/jquery.validate.unobtrusive.maxfilesize.js"></script>
     <script async defer>
         (function ($) {
-
-            //
-            // Add bootstrap styling to fancy HTML5 inputs
-            $("input[type='url'], input[type='email']").addClass("form-control");
-
-            //
-            // Hide dismissable alerts after 10 seconds
+                        
+            // hide dismissable alerts after 10 seconds
             setTimeout(function () {
                 $(".alert-dismissable").slideUp("normal", function () {
                     $(this).remove();

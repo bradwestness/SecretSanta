@@ -3,17 +3,15 @@
     ViewBag.Title = "Home Page";
 }
 
-<div class="jumbotron">
-    <div class="row">
-        <div class="col-lg-6">
-            <h1>You picked @Model?.PickedAccountDisplayName!</h1>
-            <p>Ho ho ho!</p>
-            <p>
-                <a asp-controller="Wishlist" asp-action="Details" asp-route-id="@Model?.PickedAccountId" class="btn btn-primary btn-lg">View @Model?.PickedAccountDisplayName's Wish List &raquo;</a>
-            </p>
-        </div>
-        <div class="col-lg-6">
-            <img src="~/images/santa.png" alt="Santa" class="img-responsive" />
-        </div>
+<div class="row">
+    <div class="col">
+        <h1>You picked @Model?.PickedAccountDisplayName!</h1>
+        <p>Ho ho ho!</p>
+        <p>
+            <a asp-controller="Wishlist" asp-action="Details" asp-route-id="@Model?.PickedAccountId" class="btn btn-primary btn-lg">View @Model?.PickedAccountDisplayName's Wish List</a>
+        </p>
+    </div>
+    <div class="col">
+        <img src="~/images/santa.png" alt="Santa" class="img-fluid" />
     </div>
 </div>

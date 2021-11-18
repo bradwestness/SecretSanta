@@ -3,38 +3,30 @@
     ViewBag.Title = "Send Log In Link";
 }
 
-<div class="jumbotron">
-    <div class="row">
-        <div class="col-lg-6">
-            <h1>Welcome to Secret Santa!</h1>
+<div class="row">
+    <div class="col">
+        <h1 class="display-1">Welcome to Secret Santa!</h1>
+        <form asp-controller="Account" asp-action="SendLogInLink" method="post" class="row">
+            <fieldset>
+                <legend>@ViewBag.Title</legend>
 
-            @using (Html.BeginForm("SendLogInLink", "Account", FormMethod.Post, new { role = "form", @class = "form-horizontal" }))
-            {
-                <fieldset>
-                    <legend>@ViewBag.Title</legend>
+                <p>
+                    If you misplaced your log-in email, you can use this form to have another
+                    log-in link sent to you.
+                </p>
 
-                    <p>
-                        If you misplaced your log-in email, you can use this form to have another
-                        log-in link sent to you.
-                    </p>
-
-                    <div class="form-group">
-                        <small><label asp-for="Email" class="control-label col-sm-4"></label></small>
-                        <div class="col-sm-6">
-                            <input asp-for="Email" />
-                            <span asp-validation-for="Email"></span>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="col-sm-offset-2 col-sm-10">
-                            <button type="submit" class="btn btn-default">Send Log-In Link</button>
-                        </div>
-                    </div>
-                </fieldset>
-            }
-        </div>
-        <div class="col-lg-6">
-            <img src="~/images/santa.png" alt="Santa" class="img-responsive" />
-        </div>
+                <div class="mb-3">
+                    <label asp-for="Email" class="form-label"></label>
+                    <input asp-for="Email" class="form-control" />
+                    <span asp-validation-for="Email"></span>
+                </div>
+                <div class="mb-3">
+                    <button type="submit" class="btn btn-primary">Send Log-In Link</button>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+    <div class="col">
+        <img src="~/images/santa.png" alt="Santa" class="img-fluid" />
     </div>
 </div>

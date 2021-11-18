@@ -32,17 +32,15 @@
                         }
                         <p>&nbsp;</p>
                     </td>
-                    <td>
-                        <div class="pull-right">
-                            @if (!string.IsNullOrWhiteSpace(item.Url))
-                            {
-                                <a target="_blank" class="btn btn-default" href="@item.Url">More Information &raquo;</a>
-                            }
-                            else
-                            {
-                                <a class="btn btn-link" href="#">No Link Provided</a>
-                            }
-                        </div>
+                    <td class="text-end">
+                        @if (!string.IsNullOrWhiteSpace(item.Url))
+                        {
+                            <a target="_blank" class="btn btn-secondary" href="@item.Url">More Information</a>
+                        }
+                        else
+                        {
+                            <a class="btn btn-link" href="#">No Link Provided</a>
+                        }
                     </td>
                 </tr>
             }
@@ -53,6 +51,6 @@ else
 {
     <p>Looks like @Model?.DisplayName has not added any items yet.</p>
     <p>
-        <a asp-controller="Wishlist" asp-action="Remind" asp-route-id="@Model?.AccountId" class="btn btn-primary btn-lg">Send a Reminder &raquo;</a>
+        <a asp-controller="Wishlist" asp-action="Remind" asp-route-id="@Model?.AccountId" class="btn btn-primary btn-lg">Send a Reminder</a>
     </p>
 }

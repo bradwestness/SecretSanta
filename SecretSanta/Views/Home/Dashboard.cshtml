@@ -3,29 +3,27 @@
     ViewBag.Title = "Home Page";
 }
 
-<div class="jumbotron">
-    <div class="row">
-        <div class="col-lg-6">
-            <h1>Welcome to Secret Santa, @Model?.DisplayName!</h1>
-            @if (Model?.PickedAccountId is null)
-            {
-                <p>Looks like you haven't picked your recipient yet.</p>
-                <p>
-                    <a asp-controller="Home" asp-action="Pick" class="btn btn-primary btn-lg">Pick Your Recipient &raquo;</a>
-                    <a asp-controller="Wishlist" asp-action="Index" class="btn btn-default btn-lg">Manage Your Wish List &raquo;</a>
-                </p>
-            }
-            else
-            {
-                <p>You picked @Model?.PickedAccountDisplayName!</p>
-                <p>
-                    <a asp-controller="Wishlist" asp-action="Details" asp-route-id="@Model?.PickedAccountId" class="btn btn-primary btn-lg">View @Model?.PickedAccountDisplayName's Wish List &raquo;</a>                    
-                    <a asp-controller="Wishlist" asp-action="Index" class="btn btn-default btn-lg">Manage Your Wish List &raquo;</a>
-                </p>
-            }
-        </div>
-        <div class="col-lg-6">
-            <img src="~/images/santa.png" alt="Santa" class="img-responsive" />
-        </div>
+<div class="row">
+    <div class="col">
+        <h1>Welcome to Secret Santa, @Model?.DisplayName!</h1>
+        @if (Model?.PickedAccountId is null)
+        {
+            <p>Looks like you haven't picked your recipient yet.</p>
+            <p>
+                <a asp-controller="Home" asp-action="Pick" class="btn btn-primary btn-lg">Pick Your Recipient</a>
+                <a asp-controller="Wishlist" asp-action="Index" class="btn btn-secondary btn-lg">Manage Your Wish List</a>
+            </p>
+        }
+        else
+        {
+            <p>You picked @Model?.PickedAccountDisplayName!</p>
+            <p>
+                <a asp-controller="Wishlist" asp-action="Details" asp-route-id="@Model?.PickedAccountId" class="btn btn-primary btn-lg">View @Model?.PickedAccountDisplayName's Wish List</a>                    
+                <a asp-controller="Wishlist" asp-action="Index" class="btn btn-secondary btn-lg">Manage Your Wish List</a>
+            </p>
+        }
+    </div>
+    <div class="col">
+        <img src="~/images/santa.png" alt="Santa" class="img-fluid" />
     </div>
 </div>

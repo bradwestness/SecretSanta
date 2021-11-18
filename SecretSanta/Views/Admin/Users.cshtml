@@ -5,15 +5,15 @@
 
 <h1>@ViewBag.Title</h1>
 
-<div class="text-right">
-    <a asp-controller="Admin" asp-action="Invite" class="btn btn-default">Send Invitations</a>
-    <a asp-controller="Admin" asp-action="ReceivedGift" class="btn btn-default">Send Received Gift Reminders</a>
+<div class="text-end">
+    <a asp-controller="Admin" asp-action="Invite" class="btn btn-secondary">Send Invitations</a>
+    <a asp-controller="Admin" asp-action="ReceivedGift" class="btn btn-secondary">Send Received Gift Reminders</a>
     @if (Model?.AllPicked == true)
     {
-        <a asp-controller="Admin" asp-action="AllPicked" class="btn btn-default">Send All Picked Reminders</a>
+        <a asp-controller="Admin" asp-action="AllPicked" class="btn btn-secondary">Send All Picked Reminders</a>
     }
     <a asp-controller="Admin" asp-action="Reset" class="btn btn-danger">Reset User Data</a>
-    <button class="btn btn-primary" data-toggle="modal" data-target="#AddUser">Add User</button>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#AddUser">Add User</button>
 </div>
 
 <div id="AddUser" class="modal fade">
@@ -36,18 +36,17 @@
             <tr>
                 <td>@Model?.Users[i].DisplayName</td>
                 <td>@Model?.Users[i].Email</td>
-                <td>@Html.CheckBox("Users[" + i + "].HasPicked", Model?.Users[i].Picked.HasValue, new { disabled = "disabled" })</td>
-                <td>@Html.CheckBox("Users[" + i + "].HasBeenPicked", !string.IsNullOrWhiteSpace(Model?.Users[i].PickedBy), new { disabled = "disabled" })</td>
-                <td>
-                    <div class="pull-right">
-                        <a asp-controller="Wishlist" asp-action="Details" asp-route-id="@Model?.Users[i].AccountId" class="btn btn-link">View Wishlist &raquo;</a>
-                        <button class="btn btn-primary" data-toggle="modal" data-target="#EditUser@(i)">Edit</button>
-                        <button class="btn btn-default" data-toggle="modal" data-target="#DeleteUser@(i)">Delete</button>
-                    </div>
+                <td>@Html.CheckBox("Users[" + i + "].HasPicked", Model?.Users[i].Picked.HasValue, new { @class = "form-check-input", disabled = "disabled" })</td>
+                <td>@Html.CheckBox("Users[" + i + "].HasBeenPicked", !string.IsNullOrWhiteSpace(Model?.Users[i].PickedBy), new { @class = "form-check-input", disabled = "disabled" })</td>
+                <td class="text-end">
+                    <a asp-controller="Wishlist" asp-action="Details" asp-route-id="@Model?.Users[i].AccountId" class="btn btn-link">View Wishlist</a>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#EditUser@(i)">Edit</button>
+                    <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#DeleteUser@(i)">Delete</button>
 
                     <div id="EditUser@(i)" class="modal fade">
                         <partial name="EditorTemplates/EditUser" for="Users[i]" />
                     </div>
+
                     <div id="DeleteUser@(i)" class="modal fade">
                         <partial name="EditorTemplates/DeleteUser" for="Users[i]" />
                     </div>

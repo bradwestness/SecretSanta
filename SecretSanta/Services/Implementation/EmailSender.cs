@@ -7,10 +7,14 @@ namespace SecretSanta.Services.Implementation;
 public class EmailSender : IEmailSender
 {
     private readonly IAppSettings _appSettings;
+    private readonly IWebHostEnvironment _webHostEnvironment;
 
-    public EmailSender(IAppSettings appSettings)
+    public EmailSender(
+        IAppSettings appSettings,
+        IWebHostEnvironment webHostEnvironment)
     {
-        _appSettings = appSettings;
+        _appSettings = appSettings ?? throw new ArgumentNullException(nameof(appSettings));
+        _webHostEnvironment = webHostEnvironment ?? throw new ArgumentNullException(nameof(webHostEnvironment));
     }
 
     public async Task SendAsync(
@@ -19,6 +23,12 @@ public class EmailSender : IEmailSender
         string body,
         CancellationToken token)
     {
+        if (_webHostEnvironment.IsDevelopment()
+            && string.IsNullOrEmpty(_appSettings.SmtpHost))
+        {
+            return;
+        }
+
         var toAddresses = to
             ?.Where(x => !string.IsNullOrEmpty(x.DisplayName) && !string.IsNullOrEmpty(x.Email))
             ?.Select(x => new MailboxAddress(x.DisplayName, x.Email))
