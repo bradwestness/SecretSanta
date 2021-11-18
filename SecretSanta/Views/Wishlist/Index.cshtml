@@ -10,7 +10,7 @@
 </div>
 
 <div id="AddItem" class="modal fade">
-    @Html.EditorFor(m => m.NewItem, "AddItem")
+    <partial name="EditorTemplates/AddItem" for="NewItem" />
 </div>
 
 @if (Model?.Items.Any() ?? false)
@@ -50,10 +50,10 @@
                             <button class="btn btn-default" data-toggle="modal" data-target="#DeleteItem@(i)">Delete</button>
                         </div>
                         <div id="EditItem@(i)" class="modal fade">
-                            @Html.EditorFor(m => m.Items[i], "EditItem")
+                            <partial name="EditorTemplates/EditItem" for="Items[i]" />
                         </div>
                         <div id="DeleteItem@(i)" class="modal fade">
-                            @Html.EditorFor(m => m.Items[i], "DeleteItem")
+                            <partial name="EditorTemplates/DeleteItem" for="Items[i]" />
                         </div>
                     </td>
                 </tr>

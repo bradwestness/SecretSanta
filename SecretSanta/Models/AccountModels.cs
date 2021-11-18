@@ -73,7 +73,7 @@ public class EditUserModel
 
     public Guid? Picked { get; set; }
 
-    [DisplayName("PickedBy")]
+    [DisplayName("Picked By")]
     public string? PickedBy { get; set; }
 
     [DisplayName("Do Not Pick")]

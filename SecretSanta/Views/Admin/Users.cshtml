@@ -46,10 +46,10 @@
                     </div>
 
                     <div id="EditUser@(i)" class="modal fade">
-                        @Html.EditorFor(m => m.Users[i], "EditUser")
+                        <partial name="EditorTemplates/EditUser" for="Users[i]" />
                     </div>
                     <div id="DeleteUser@(i)" class="modal fade">
-                        @Html.EditorFor(m => m.Users[i], "DeleteUser")
+                        <partial name="EditorTemplates/DeleteUser" for="Users[i]" />
                     </div>
                 </td>
             </tr>
