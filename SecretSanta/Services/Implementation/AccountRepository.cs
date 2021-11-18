@@ -23,10 +23,24 @@ public class AccountRepository : IAccountRepository
 
     public async Task<IEnumerable<Account>> GetAllAsync(CancellationToken token)
     {
+        string accountFileSuffix = _appSettings.AccountFilePattern.Replace("*", string.Empty);
+
+        string removeAccountFileSuffix(string filePath) =>
+            Path.GetFileNameWithoutExtension(filePath)
+                .Replace(accountFileSuffix, string.Empty)
+                .Trim(new[] { ' ', '.' });
+
+        bool isAccountFile(string filePath) => Guid.TryParseExact(removeAccountFileSuffix(filePath), "N", out Guid _);
+
         if (!_accounts.Any())
         {
             foreach (var filePath in Directory.EnumerateFiles(DataDirectory, _appSettings.AccountFilePattern))
             {
+                if (!isAccountFile(filePath))
+                {
+                    continue;
+                }
+
                 using var file = File.OpenRead(filePath);
 
                 var account = await JsonSerializer.DeserializeAsync<Account>(file, cancellationToken: token);

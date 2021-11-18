@@ -12,7 +12,7 @@ csharp_style_expression_bodied_properties=true:error
 csharp_style_expression_bodied_indexers=true:error
 csharp_style_expression_bodied_accessors=true:error
 csharp_style_expression_bodied_lambdas=true:error
-csharp_style_expression_bodied_local_functions=false:error
+csharp_style_expression_bodied_local_functions=true:error
 [*.{cs,vb}]
 dotnet_style_coalesce_expression=true:error
 dotnet_style_null_propagation=true:error
