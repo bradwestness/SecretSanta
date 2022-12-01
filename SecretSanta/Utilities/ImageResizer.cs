@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
+﻿using SkiaSharp;
 
 namespace SecretSanta.Utilities;
 
@@ -10,18 +8,23 @@ public static class ImageResizer
 
     private const double MaxHeight = 768;
 
+    private const int DefaultQuality = 75;
+
     public static byte[] ResizeJpg(byte[] imageBytes)
     {
         using var inputStream = new MemoryStream(imageBytes, writable: false);
-        return ResizeImageInternal(inputStream, ImageFormat.Jpeg);
+        return ResizeImageInternal(inputStream, SKEncodedImageFormat.Jpeg);
     }
 
     public static byte[] ResizeJpg(Stream inputStream) =>
-        ResizeImageInternal(inputStream, ImageFormat.Jpeg);
+        ResizeImageInternal(inputStream, SKEncodedImageFormat.Jpeg);
 
-    private static byte[] ResizeImageInternal(Stream inputStream, ImageFormat imageFormat)
+    private static byte[] ResizeImageInternal(
+        Stream inputStream,
+        SKEncodedImageFormat imageFormat)
     {
-        using var inputBitmap = new Bitmap(inputStream);
+        using var managedStream = new SKManagedStream(inputStream);
+        using var inputBitmap = SKBitmap.Decode(managedStream);
 
         if (inputBitmap.Width < MaxWidth
             && inputBitmap.Height < MaxHeight)
@@ -32,41 +35,24 @@ public static class ImageResizer
         var scaleWidth = MaxWidth / inputBitmap.Width;
         var scaleHeight = MaxHeight / inputBitmap.Height;
         var scaleFactor = Math.Min(scaleWidth, scaleHeight);
+        var outputWidth = (int)Math.Round(scaleFactor * inputBitmap.Width);
+        var outputHeight = (int)Math.Round(scaleFactor * inputBitmap.Height);
 
-        var rect = new Rectangle(
-            0,
-            0,
-            (int)Math.Round(scaleFactor * inputBitmap.Width),
-            (int)Math.Round(scaleFactor * inputBitmap.Height));
+        var outputImageInfo = new SKImageInfo(outputWidth, outputHeight);
 
-        using var imageAttributes = new ImageAttributes();
-        imageAttributes.SetWrapMode(WrapMode.TileFlipXY);
-
-        using var outputBitmap = new Bitmap(rect.Width, rect.Height);
-        using var gfx = Graphics.FromImage(outputBitmap);
-        gfx.CompositingMode = CompositingMode.SourceCopy;
-        gfx.CompositingQuality = CompositingQuality.HighQuality;
-        gfx.InterpolationMode = InterpolationMode.HighQualityBicubic;
-        gfx.SmoothingMode = SmoothingMode.HighQuality;
-        gfx.PixelOffsetMode = PixelOffsetMode.HighQuality;
-
-        gfx.DrawImage(
-            inputBitmap,
-            rect,
-            0,
-            0,
-            inputBitmap.Width,
-            inputBitmap.Height,
-            GraphicsUnit.Pixel,
-            imageAttributes);
+        using var outputBitmap = inputBitmap.Resize(
+            outputImageInfo,
+            SKFilterQuality.High);
 
         return ConvertToFormat(outputBitmap, imageFormat);
     }
 
-    private static byte[] ConvertToFormat(Bitmap bitmap, ImageFormat imageFormat)
+    private static byte[] ConvertToFormat(
+        SKBitmap bitmap,
+        SKEncodedImageFormat imageFormat,
+        int quality = DefaultQuality)
     {
-        using var outputStream = new MemoryStream();
-        bitmap.Save(outputStream, imageFormat);
-        return outputStream.ToArray();
+        using var image = SKImage.FromBitmap(bitmap);
+        return image.Encode(imageFormat, quality).ToArray();
     }
 }
